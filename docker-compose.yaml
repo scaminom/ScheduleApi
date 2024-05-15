@@ -1,3 +1,5 @@
+version: '3.8'
+
 services:
   db-dev:
     image: postgres:14.3
@@ -15,7 +17,7 @@ services:
     image: postgres:14.3
     restart: always
     ports:
-      - '5432:${DB_PORT}'
+      - '5437:5432'
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
@@ -29,13 +31,13 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - '3000:3000'
+      - '${PORT}:${PORT}'
     environment:
       NODE_ENV: development
       DATABASE_URL: ${DATABASE_URL}
+      PORT: ${PORT}
     depends_on:
       - db-dev
     volumes:
       - .:/usr/src/app
       - /usr/src/app/node_modules
-
