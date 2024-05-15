@@ -15,10 +15,27 @@ services:
     image: postgres:14.3
     restart: always
     ports:
-      - '5437:5432'
+      - '${DB_PORT}:5432'
     environment:
       POSTGRES_PASSWORD: ${DB_PASSWORD}
       POSTGRES_DB: ${DB_NAME}
     container_name: ${CONTAINER_NAME}
     volumes:
       - ./postgres-test:/var/lib/postgresql/data
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: always
+    ports:
+      - '${PROJECT_LOCAL_PORT}:${PROJECT_CONTAINER_PORT}'
+    environment:
+      NODE_ENV: development
+      DATABASE_URL: ${DATABASE_URL}
+    depends_on:
+      - db-dev
+    volumes:
+      - .:/usr/src/app
+      - /usr/src/app/node_modules
+
