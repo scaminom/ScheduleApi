@@ -11,11 +11,14 @@ RUN npm install
 # Copy app source code
 COPY . .
 
+# Prisma
+RUN npx prisma generate
+
 # Build the app
 RUN npm run build
 
 # Expose port
-EXPOSE 3005
+EXPOSE 3000
 
 # Start the app
 CMD ["npm", "run", "start:dev"]

@@ -6,12 +6,17 @@ COMPOSE_FILE := docker-compose.yaml
 
 up-dev:
 	@echo "Starting development environment"
-	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up -d db-dev
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up -d db-dev app
+	@echo "Start server"
+	docker exec -it scheduleapi-app-1 npm run start:dev
 	@echo "Development environment started"
 
 down-dev:
 	@echo "Stopping development environment"
-	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) down db-dev
+	@echo "Stop server"
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) stop app
+	@echo "Stoping development container"
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) down db-dev app
 	@echo "Development environment stopped"
 
 up-test:
@@ -43,3 +48,8 @@ connect-db-test:
 	@echo "Connecting to test database"
 	docker exec -it ScheduleDbTest  psql -U postgres SchedulesDbTest
 	@echo "Connected to test database"
+
+build-app:
+	@echo "Building the application"
+	docker compose -f $(COMPOSE_FILE) build app
+	@echo "Application built"
