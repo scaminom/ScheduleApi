@@ -55,3 +55,13 @@ $ make connect-db-dev
 # connect to test database
 $ make connect-db-test
 ```
+
+## Environments
+
+In this proyect we'll have three environments
+
+- Production
+- Development
+- Test
+
+There is a file called .env.example where you can create each enviroment file with those environment options.
