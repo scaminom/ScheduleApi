@@ -36,10 +36,10 @@ run-migrations-test:
 
 connect-db-dev:
 	@echo "Connecting to development database"
-	sudo docker exec -it ScheduleDbDev  psql -U postgres SchedulesDbDev
+	docker exec -it ScheduleDbDev  psql -U postgres SchedulesDbDev
 	@echo "Connected to development database"
 
 connect-db-test:
 	@echo "Connecting to test database"
-	sudo docker exec -it ScheduleDbTest  psql -U postgres SchedulesDbTest
+	docker exec -it ScheduleDbTest  psql -U postgres SchedulesDbTest
 	@echo "Connected to test database"
