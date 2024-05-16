@@ -1,4 +1,4 @@
-version: '3.8'
+# version: '3.8'
 
 services:
   db-dev:
@@ -31,11 +31,11 @@ services:
       dockerfile: Dockerfile
     restart: always
     ports:
-      - '${PORT}:${PORT}'
+      - '${PROJECT_LOCAL_PORT}:${PROJECT_CONTAINER_PORT}'
     environment:
       NODE_ENV: development
       DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PORT}
+      PORT: ${PROJECT_LOCAL_PORT}
     depends_on:
       - db-dev
     volumes:

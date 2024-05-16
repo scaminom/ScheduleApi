@@ -2,12 +2,24 @@
 
 DEV_ENV_FILE := .env.development
 TEST_ENV_FILE := .env.test
+PROD_ENV_FILE := .env.production
 COMPOSE_FILE := docker-compose.yaml
+COMPOSE_FILE_PROD := docker-compose-prod.yaml
+
+up-prod:
+	@echo "Starting production environment"
+	docker compose -f $(COMPOSE_FILE_PROD) --env-file $(PROD_ENV_FILE) up -d app
+	@echo "Production environment started"
+
+down-prod:
+	@echo "Stopping production environment"
+	docker compose -f $(COMPOSE_FILE_PROD) --env-file $(PROD_ENV_FILE) stop app
+	docker compose -f $(COMPOSE_FILE_PROD) --env-file $(PROD_ENV_FILE) down
+	@echo "Production environment stopped"
 
 up-dev:
 	@echo "Starting development environment"
 	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up -d db-dev app
-
 	@echo "Development environment started"
 
 down-dev:
@@ -27,6 +39,11 @@ down-test:
 	@echo "Stopping test environment"
 	docker compose -f $(COMPOSE_FILE) --env-file $(TEST_ENV_FILE) down db-test
 	@echo "Test environment stopped"
+
+run-migrations-prod:
+	@echo "Running migrations"
+	yarn dotenv -e $(PROD_ENV_FILE) yarn prisma migrate deploy
+	@echo "Migrations ran"
 
 run-migrations-dev:
 	@echo "Running migrations"
