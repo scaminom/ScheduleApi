@@ -1,10 +1,10 @@
-import { NestFactory } from '@nestjs/core';
-import { AppModule } from './app.module';
-import { ValidationPipe } from '@nestjs/common';
-import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { NestFactory } from '@nestjs/core'
+import { AppModule } from './app.module'
+import { ValidationPipe } from '@nestjs/common'
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create(AppModule)
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -15,15 +15,15 @@ async function bootstrap() {
         enableImplicitConversion: true,
       },
     }),
-  );
+  )
   const config = new DocumentBuilder()
-    .setTitle('Travels API')
-    .setDescription('The Travels API description')
+    .setTitle('Schedule API')
+    .setDescription('API to manage schedules of a company')
     .setVersion('1.0')
-    .build();
-  const document = SwaggerModule.createDocument(app, config);
+    .build()
+  const document = SwaggerModule.createDocument(app, config)
 
-  SwaggerModule.setup('api', app, document);
-  await app.listen(process.env.PORT || 3001);
+  SwaggerModule.setup('api', app, document)
+  await app.listen(process.env.PORT || 3001)
 }
-bootstrap();
+bootstrap()
