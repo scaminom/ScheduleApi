@@ -69,3 +69,9 @@ build-app:
 	@echo "Building the application"
 	docker compose -f $(COMPOSE_FILE) build app
 	@echo "Application built"
+
+i-dep:
+	@echo "Installing dependencies"
+	docker exec -it scheduleapi-app-1 yarn install
+	@echo "Dependencies installed"
+
