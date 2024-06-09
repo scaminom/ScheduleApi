@@ -12,7 +12,7 @@ import { UserNotFoundException } from './exceptions/user-not-found'
 export class UserService {
   constructor(private prisma: PrismaService) {}
 
-  private async user(
+  async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User | null> {
     const { ci } = userWhereUniqueInput
