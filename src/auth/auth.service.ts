@@ -6,8 +6,8 @@ import {
 } from '@nestjs/common'
 import { JwtService } from '@nestjs/jwt'
 import { Request } from 'express'
-import { CreateUserDto } from 'src/users/dto/create-user.dto'
-import { UserService } from 'src/users/users.service'
+import { CreateUserDto } from '../users/dto/create-user.dto'
+import { UserService } from '../users/users.service'
 
 @Injectable()
 export class AuthService {

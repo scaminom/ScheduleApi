@@ -1,7 +1,9 @@
 import { Injectable } from '@nestjs/common'
-import { PrismaService } from 'src/prisma/prisma.service'
+import { PrismaService } from '../prisma/prisma.service'
 import { User, Prisma } from '@prisma/client'
 import { CreateUserDto } from './dto/create-user.dto'
+import { UpdateUserDto } from './dto/update-user.dto'
+import { validateCI } from './factories/user.factory'
 
 @Injectable()
 export class UserService {
@@ -33,6 +35,18 @@ export class UserService {
   }
 
   async createUser(data: CreateUserDto): Promise<User> {
+    const { ci } = data
+
+    if (!validateCI(ci)) {
+      throw new Error('Cédula inválida')
+    }
+
+    const alreadyExists = await this.user({ ci })
+
+    if (alreadyExists) {
+      throw new Error('Usuario ya existe')
+    }
+
     return this.prisma.user.create({
       data,
     })
@@ -40,7 +54,7 @@ export class UserService {
 
   async updateUser(params: {
     where: Prisma.UserWhereUniqueInput
-    data: Prisma.UserUpdateInput
+    data: UpdateUserDto
   }): Promise<User> {
     const { where, data } = params
     return this.prisma.user.update({

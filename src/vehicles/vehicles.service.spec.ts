@@ -15,4 +15,23 @@ describe('VehiclesService', () => {
   it('should be defined', () => {
     expect(service).toBeDefined()
   })
+
+  it('should return an array of vehicles', async () => {
+    const vehicles = await service.findAll()
+    expect(vehicles).toBeInstanceOf(Array)
+  })
+
+  it('should return a vehicle', async () => {
+    const vehicle = await service.findOne(1)
+    expect(vehicle).toHaveProperty('id')
+  })
+
+  it('should return a vehicle', async () => {
+    const vehicle = await service.create({
+      model: 'Ferrari',
+      year: 2021,
+      price: 1000000,
+    })
+    expect(vehicle).toHaveProperty('id')
+  })
 })

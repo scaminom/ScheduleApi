@@ -3,9 +3,9 @@ import { AppController } from './app.controller'
 import { AppService } from './app.service'
 import { ConfigModule } from '@nestjs/config'
 import { UsersModule } from './users/users.module'
-import { environments } from '../config/environments'
+import { environments } from './config/environments'
 
-import config from '../config/config'
+import config from './config/config'
 import { AuthModule } from './auth/auth.module'
 import { VehiclesModule } from './vehicles/vehicles.module'
 
