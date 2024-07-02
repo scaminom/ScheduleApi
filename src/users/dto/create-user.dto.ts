@@ -3,7 +3,7 @@ import { Prisma, Role } from '@prisma/client'
 import { IsEnum, IsNumberString, IsString } from 'class-validator'
 
 export class CreateUserDto implements Prisma.UserCreateInput {
-  @IsNumberString()
+  @IsNumberString({ no_symbols: true }, { message: 'CI must be a number' })
   ci: string
 
   @IsString()

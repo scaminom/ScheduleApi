@@ -3,7 +3,7 @@ import { TestingModule, Test } from '@nestjs/testing'
 import { UserService } from '../users/users.service'
 import { AuthService } from './auth.service'
 import { HttpStatus, UnauthorizedException } from '@nestjs/common'
-import { createUserFactory } from '../users/factories/user.factory'
+import { UserFactory } from '../users/factories/user.factory'
 
 describe('AuthService', () => {
   let authService: AuthService
@@ -37,8 +37,8 @@ describe('AuthService', () => {
 
   // Aquí irán las pruebas...
   it('should return a valid token for correct credentials', async () => {
-    const userMock = createUserFactory()
-    console.log(userMock)
+    const userMock = await UserFactory.create()
+
     jest.spyOn(userService, 'user').mockResolvedValue(userMock)
     jest.spyOn(jwtService, 'signAsync').mockResolvedValue('token')
 
@@ -55,8 +55,7 @@ describe('AuthService', () => {
   })
 
   it('should successfully create a new user', async () => {
-    const createUser = createUserFactory()
-    console.log(createUser)
+    const createUser = await UserFactory.create()
     jest.spyOn(userService, 'createUser').mockResolvedValue(createUser)
 
     const result = await authService.signUp(createUser)

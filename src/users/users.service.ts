@@ -3,10 +3,10 @@ import { PrismaService } from '../prisma/prisma.service'
 import { User, Prisma } from '@prisma/client'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { validateCI } from './factories/user.factory'
 import { UserInvalidCIException } from './exceptions/user-invalid-ci'
 import { UserAlreadyExistsException } from './exceptions/user-already-exits'
 import { UserNotFoundException } from './exceptions/user-not-found'
+import { validateCI } from './validators/user-validator'
 
 @Injectable()
 export class UserService {

@@ -6,11 +6,7 @@ import { UserAlreadyExistsException } from './exceptions/user-already-exits'
 import { UserNotFoundException } from './exceptions/user-not-found'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { User } from '@prisma/client'
-import {
-  createUserDtoFactory,
-  createUserFactory,
-  createUserUpdateDtoFactory,
-} from './factories/user.factory'
+import { generateValidCI, UserFactory } from './factories/user.factory'
 
 describe('UserService', () => {
   let userService: UserService
@@ -48,7 +44,7 @@ describe('UserService', () => {
 
   describe('user', () => {
     it('should return a user when it exists', async () => {
-      const userMock = createUserFactory()
+      const userMock = await UserFactory.create({ ci: generateValidCI() })
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(userMock)
 
       const result = await userService.findOne(userMock.ci)
@@ -67,8 +63,10 @@ describe('UserService', () => {
 
   describe('createUser', () => {
     it('should create a new user when the CI is valid and it does not exist', async () => {
-      const createUserDto = createUserDtoFactory()
-      const userMock: User = createUserFactory(createUserDto)
+      const createUserDto = await UserFactory.buildCreateInput({
+        ci: generateValidCI(),
+      })
+      const userMock: User = await UserFactory.create(createUserDto)
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
 
       jest.spyOn(prismaService.user, 'create').mockResolvedValue(userMock)
@@ -78,16 +76,17 @@ describe('UserService', () => {
     })
 
     it('should throw UserInvalidCIException when the CI is invalid', async () => {
-      const createUserDto = createUserDtoFactory()
-      createUserDto.ci = '1234567'
+      const createUserDto = await UserFactory.buildCreateInput()
       await expect(userService.createUser(createUserDto)).rejects.toThrow(
         UserInvalidCIException,
       )
     })
 
     it('should throw UserAlreadyExistsException when the user already exists', async () => {
-      const createUserDto = createUserDtoFactory()
-      const userMock: User = createUserFactory(createUserDto)
+      const createUserDto = await UserFactory.buildCreateInput({
+        ci: generateValidCI(),
+      })
+      const userMock: User = await UserFactory.create(createUserDto)
       jest.spyOn(prismaService.user, 'create').mockResolvedValue(userMock)
 
       await expect(userService.createUser(createUserDto)).rejects.toThrow(
@@ -98,8 +97,15 @@ describe('UserService', () => {
 
   describe('updateUser', () => {
     it('should update a user when it exists', async () => {
-      const updateUserDto: UpdateUserDto = createUserUpdateDtoFactory()
-      const userMock: User = createUserFactory()
+      const userMock: User = await UserFactory.create()
+      const updateUserDto: UpdateUserDto = await UserFactory.buildCreateInput({
+        firstName: 'New Name',
+      })
+
+      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(userMock)
+
+      userMock.firstName = updateUserDto.firstName
+
       jest.spyOn(prismaService.user, 'update').mockResolvedValue(userMock)
 
       const result = await userService.updateUser({
@@ -111,7 +117,10 @@ describe('UserService', () => {
     })
 
     it('should throw UserNotFoundException when the user does not exist', async () => {
-      const updateUserDto: UpdateUserDto = createUserUpdateDtoFactory()
+      const updateUserDto: UpdateUserDto = await UserFactory.buildCreateInput({
+        ci: '1234567',
+        password: 'newpassword',
+      })
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
 
       await expect(
@@ -125,7 +134,7 @@ describe('UserService', () => {
 
   describe('deleteUser', () => {
     it('should delete a user when it exists', async () => {
-      const userMock: User = createUserFactory()
+      const userMock: User = await UserFactory.create()
       jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(userMock)
       userMock.deletedAt = new Date()
       jest.spyOn(prismaService.user, 'update').mockResolvedValue(userMock)
