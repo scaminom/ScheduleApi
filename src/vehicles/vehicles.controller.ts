@@ -22,7 +22,7 @@ export class VehiclesController {
 
   @Get()
   findAll() {
-    return this.vehiclesService.findAll()
+    return this.vehiclesService.findAll({})
   }
 
   @Get(':id')

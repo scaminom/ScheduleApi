@@ -20,11 +20,12 @@ enum Role {
 }
 
 model User {
-  ci        String @id @unique
+  ci        String    @id @unique
   password  String
   role      Role
-  firstName String @map("first_name")
-  lastName  String @map("last_name")
+  firstName String    @map("first_name")
+  lastName  String    @map("last_name")
+  deletedAt DateTime? @map("deleted_at")
 
   @@map("users")
 }
@@ -38,4 +39,8 @@ model Vehicle {
   color String
 
   @@map("vehicles")
+}
+
+generator fabbrica {
+  provider = "prisma-fabbrica"
 }

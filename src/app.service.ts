@@ -1,7 +1,7 @@
-import { Inject, Injectable } from '@nestjs/common';
-import { ConfigType } from '@nestjs/config';
+import { Inject, Injectable } from '@nestjs/common'
+import { ConfigType } from '@nestjs/config'
 
-import config from '../config/config';
+import config from './config/config'
 
 @Injectable()
 export class AppService {
@@ -10,6 +10,6 @@ export class AppService {
   ) {}
 
   getHello(): string {
-    return this.configService.DATABASE_URL;
+    return this.configService.DATABASE_URL
   }
 }
