@@ -27,8 +27,8 @@ down-dev:
 	@echo "Stopping development environment"
 	@echo "Stopping server"
 	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) stop app
-	@echo "Stopping development containers"
 	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) down
+	@echo "Stopping development containers"
 	@echo "Development environment stopped"
 
 up-test:

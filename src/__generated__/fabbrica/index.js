@@ -164,9 +164,8 @@ function autoGenerateReminderScalarsOrEnums({ seq }) {
     return {
         title: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Reminder", fieldName: "title", isId: false, isUnique: false, seq }),
         description: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Reminder", fieldName: "description", isId: false, isUnique: false, seq }),
-        isCompleted: (0, internal_1.getScalarFieldValueGenerator)().Boolean({ modelName: "Reminder", fieldName: "isCompleted", isId: false, isUnique: false, seq }),
-        createdAt: (0, internal_1.getScalarFieldValueGenerator)().DateTime({ modelName: "Reminder", fieldName: "createdAt", isId: false, isUnique: false, seq }),
-        notificationDate: (0, internal_1.getScalarFieldValueGenerator)().DateTime({ modelName: "Reminder", fieldName: "notificationDate", isId: false, isUnique: false, seq })
+        reminderDate: (0, internal_1.getScalarFieldValueGenerator)().DateTime({ modelName: "Reminder", fieldName: "reminderDate", isId: false, isUnique: false, seq }),
+        notificationMinutesBefore: (0, internal_1.getScalarFieldValueGenerator)().Int({ modelName: "Reminder", fieldName: "notificationMinutesBefore", isId: false, isUnique: false, seq })
     };
 }
 function defineReminderFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
@@ -226,6 +225,6 @@ function defineReminderFactoryInternal({ defaultData: defaultDataResolver, trait
     };
 }
 function defineReminderFactory(options) {
-    return defineReminderFactoryInternal(options);
+    return defineReminderFactoryInternal(options ?? {});
 }
 exports.defineReminderFactory = defineReminderFactory;
