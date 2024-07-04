@@ -5,14 +5,8 @@ import type { Role } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import type { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
-type BuildDataOptions<TTransients extends Record<string, unknown>> = {
+type BuildDataOptions = {
     readonly seq: number;
-} & TTransients;
-type TraitName = string | symbol;
-type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<string, unknown>> = {
-    onAfterBuild?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
-    onBeforeCreate?: (createInput: TCreateInput, transientFields: TTransients) => void | PromiseLike<void>;
-    onAfterCreate?: (created: TCreated, transientFields: TTransients) => void | PromiseLike<void>;
 };
 export declare const initialize: (options: import("@quramy/prisma-fabbrica/lib/initialize").InitializeOptions) => void;
 type UserFactoryDefineInput = {
@@ -24,37 +18,29 @@ type UserFactoryDefineInput = {
     deletedAt?: Date | null;
     reminders?: Prisma.ReminderCreateNestedManyWithoutUserInput;
 };
-type UserTransientFields = Record<string, unknown> & Partial<Record<keyof UserFactoryDefineInput, never>>;
-type UserFactoryTrait<TTransients extends Record<string, unknown>> = {
-    data?: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions<TTransients>>;
-} & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
-type UserFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
-    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions<TTransients>>;
+type UserFactoryDefineOptions = {
+    defaultData?: Resolver<UserFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: TraitName]: UserFactoryTrait<TTransients>;
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<UserFactoryDefineInput>, BuildDataOptions>;
+        };
     };
-} & CallbackDefineOptions<User, Prisma.UserCreateInput, TTransients>;
-type UserTraitKeys<TOptions extends UserFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
-export interface UserFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
+};
+type UserTraitKeys<TOptions extends UserFactoryDefineOptions> = keyof TOptions["traits"];
+export interface UserFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "User";
-    build(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
-    buildCreateInput(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput>;
-    buildList(list: readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<Prisma.UserCreateInput[]>;
-    buildList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Prisma.UserCreateInput[]>;
+    build(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Prisma.UserCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<Prisma.UserCreateInput[]>;
     pickForConnect(inputData: User): Pick<User, "ci">;
-    create(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User>;
-    createList(list: readonly Partial<Prisma.UserCreateInput & TTransients>[]): PromiseLike<User[]>;
-    createList(count: number, item?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<User[]>;
-    createForConnect(inputData?: Partial<Prisma.UserCreateInput & TTransients>): PromiseLike<Pick<User, "ci">>;
+    create(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<User>;
+    createList(inputData: number | readonly Partial<Prisma.UserCreateInput>[]): PromiseLike<User[]>;
+    createForConnect(inputData?: Partial<Prisma.UserCreateInput>): PromiseLike<Pick<User, "ci">>;
 }
-export interface UserFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends UserFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: TTraitName, ...names: readonly TTraitName[]): UserFactoryInterfaceWithoutTraits<TTransients>;
+export interface UserFactoryInterface<TOptions extends UserFactoryDefineOptions = UserFactoryDefineOptions> extends UserFactoryInterfaceWithoutTraits {
+    use(name: UserTraitKeys<TOptions>, ...names: readonly UserTraitKeys<TOptions>[]): UserFactoryInterfaceWithoutTraits;
 }
-interface UserFactoryBuilder {
-    <TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<{}, UserTraitKeys<TOptions>>;
-    withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, UserTraitKeys<TOptions>>;
-}
-export declare const defineUserFactory: UserFactoryBuilder;
+export declare function defineUserFactory<TOptions extends UserFactoryDefineOptions>(options?: TOptions): UserFactoryInterface<TOptions>;
 type VehicleFactoryDefineInput = {
     plate?: string;
     type?: string;
@@ -62,37 +48,29 @@ type VehicleFactoryDefineInput = {
     model?: string;
     color?: string;
 };
-type VehicleTransientFields = Record<string, unknown> & Partial<Record<keyof VehicleFactoryDefineInput, never>>;
-type VehicleFactoryTrait<TTransients extends Record<string, unknown>> = {
-    data?: Resolver<Partial<VehicleFactoryDefineInput>, BuildDataOptions<TTransients>>;
-} & CallbackDefineOptions<Vehicle, Prisma.VehicleCreateInput, TTransients>;
-type VehicleFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
-    defaultData?: Resolver<VehicleFactoryDefineInput, BuildDataOptions<TTransients>>;
+type VehicleFactoryDefineOptions = {
+    defaultData?: Resolver<VehicleFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: TraitName]: VehicleFactoryTrait<TTransients>;
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<VehicleFactoryDefineInput>, BuildDataOptions>;
+        };
     };
-} & CallbackDefineOptions<Vehicle, Prisma.VehicleCreateInput, TTransients>;
-type VehicleTraitKeys<TOptions extends VehicleFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
-export interface VehicleFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
+};
+type VehicleTraitKeys<TOptions extends VehicleFactoryDefineOptions> = keyof TOptions["traits"];
+export interface VehicleFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Vehicle";
-    build(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Prisma.VehicleCreateInput>;
-    buildCreateInput(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Prisma.VehicleCreateInput>;
-    buildList(list: readonly Partial<Prisma.VehicleCreateInput & TTransients>[]): PromiseLike<Prisma.VehicleCreateInput[]>;
-    buildList(count: number, item?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Prisma.VehicleCreateInput[]>;
+    build(inputData?: Partial<Prisma.VehicleCreateInput>): PromiseLike<Prisma.VehicleCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.VehicleCreateInput>): PromiseLike<Prisma.VehicleCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.VehicleCreateInput>[]): PromiseLike<Prisma.VehicleCreateInput[]>;
     pickForConnect(inputData: Vehicle): Pick<Vehicle, "id">;
-    create(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Vehicle>;
-    createList(list: readonly Partial<Prisma.VehicleCreateInput & TTransients>[]): PromiseLike<Vehicle[]>;
-    createList(count: number, item?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Vehicle[]>;
-    createForConnect(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Pick<Vehicle, "id">>;
+    create(inputData?: Partial<Prisma.VehicleCreateInput>): PromiseLike<Vehicle>;
+    createList(inputData: number | readonly Partial<Prisma.VehicleCreateInput>[]): PromiseLike<Vehicle[]>;
+    createForConnect(inputData?: Partial<Prisma.VehicleCreateInput>): PromiseLike<Pick<Vehicle, "id">>;
 }
-export interface VehicleFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends VehicleFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: TTraitName, ...names: readonly TTraitName[]): VehicleFactoryInterfaceWithoutTraits<TTransients>;
+export interface VehicleFactoryInterface<TOptions extends VehicleFactoryDefineOptions = VehicleFactoryDefineOptions> extends VehicleFactoryInterfaceWithoutTraits {
+    use(name: VehicleTraitKeys<TOptions>, ...names: readonly VehicleTraitKeys<TOptions>[]): VehicleFactoryInterfaceWithoutTraits;
 }
-interface VehicleFactoryBuilder {
-    <TOptions extends VehicleFactoryDefineOptions>(options?: TOptions): VehicleFactoryInterface<{}, VehicleTraitKeys<TOptions>>;
-    withTransientFields: <TTransients extends VehicleTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends VehicleFactoryDefineOptions<TTransients>>(options?: TOptions) => VehicleFactoryInterface<TTransients, VehicleTraitKeys<TOptions>>;
-}
-export declare const defineVehicleFactory: VehicleFactoryBuilder;
+export declare function defineVehicleFactory<TOptions extends VehicleFactoryDefineOptions>(options?: TOptions): VehicleFactoryInterface<TOptions>;
 type ReminderuserFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutRemindersInput["create"]>;
@@ -107,34 +85,26 @@ type ReminderFactoryDefineInput = {
     notificationMinutesBefore?: number;
     user?: ReminderuserFactory | Prisma.UserCreateNestedOneWithoutRemindersInput;
 };
-type ReminderTransientFields = Record<string, unknown> & Partial<Record<keyof ReminderFactoryDefineInput, never>>;
-type ReminderFactoryTrait<TTransients extends Record<string, unknown>> = {
-    data?: Resolver<Partial<ReminderFactoryDefineInput>, BuildDataOptions<TTransients>>;
-} & CallbackDefineOptions<Reminder, Prisma.ReminderCreateInput, TTransients>;
-type ReminderFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
-    defaultData?: Resolver<ReminderFactoryDefineInput, BuildDataOptions<TTransients>>;
+type ReminderFactoryDefineOptions = {
+    defaultData?: Resolver<ReminderFactoryDefineInput, BuildDataOptions>;
     traits?: {
-        [traitName: TraitName]: ReminderFactoryTrait<TTransients>;
+        [traitName: string | symbol]: {
+            data: Resolver<Partial<ReminderFactoryDefineInput>, BuildDataOptions>;
+        };
     };
-} & CallbackDefineOptions<Reminder, Prisma.ReminderCreateInput, TTransients>;
-type ReminderTraitKeys<TOptions extends ReminderFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
-export interface ReminderFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
+};
+type ReminderTraitKeys<TOptions extends ReminderFactoryDefineOptions> = keyof TOptions["traits"];
+export interface ReminderFactoryInterfaceWithoutTraits {
     readonly _factoryFor: "Reminder";
-    build(inputData?: Partial<Prisma.ReminderCreateInput & TTransients>): PromiseLike<Prisma.ReminderCreateInput>;
-    buildCreateInput(inputData?: Partial<Prisma.ReminderCreateInput & TTransients>): PromiseLike<Prisma.ReminderCreateInput>;
-    buildList(list: readonly Partial<Prisma.ReminderCreateInput & TTransients>[]): PromiseLike<Prisma.ReminderCreateInput[]>;
-    buildList(count: number, item?: Partial<Prisma.ReminderCreateInput & TTransients>): PromiseLike<Prisma.ReminderCreateInput[]>;
+    build(inputData?: Partial<Prisma.ReminderCreateInput>): PromiseLike<Prisma.ReminderCreateInput>;
+    buildCreateInput(inputData?: Partial<Prisma.ReminderCreateInput>): PromiseLike<Prisma.ReminderCreateInput>;
+    buildList(inputData: number | readonly Partial<Prisma.ReminderCreateInput>[]): PromiseLike<Prisma.ReminderCreateInput[]>;
     pickForConnect(inputData: Reminder): Pick<Reminder, "id">;
-    create(inputData?: Partial<Prisma.ReminderCreateInput & TTransients>): PromiseLike<Reminder>;
-    createList(list: readonly Partial<Prisma.ReminderCreateInput & TTransients>[]): PromiseLike<Reminder[]>;
-    createList(count: number, item?: Partial<Prisma.ReminderCreateInput & TTransients>): PromiseLike<Reminder[]>;
-    createForConnect(inputData?: Partial<Prisma.ReminderCreateInput & TTransients>): PromiseLike<Pick<Reminder, "id">>;
+    create(inputData?: Partial<Prisma.ReminderCreateInput>): PromiseLike<Reminder>;
+    createList(inputData: number | readonly Partial<Prisma.ReminderCreateInput>[]): PromiseLike<Reminder[]>;
+    createForConnect(inputData?: Partial<Prisma.ReminderCreateInput>): PromiseLike<Pick<Reminder, "id">>;
 }
-export interface ReminderFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends ReminderFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: TTraitName, ...names: readonly TTraitName[]): ReminderFactoryInterfaceWithoutTraits<TTransients>;
+export interface ReminderFactoryInterface<TOptions extends ReminderFactoryDefineOptions = ReminderFactoryDefineOptions> extends ReminderFactoryInterfaceWithoutTraits {
+    use(name: ReminderTraitKeys<TOptions>, ...names: readonly ReminderTraitKeys<TOptions>[]): ReminderFactoryInterfaceWithoutTraits;
 }
-interface ReminderFactoryBuilder {
-    <TOptions extends ReminderFactoryDefineOptions>(options?: TOptions): ReminderFactoryInterface<{}, ReminderTraitKeys<TOptions>>;
-    withTransientFields: <TTransients extends ReminderTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends ReminderFactoryDefineOptions<TTransients>>(options?: TOptions) => ReminderFactoryInterface<TTransients, ReminderTraitKeys<TOptions>>;
-}
-export declare const defineReminderFactory: ReminderFactoryBuilder;
+export declare function defineReminderFactory<TOptions extends ReminderFactoryDefineOptions>(options?: TOptions): ReminderFactoryInterface<TOptions>;
