@@ -35,7 +35,6 @@ describe('AuthService', () => {
     jwtService = module.get<JwtService>(JwtService)
   })
 
-  // Aquí irán las pruebas...
   it('should return a valid token for correct credentials', async () => {
     const userMock = await UserFactory.create()
 
