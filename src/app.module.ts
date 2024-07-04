@@ -8,6 +8,7 @@ import { environments } from './config/environments'
 import config from './config/config'
 import { AuthModule } from './auth/auth.module'
 import { VehiclesModule } from './vehicles/vehicles.module'
+import { RemindersModule } from './reminders/reminders.module'
 
 @Module({
   imports: [
@@ -16,8 +17,9 @@ import { VehiclesModule } from './vehicles/vehicles.module'
       load: [config],
       isGlobal: true,
     }),
-    UsersModule,
     AuthModule,
+    RemindersModule,
+    UsersModule,
     VehiclesModule,
   ],
   controllers: [AppController],

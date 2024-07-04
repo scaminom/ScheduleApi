@@ -19,15 +19,16 @@ down-prod:
 
 up-dev:
 	@echo "Starting development environment"
-	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up -d db-dev app
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up -d db-dev
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up app
 	@echo "Development environment started"
 
 down-dev:
 	@echo "Stopping development environment"
 	@echo "Stopping server"
 	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) stop app
-	@echo "Stopping development containers"
 	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) down
+	@echo "Stopping development containers"
 	@echo "Development environment stopped"
 
 up-test:
@@ -67,7 +68,7 @@ connect-db-test:
 
 build-app:
 	@echo "Building the application"
-	docker compose -f $(COMPOSE_FILE) build app
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) build app
 	@echo "Application built"
 
 i-dep:

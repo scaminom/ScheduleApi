@@ -8,33 +8,25 @@ import { UpdateUserDto } from './dto/update-user.dto'
 import { User } from '@prisma/client'
 import { generateValidCI, UserFactory } from './factories/user.factory'
 
+const prismaMock = {
+  user: {
+    findMany: jest.fn(),
+    findUnique: jest.fn(),
+    create: jest.fn(),
+    update: jest.fn(),
+  },
+}
+
 describe('UserService', () => {
   let userService: UserService
-  let prismaService: PrismaService
 
   beforeEach(async () => {
-    prismaService = {
-      user: {
-        findUnique: jest.fn().mockResolvedValue({
-          /* simple user object */
-        }),
-        create: jest.fn().mockResolvedValue({
-          /* simple user object */
-        }),
-        update: jest.fn().mockResolvedValue({
-          /* simple user object */
-        }),
-        // other methods
-      },
-      // other services
-    } as unknown as PrismaService
-
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         UserService,
         {
           provide: PrismaService,
-          useValue: prismaService,
+          useValue: prismaMock,
         },
       ],
     }).compile()
@@ -42,114 +34,108 @@ describe('UserService', () => {
     userService = module.get<UserService>(UserService)
   })
 
-  describe('user', () => {
-    it('should return a user when it exists', async () => {
-      const userMock = await UserFactory.create({ ci: generateValidCI() })
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(userMock)
+  it('should return a user when it exists', async () => {
+    const userMock = await UserFactory.create({ ci: generateValidCI() })
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(userMock)
 
-      const result = await userService.findOne(userMock.ci)
+    const result = await userService.findOne(userMock.ci)
 
-      expect(result).toEqual(userMock)
-    })
-
-    it('should return not found exception when user does not exist', async () => {
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
-
-      await expect(userService.findOne('1234567')).rejects.toThrow(
-        UserNotFoundException,
-      )
-    })
+    expect(result).toEqual(userMock)
   })
 
-  describe('createUser', () => {
-    it('should create a new user when the CI is valid and it does not exist', async () => {
-      const createUserDto = await UserFactory.buildCreateInput({
-        ci: generateValidCI(),
-      })
-      const userMock: User = await UserFactory.create(createUserDto)
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
+  it('should return not found exception when user does not exist', async () => {
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(null)
 
-      jest.spyOn(prismaService.user, 'create').mockResolvedValue(userMock)
-
-      const result = await userService.createUser(createUserDto)
-      expect(result).toEqual(userMock)
-    })
-
-    it('should throw UserInvalidCIException when the CI is invalid', async () => {
-      const createUserDto = await UserFactory.buildCreateInput()
-      await expect(userService.createUser(createUserDto)).rejects.toThrow(
-        UserInvalidCIException,
-      )
-    })
-
-    it('should throw UserAlreadyExistsException when the user already exists', async () => {
-      const createUserDto = await UserFactory.buildCreateInput({
-        ci: generateValidCI(),
-      })
-      const userMock: User = await UserFactory.create(createUserDto)
-      jest.spyOn(prismaService.user, 'create').mockResolvedValue(userMock)
-
-      await expect(userService.createUser(createUserDto)).rejects.toThrow(
-        UserAlreadyExistsException,
-      )
-    })
+    await expect(userService.findOne('1234567')).rejects.toThrow(
+      UserNotFoundException,
+    )
   })
 
-  describe('updateUser', () => {
-    it('should update a user when it exists', async () => {
-      const userMock: User = await UserFactory.create()
-      const updateUserDto: UpdateUserDto = await UserFactory.buildCreateInput({
-        firstName: 'New Name',
-      })
+  it('should create a new user when the CI is valid and it does not exist', async () => {
+    const createUserDto = await UserFactory.buildCreateInput({
+      ci: generateValidCI(),
+    })
+    const userMock: User = await UserFactory.create(createUserDto)
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(null)
 
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(userMock)
+    jest.spyOn(prismaMock.user, 'create').mockResolvedValue(userMock)
 
-      userMock.firstName = updateUserDto.firstName
+    const result = await userService.createUser(createUserDto)
+    expect(result).toEqual(userMock)
+  })
 
-      jest.spyOn(prismaService.user, 'update').mockResolvedValue(userMock)
+  it('should throw UserInvalidCIException when the CI is invalid', async () => {
+    const createUserDto = await UserFactory.buildCreateInput()
+    await expect(userService.createUser(createUserDto)).rejects.toThrow(
+      UserInvalidCIException,
+    )
+  })
 
-      const result = await userService.updateUser({
-        where: { ci: userMock.ci },
+  it('should throw UserAlreadyExistsException when the user already exists', async () => {
+    const createUserDto = await UserFactory.buildCreateInput({
+      ci: generateValidCI(),
+    })
+
+    const userMock: User = await UserFactory.create(createUserDto)
+
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(userMock)
+
+    await expect(userService.createUser(createUserDto)).rejects.toThrow(
+      UserAlreadyExistsException,
+    )
+  })
+
+  it('should update a user when it exists', async () => {
+    const userMock: User = await UserFactory.create()
+    const updateUserDto: UpdateUserDto = await UserFactory.buildCreateInput({
+      firstName: 'New Name',
+    })
+
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(userMock)
+
+    userMock.firstName = updateUserDto.firstName
+
+    jest.spyOn(prismaMock.user, 'update').mockResolvedValue(userMock)
+
+    const result = await userService.updateUser({
+      where: { ci: userMock.ci },
+      data: updateUserDto,
+    })
+
+    expect(result).toEqual(userMock)
+  })
+
+  it('should throw UserNotFoundException when the user does not exist', async () => {
+    const updateUserDto: UpdateUserDto = await UserFactory.buildCreateInput({
+      ci: '1234567',
+      password: 'newpassword',
+    })
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(null)
+
+    await expect(
+      userService.updateUser({
+        where: { ci: '1234567' },
         data: updateUserDto,
-      })
-
-      expect(result).toEqual(userMock)
-    })
-
-    it('should throw UserNotFoundException when the user does not exist', async () => {
-      const updateUserDto: UpdateUserDto = await UserFactory.buildCreateInput({
-        ci: '1234567',
-        password: 'newpassword',
-      })
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
-
-      await expect(
-        userService.updateUser({
-          where: { ci: '1234567' },
-          data: updateUserDto,
-        }),
-      ).rejects.toThrow(UserNotFoundException)
-    })
+      }),
+    ).rejects.toThrow(UserNotFoundException)
   })
 
-  describe('deleteUser', () => {
-    it('should delete a user when it exists', async () => {
-      const userMock: User = await UserFactory.create()
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(userMock)
-      userMock.deletedAt = new Date()
-      jest.spyOn(prismaService.user, 'update').mockResolvedValue(userMock)
+  it('should delete a user when it exists', async () => {
+    const userMock: User = await UserFactory.create()
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(userMock)
+    userMock.deletedAt = new Date()
+    jest.spyOn(prismaMock.user, 'update').mockResolvedValue(userMock)
 
-      const result = await userService.deleteUser({ ci: userMock.ci })
+    const result = await userService.deleteUser({ ci: userMock.ci })
 
-      expect(result).toEqual(userMock)
-    })
+    expect(result).toEqual(userMock)
+  })
 
-    it('should throw UserNotFoundException when the user does not exist', async () => {
-      jest.spyOn(prismaService.user, 'findUnique').mockResolvedValue(null)
+  it('should throw UserNotFoundException when the user does not exist', async () => {
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(null)
 
-      await expect(userService.deleteUser({ ci: '1234567' })).rejects.toThrow(
-        UserNotFoundException,
-      )
-    })
+    await expect(userService.deleteUser({ ci: '1234567' })).rejects.toThrow(
+      UserNotFoundException,
+    )
   })
 })
