@@ -51,13 +51,13 @@ model Reminder {
   id                        Int       @id @default(autoincrement())
   title                     String
   description               String
-  isCompleted               Boolean?   @map("is_completed")
-  createdAt                 DateTime?  @map("created_at")
-  deletedAt                 DateTime?  @map("deleted_at")
-  reminderDate              DateTime   @map("reminder_date")
-  notificationMinutesBefore Int        @map("notification_minutes_before")
-  userId                    String     @map("user_id")
-  user                      User?      @relation(fields: [userId], references: [ci])
+  isCompleted               Boolean?  @default(false) @map("is_completed")
+  createdAt                 DateTime? @map("created_at")
+  deletedAt                 DateTime? @map("deleted_at")
+  reminderDate              DateTime  @map("reminder_date")
+  notificationMinutesBefore Int       @map("notification_minutes_before")
+  userId                    String    @map("user_id")
+  user                      User?     @relation(fields: [userId], references: [ci])
 
   @@map("reminders")
 }

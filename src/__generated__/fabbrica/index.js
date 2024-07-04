@@ -36,37 +36,56 @@ function autoGenerateUserScalarsOrEnums({ seq }) {
         lastName: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "User", fieldName: "lastName", isId: false, isUnique: false, seq })
     };
 }
-function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function defineUserFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("User", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateUserScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const [transientFields, filteredInputData] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
-            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
+            await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             ci: inputData.ci
         });
         const create = async (inputData = {}) => {
+            const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
-            return await getClient().user.create({ data });
+            await handleBeforeCreate(data, transientFields);
+            const createdData = await getClient().user.create({ data });
+            await handleAfterCreate(createdData, transientFields);
+            return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "User",
@@ -88,10 +107,10 @@ function defineUserFactoryInternal({ defaultData: defaultDataResolver, traits: t
         use: useTraits,
     };
 }
-function defineUserFactory(options) {
-    return defineUserFactoryInternal(options ?? {});
-}
-exports.defineUserFactory = defineUserFactory;
+exports.defineUserFactory = ((options) => {
+    return defineUserFactoryInternal(options ?? {}, {});
+});
+exports.defineUserFactory.withTransientFields = defaultTransientFieldValues => options => defineUserFactoryInternal(options ?? {}, defaultTransientFieldValues);
 function autoGenerateVehicleScalarsOrEnums({ seq }) {
     return {
         plate: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Vehicle", fieldName: "plate", isId: false, isUnique: true, seq }),
@@ -101,37 +120,56 @@ function autoGenerateVehicleScalarsOrEnums({ seq }) {
         color: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Vehicle", fieldName: "color", isId: false, isUnique: false, seq })
     };
 }
-function defineVehicleFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function defineVehicleFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("Vehicle", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateVehicleScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const [transientFields, filteredInputData] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {};
-            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
+            await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
-            return await getClient().vehicle.create({ data });
+            await handleBeforeCreate(data, transientFields);
+            const createdData = await getClient().vehicle.create({ data });
+            await handleAfterCreate(createdData, transientFields);
+            return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "Vehicle",
@@ -153,10 +191,10 @@ function defineVehicleFactoryInternal({ defaultData: defaultDataResolver, traits
         use: useTraits,
     };
 }
-function defineVehicleFactory(options) {
-    return defineVehicleFactoryInternal(options ?? {});
-}
-exports.defineVehicleFactory = defineVehicleFactory;
+exports.defineVehicleFactory = ((options) => {
+    return defineVehicleFactoryInternal(options ?? {}, {});
+});
+exports.defineVehicleFactory.withTransientFields = defaultTransientFieldValues => options => defineVehicleFactoryInternal(options ?? {}, defaultTransientFieldValues);
 function isReminderuserFactory(x) {
     return x?._factoryFor === "User";
 }
@@ -168,41 +206,60 @@ function autoGenerateReminderScalarsOrEnums({ seq }) {
         notificationMinutesBefore: (0, internal_1.getScalarFieldValueGenerator)().Int({ modelName: "Reminder", fieldName: "notificationMinutesBefore", isId: false, isUnique: false, seq })
     };
 }
-function defineReminderFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+function defineReminderFactoryInternal({ defaultData: defaultDataResolver, onAfterBuild, onBeforeCreate, onAfterCreate, traits: traitsDefs = {} }, defaultTransientFieldValues) {
     const getFactoryWithTraits = (traitKeys = []) => {
         const seqKey = {};
         const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
         const screen = (0, internal_1.createScreener)("Reminder", modelFieldDefinitions);
+        const handleAfterBuild = (0, internal_1.createCallbackChain)([
+            onAfterBuild,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterBuild),
+        ]);
+        const handleBeforeCreate = (0, internal_1.createCallbackChain)([
+            ...traitKeys.slice().reverse().map(traitKey => traitsDefs[traitKey]?.onBeforeCreate),
+            onBeforeCreate,
+        ]);
+        const handleAfterCreate = (0, internal_1.createCallbackChain)([
+            onAfterCreate,
+            ...traitKeys.map(traitKey => traitsDefs[traitKey]?.onAfterCreate),
+        ]);
         const build = async (inputData = {}) => {
             const seq = getSeq();
             const requiredScalarData = autoGenerateReminderScalarsOrEnums({ seq });
             const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const [transientFields, filteredInputData] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
+            const resolverInput = { seq, ...transientFields };
             const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
                 const acc = await queue;
                 const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
-                const traitData = await resolveTraitValue({ seq });
+                const traitData = await resolveTraitValue(resolverInput);
                 return {
                     ...acc,
                     ...traitData,
                 };
-            }, resolveValue({ seq }));
+            }, resolveValue(resolverInput));
             const defaultAssociations = {
                 user: isReminderuserFactory(defaultData.user) ? {
                     create: await defaultData.user.build()
                 } : defaultData.user
             };
-            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...filteredInputData };
+            await handleAfterBuild(data, transientFields);
             return data;
         };
-        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const buildList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => build(data)));
         const pickForConnect = (inputData) => ({
             id: inputData.id
         });
         const create = async (inputData = {}) => {
+            const [transientFields] = (0, internal_1.destructure)(defaultTransientFieldValues, inputData);
             const data = await build(inputData).then(screen);
-            return await getClient().reminder.create({ data });
+            await handleBeforeCreate(data, transientFields);
+            const createdData = await getClient().reminder.create({ data });
+            await handleAfterCreate(createdData, transientFields);
+            return createdData;
         };
-        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createList = (...args) => Promise.all((0, internal_1.normalizeList)(...args).map(data => create(data)));
         const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
         return {
             _factoryFor: "Reminder",
@@ -224,7 +281,7 @@ function defineReminderFactoryInternal({ defaultData: defaultDataResolver, trait
         use: useTraits,
     };
 }
-function defineReminderFactory(options) {
-    return defineReminderFactoryInternal(options ?? {});
-}
-exports.defineReminderFactory = defineReminderFactory;
+exports.defineReminderFactory = ((options) => {
+    return defineReminderFactoryInternal(options ?? {}, {});
+});
+exports.defineReminderFactory.withTransientFields = defaultTransientFieldValues => options => defineReminderFactoryInternal(options ?? {}, defaultTransientFieldValues);
