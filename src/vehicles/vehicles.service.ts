@@ -16,7 +16,6 @@ export class VehiclesService {
    * @param createVehicleDto - The vehicle data to create
    * @returns {Promise<Vehicle>} - The created vehicle
    * @throws {VehicleAlreadyExistsException} - If the vehicle already exists
-   * @memberof VehiclesService
    */
   async create(createVehicleDto: CreateVehicleDto): Promise<Vehicle> {
     const { plate } = createVehicleDto
@@ -37,8 +36,6 @@ export class VehiclesService {
    * @param vehicleWhereUniqueInput - The unique identifier of the vehicle
    * @returns {Promise<Vehicle | null>} - The vehicle or null if not found
    * @throws {VehicleNotFoundException} - If the vehicle is not found
-   * @private
-   * @memberof VehiclesService
    */
   private async vehicle(
     vehicleWhereUniqueInput: Prisma.VehicleWhereUniqueInput,
@@ -59,9 +56,6 @@ export class VehiclesService {
    * @param {number} id - The ID of the vehicle
    * @returns {Promise<Vehicle | null>} - The vehicle or null if not found
    * @throws {VehicleNotFoundException} - If the vehicle is not found
-   * @memberof VehiclesService
-   * @public
-   * @async
    */
   async findOne(id: number) {
     const vehicle = await this.vehicle({ id })
@@ -78,8 +72,6 @@ export class VehiclesService {
    * @param {IFindParams} params - The parameters to filter the vehicles
    * @returns {Promise<Vehicle[]>} - The vehicles
    * @memberof VehiclesService
-   * @public
-   * @async
    * @example
    * findAll({
    *  skip: 0,
@@ -106,9 +98,6 @@ export class VehiclesService {
    * @param {UpdateVehicleDto} updateVehicleDto - The vehicle data to update
    * @returns {Promise<Vehicle>} - The updated vehicle
    * @throws {VehicleNotFoundException} - If the vehicle is not found
-   * @memberof VehiclesService
-   * @public
-   * @async
    * @example
    * update(1, { plate: 'XYZ123' })
    * @example
@@ -132,9 +121,6 @@ export class VehiclesService {
    * @param {number} id - The ID of the vehicle
    * @returns {Promise<Vehicle>} - The removed vehicle
    * @throws {VehicleNotFoundException} - If the vehicle is not found
-   * @memberof VehiclesService
-   * @public
-   * @async
    * @example
    * remove(1)
    */
