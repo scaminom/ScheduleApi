@@ -83,6 +83,7 @@ type ReminderFactoryDefineInput = {
     deletedAt?: Date | null;
     reminderDate?: Date;
     notificationMinutesBefore?: number;
+    notificationSent?: boolean;
     user?: ReminderuserFactory | Prisma.UserCreateNestedOneWithoutRemindersInput;
 };
 type ReminderFactoryDefineOptions = {

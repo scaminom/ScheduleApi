@@ -9,6 +9,49 @@ import { ReminderNotFoundException } from './exceptions/reminder-not-found'
 export class RemindersService {
   public constructor(private readonly prisma: PrismaService) {}
 
+  async getPendingReminders(): Promise<Reminder[]> {
+    const now = new Date()
+    return this.prisma.reminder.findMany({
+      where: {
+        isCompleted: false,
+        reminderDate: {
+          lte: now,
+        },
+        deletedAt: null,
+      },
+    })
+  }
+
+  // async getDueNotifications(): Promise<Reminder[]> {
+  //   const now = new Date()
+  //   return this.prisma.reminder.findMany({
+  //     where: {
+  //       isCompleted: false,
+  //       notificationSent: false,
+  //       deletedAt: null,
+  //       OR: [
+  //         { reminderDate: { lte: new Date(now.getTime() + 15 * 60000) } },
+  //         { reminderDate: { lte: new Date(now.getTime() + 30 * 60000) } },
+  //         { reminderDate: { lte: new Date(now.getTime() + 60 * 60000) } },
+  //       ],
+  //     },
+  //   })
+  // }
+
+  // async markNotificationAsSent(id: number): Promise<Reminder> {
+  //   return this.prisma.reminder.update({
+  //     where: { id },
+  //     data: { notificationSent: true },
+  //   })
+  // }
+
+  async markReminderAsCompleted(id: number): Promise<Reminder> {
+    return this.prisma.reminder.update({
+      where: { id },
+      data: { isCompleted: true },
+    })
+  }
+
   async getAllReminders(): Promise<Reminder[]> {
     return await this.prisma.reminder.findMany({
       where: {

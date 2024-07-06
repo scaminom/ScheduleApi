@@ -56,6 +56,7 @@ model Reminder {
   deletedAt                 DateTime? @map("deleted_at")
   reminderDate              DateTime  @map("reminder_date")
   notificationMinutesBefore Int       @map("notification_minutes_before")
+  notificationSent          Boolean   @default(false) @map("notification_sent")
   userId                    String    @map("user_id")
   user                      User?     @relation(fields: [userId], references: [ci])
 
