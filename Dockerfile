@@ -1,21 +1,14 @@
-# Base image
 FROM node:20-alpine
 
-# Set working directory
 WORKDIR /usr/src/app
 
-# Install app dependencies
-COPY package*.json ./
-RUN npm install
+COPY package.json yarn.lock ./
+RUN yarn install
 
-# Copy app source code
 COPY . .
 
-# Prisma
-RUN npx prisma generate
+RUN yarn prisma generate
 
-# Build the app
-RUN npm run build
+RUN yarn build
 
-# Start the app
-CMD ["npm", "run", "start:dev"]
+CMD ["yarn", "start:dev"]

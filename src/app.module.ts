@@ -9,6 +9,7 @@ import config from './config/config'
 import { AuthModule } from './auth/auth.module'
 import { VehiclesModule } from './vehicles/vehicles.module'
 import { ApointmentsModule } from './appoitments/appointments.module'
+import { RemindersModule } from './reminders/reminders.module'
 
 @Module({
   imports: [
@@ -17,8 +18,9 @@ import { ApointmentsModule } from './appoitments/appointments.module'
       load: [config],
       isGlobal: true,
     }),
-    UsersModule,
     AuthModule,
+    RemindersModule,
+    UsersModule,
     VehiclesModule,
     ApointmentsModule,
   ],

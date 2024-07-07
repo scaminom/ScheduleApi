@@ -1,8 +1,6 @@
 import type { User } from '@prisma/client'
 import type { Vehicle } from '@prisma/client'
-import type { Appointment } from '@prisma/client'
 import type { Role } from '@prisma/client'
-import type { APOITMENT_STATUS } from '@prisma/client'
 import type { Prisma } from '@prisma/client'
 import type { Resolver } from '@quramy/prisma-fabbrica/lib/internal'
 export {
@@ -115,72 +113,61 @@ export interface VehicleFactoryInterface<
 export declare function defineVehicleFactory<
   TOptions extends VehicleFactoryDefineOptions,
 >(options?: TOptions): VehicleFactoryInterface<TOptions>
-type AppointmentvehicleFactory = {
-  _factoryFor: 'Vehicle'
-  build: () => PromiseLike<
-    Prisma.VehicleCreateNestedOneWithoutAppointmentInput['create']
-  >
-}
-type AppointmentuserFactory = {
+type ReminderuserFactory = {
   _factoryFor: 'User'
   build: () => PromiseLike<
-    Prisma.UserCreateNestedOneWithoutAppointmentInput['create']
+    Prisma.UserCreateNestedOneWithoutRemindersInput['create']
   >
 }
-type AppointmentFactoryDefineInput = {
-  clientName?: string
-  description?: string | null
-  date?: Date
-  status?: APOITMENT_STATUS
+type ReminderFactoryDefineInput = {
+  title?: string
+  description?: string
+  isCompleted?: boolean | null
+  createdAt?: Date | null
   deletedAt?: Date | null
-  vehicle:
-    | AppointmentvehicleFactory
-    | Prisma.VehicleCreateNestedOneWithoutAppointmentInput
-  user:
-    | AppointmentuserFactory
-    | Prisma.UserCreateNestedOneWithoutAppointmentInput
+  reminderDate?: Date
+  notificationMinutesBefore?: number
+  notificationSent?: boolean
+  user?: ReminderuserFactory | Prisma.UserCreateNestedOneWithoutRemindersInput
 }
-type AppointmentFactoryDefineOptions = {
-  defaultData: Resolver<AppointmentFactoryDefineInput, BuildDataOptions>
+type ReminderFactoryDefineOptions = {
+  defaultData?: Resolver<ReminderFactoryDefineInput, BuildDataOptions>
   traits?: {
     [traitName: string | symbol]: {
-      data: Resolver<Partial<AppointmentFactoryDefineInput>, BuildDataOptions>
+      data: Resolver<Partial<ReminderFactoryDefineInput>, BuildDataOptions>
     }
   }
 }
-type AppointmentTraitKeys<TOptions extends AppointmentFactoryDefineOptions> =
+type ReminderTraitKeys<TOptions extends ReminderFactoryDefineOptions> =
   keyof TOptions['traits']
-export interface AppointmentFactoryInterfaceWithoutTraits {
-  readonly _factoryFor: 'Appointment'
+export interface ReminderFactoryInterfaceWithoutTraits {
+  readonly _factoryFor: 'Reminder'
   build(
-    inputData?: Partial<Prisma.AppointmentCreateInput>,
-  ): PromiseLike<Prisma.AppointmentCreateInput>
+    inputData?: Partial<Prisma.ReminderCreateInput>,
+  ): PromiseLike<Prisma.ReminderCreateInput>
   buildCreateInput(
-    inputData?: Partial<Prisma.AppointmentCreateInput>,
-  ): PromiseLike<Prisma.AppointmentCreateInput>
+    inputData?: Partial<Prisma.ReminderCreateInput>,
+  ): PromiseLike<Prisma.ReminderCreateInput>
   buildList(
-    inputData: number | readonly Partial<Prisma.AppointmentCreateInput>[],
-  ): PromiseLike<Prisma.AppointmentCreateInput[]>
-  pickForConnect(inputData: Appointment): Pick<Appointment, 'id'>
-  create(
-    inputData?: Partial<Prisma.AppointmentCreateInput>,
-  ): PromiseLike<Appointment>
+    inputData: number | readonly Partial<Prisma.ReminderCreateInput>[],
+  ): PromiseLike<Prisma.ReminderCreateInput[]>
+  pickForConnect(inputData: Reminder): Pick<Reminder, 'id'>
+  create(inputData?: Partial<Prisma.ReminderCreateInput>): PromiseLike<Reminder>
   createList(
-    inputData: number | readonly Partial<Prisma.AppointmentCreateInput>[],
-  ): PromiseLike<Appointment[]>
+    inputData: number | readonly Partial<Prisma.ReminderCreateInput>[],
+  ): PromiseLike<Reminder[]>
   createForConnect(
-    inputData?: Partial<Prisma.AppointmentCreateInput>,
-  ): PromiseLike<Pick<Appointment, 'id'>>
+    inputData?: Partial<Prisma.ReminderCreateInput>,
+  ): PromiseLike<Pick<Reminder, 'id'>>
 }
-export interface AppointmentFactoryInterface<
-  TOptions extends
-    AppointmentFactoryDefineOptions = AppointmentFactoryDefineOptions,
-> extends AppointmentFactoryInterfaceWithoutTraits {
+export interface ReminderFactoryInterface<
+  TOptions extends ReminderFactoryDefineOptions = ReminderFactoryDefineOptions,
+> extends ReminderFactoryInterfaceWithoutTraits {
   use(
-    name: AppointmentTraitKeys<TOptions>,
-    ...names: readonly AppointmentTraitKeys<TOptions>[]
-  ): AppointmentFactoryInterfaceWithoutTraits
+    name: ReminderTraitKeys<TOptions>,
+    ...names: readonly ReminderTraitKeys<TOptions>[]
+  ): ReminderFactoryInterfaceWithoutTraits
 }
-export declare function defineAppointmentFactory<
-  TOptions extends AppointmentFactoryDefineOptions,
->(options?: TOptions): AppointmentFactoryInterface<TOptions>
+export declare function defineReminderFactory<
+  TOptions extends ReminderFactoryDefineOptions,
+>(options?: TOptions): ReminderFactoryInterface<TOptions>
