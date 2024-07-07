@@ -8,6 +8,7 @@ import { environments } from './config/environments'
 import config from './config/config'
 import { AuthModule } from './auth/auth.module'
 import { VehiclesModule } from './vehicles/vehicles.module'
+import { ApointmentsModule } from './appoitments/appointments.module'
 
 @Module({
   imports: [
@@ -19,6 +20,7 @@ import { VehiclesModule } from './vehicles/vehicles.module'
     UsersModule,
     AuthModule,
     VehiclesModule,
+    ApointmentsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
