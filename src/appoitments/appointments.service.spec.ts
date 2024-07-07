@@ -50,13 +50,11 @@ describe('AppointmentsService', () => {
 
   describe('create', () => {
     it('should create an appointment successfully', async () => {
-      const appointment = await AppointmentFactory.create()
+      const appointment = await AppointmentFactory.buildCreateInput()
 
       const dto = new CreateAppointmentDto()
 
-      const createInput = await AppointmentFactory.buildCreateInput({
-        ...appointment,
-      })
+      const createInput = await AppointmentFactory.buildCreateInput()
 
       Object.assign(dto, createInput)
 
@@ -72,7 +70,7 @@ describe('AppointmentsService', () => {
       expect(prismaService.appointment.create).toHaveBeenCalledWith({
         data: dto,
       })
-      expect(result).toEqual({ id: 1 })
+      expect(result).toEqual({ ...appointment, id: 1 })
     })
 
     it('should throw an error if vehicle not found during validation', async () => {
@@ -171,22 +169,25 @@ describe('AppointmentsService', () => {
         where: { id: appointment.id },
         data: dto,
       })
-      expect(result).toEqual({ id: appointment.id, ...dto })
+
+      expect(result).toEqual({ ...appointment, ...dto, id: appointment.id })
     })
   })
 
   describe('remove', () => {
     it('should mark an appointment as deleted', async () => {
       const appointment = await AppointmentFactory.create()
-      jest
-        .spyOn(prismaService.appointment, 'update')
-        .mockResolvedValueOnce(appointment)
+      jest.spyOn(prismaService.appointment, 'update').mockResolvedValueOnce({
+        ...appointment,
+        deletedAt: new Date(),
+      })
 
       const result = await service.remove(appointment.id)
       expect(prismaService.appointment.update).toHaveBeenCalledWith({
         where: { id: appointment.id },
         data: { deletedAt: expect.any(Date) },
       })
+      console.log(result, { ...appointment, deletedAt: expect.any(Date) })
       expect(result).toEqual({ ...appointment, deletedAt: expect.any(Date) })
     })
   })
