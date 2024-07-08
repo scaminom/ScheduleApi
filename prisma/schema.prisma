@@ -65,8 +65,9 @@ model Appointment {
   userId      String           @map("user_id")
   deletedAt   DateTime?        @map("deleted_at")
 
-  vehicle Vehicle @relation(fields: [vehicleId], references: [id])
-  user    User    @relation(fields: [userId], references: [ci])
+  vehicle    Vehicle      @relation(fields: [vehicleId], references: [id])
+  user       User         @relation(fields: [userId], references: [ci])
+  Inspection Inspection[]
 
   @@map("appointments")
 }
@@ -85,4 +86,28 @@ model Reminder {
   user                      User?     @relation(fields: [userId], references: [ci])
 
   @@map("reminders")
+}
+
+model Inspection {
+  id            Int              @id @default(autoincrement())
+  appointmentId Int
+  startDate     DateTime         @map("start_date")
+  endDate       DateTime         @map("end_date")
+  status        APOITMENT_STATUS
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  jobs        Job[]
+
+  @@map("inspections")
+}
+
+model Job {
+  id           Int              @id @default(autoincrement())
+  inspectionId Int
+  name         String
+  status       APOITMENT_STATUS
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id])
+
+  @@map("jobs")
 }

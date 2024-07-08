@@ -4,6 +4,7 @@ import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import { Appointment, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppoitmentValidator'
+import { AppointmentNotFoundException } from './exceptions'
 
 @Injectable()
 /**
@@ -20,6 +21,13 @@ export class AppointmentsService {
     private readonly validateAppointment: AppoitmentValidator,
   ) {}
 
+  /**
+   * Get an appointment
+   * @param appointmentWhereUniqueInput Prisma.AppointmentWhereUniqueInput
+   * @returns Promise<Appointment | null>
+   * @throws Error if the appointment does not exist
+   * @throws Error if the appointment is already deleted
+   */
   async appointment(
     appointmentWhereUniqueInput: Prisma.AppointmentWhereUniqueInput,
   ): Promise<Appointment | null> {
@@ -32,6 +40,11 @@ export class AppointmentsService {
     })
   }
 
+  /**
+   * Get appointments
+   * @param params { skip?: number, take?: number, cursor?: Prisma.AppointmentWhereUniqueInput, where?: Prisma.AppointmentWhereInput }
+   * @returns Promise<Appointment[]>
+   */
   async appointments(params: {
     skip?: number
     take?: number
@@ -47,6 +60,12 @@ export class AppointmentsService {
     })
   }
 
+  /**
+   * Create a new appointment, validate the appointment
+   * @param createApointmentDto CreateAppointmentDto
+   * @returns Promise<Appointment>
+   * @throws Error if the appointment is invalid
+   */
   async create(createApointmentDto: CreateAppointmentDto) {
     await this.validateAppointment.validate(createApointmentDto)
 
@@ -70,13 +89,24 @@ export class AppointmentsService {
   }
 
   async findOne(id: number) {
-    return await this.prisma.appointment.findUnique({
-      where: {
-        id,
-      },
-    })
+    const appointment = await this.appointment({ id })
+
+    if (!appointment) {
+      throw new AppointmentNotFoundException(id)
+    }
+
+    return appointment
   }
 
+  /**
+   * Update an appointment
+   * @param id number
+   * @param updateApointmentDto UpdateAppointmentDto
+   * @returns Promise<Appointment>
+   * @throws Error if the appointment is invalid
+   * @throws Error if the appointment does not exist
+   * @throws Error if the appointment is already deletedk
+   */
   async update(id: number, updateApointmentDto: UpdateAppointmentDto) {
     await this.validateAppointment.validate(updateApointmentDto)
     return await this.prisma.appointment.update({
@@ -89,6 +119,13 @@ export class AppointmentsService {
     })
   }
 
+  /**
+   * Remove an appointment
+   * @param id number
+   * @returns Promise<Appointment>
+   * @throws Error if the appointment does not exist
+   * @throws Error if the appointment is already deleted
+   */
   async remove(id: number) {
     return await this.prisma.appointment.update({
       where: {
