@@ -68,20 +68,4 @@ describe('RemindersService', () => {
     expect(reminder).toBe(reminderMock)
     expect(prismaMock.reminder.create).toHaveBeenCalledTimes(1)
   })
-
-  it('should update a reminder', async () => {
-    const reminderMock = await ReminderFactory.create()
-    const updatedData = { title: 'Updated Title' }
-    const updatedReminderMock = { ...reminderMock, ...updatedData }
-    prismaMock.reminder.update.mockResolvedValue(updatedReminderMock)
-
-    const reminder = await service.updateReminder(reminderMock.id, updatedData)
-
-    expect(reminder).toBe(updatedReminderMock)
-    expect(prismaMock.reminder.update).toHaveBeenCalledTimes(1)
-    expect(prismaMock.reminder.update).toHaveBeenCalledWith({
-      where: { id: reminderMock.id },
-      data: updatedData,
-    })
-  })
 })

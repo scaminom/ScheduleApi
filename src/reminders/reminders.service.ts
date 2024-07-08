@@ -4,18 +4,23 @@ import { UpdateReminderDto } from './dto/update-reminder.dto'
 import { Reminder } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { ReminderNotFoundException } from './exceptions/reminder-not-found'
+import { getLocalDate } from 'src/shared/functions/local-date'
 
 @Injectable()
 export class RemindersService {
   public constructor(private readonly prisma: PrismaService) {}
 
   async getPendingReminders(): Promise<Reminder[]> {
-    const now = new Date()
+    const now = getLocalDate()
+    const startOfWindow = new Date(now.getTime() - 60000)
+    const endOfWindow = new Date(now.getTime() + 60000)
+
     return this.prisma.reminder.findMany({
       where: {
         isCompleted: false,
         reminderDate: {
-          lte: now,
+          gte: startOfWindow,
+          lte: endOfWindow,
         },
         deletedAt: null,
       },

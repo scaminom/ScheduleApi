@@ -18,6 +18,7 @@ export class BackgroundService {
     //   this.logger.log(`Pre-notification sent: ${reminder.title}`)
     //   await this.remindersService.markNotificationAsSent(reminder.id)
     // }
+    console.log('Checking reminders')
 
     const dueReminders = await this.remindersService.getPendingReminders()
     for (const reminder of dueReminders) {
