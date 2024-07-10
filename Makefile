@@ -8,7 +8,7 @@ COMPOSE_FILE_PROD := docker-compose-prod.yaml
 
 up-prod:
 	@echo "Starting production environment"
-	docker compose -f $(COMPOSE_FILE_PROD) --env-file $(PROD_ENV_FILE) up -d app
+	docker compose -f $(COMPOSE_FILE_PROD) --env-file $(PROD_ENV_FILE) up --build -d app
 	@echo "Production environment started"
 
 down-prod:
@@ -19,8 +19,8 @@ down-prod:
 
 up-dev:
 	@echo "Starting development environment"
-	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up -d db-dev
-	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up app
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up --build -d db-dev
+	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) up --build app
 	@echo "Development environment started"
 
 down-dev:
@@ -33,7 +33,7 @@ down-dev:
 
 up-test:
 	@echo "Starting test environment"
-	docker compose -f $(COMPOSE_FILE) --env-file $(TEST_ENV_FILE) up -d db-test
+	docker compose -f $(COMPOSE_FILE) --env-file $(TEST_ENV_FILE) up --build -d db-test
 	@echo "Test environment started"
 
 down-test:
@@ -58,12 +58,12 @@ run-migrations-test:
 
 connect-db-dev:
 	@echo "Connecting to development database"
-	docker exec -it ScheduleDbDev  psql -U postgres SchedulesDbDev
+	docker exec -it ScheduleDbDev psql -U postgres SchedulesDbDev
 	@echo "Connected to development database"
 
 connect-db-test:
 	@echo "Connecting to test database"
-	docker exec -it ScheduleDbTest  psql -U postgres SchedulesDbTest
+	docker exec -it ScheduleDbTest psql -U postgres SchedulesDbTest
 	@echo "Connected to test database"
 
 build-app:

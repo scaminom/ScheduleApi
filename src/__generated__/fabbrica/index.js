@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.defineReminderFactory = exports.defineVehicleFactory = exports.defineUserFactory = exports.initialize = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = void 0;
+exports.defineJobFactory = exports.defineInspectionFactory = exports.defineReminderFactory = exports.defineAppointmentFactory = exports.defineVehicleFactory = exports.defineUserFactory = exports.initialize = exports.resetScalarFieldValueGenerator = exports.registerScalarFieldValueGenerator = exports.resetSequence = void 0;
 const internal_1 = require("@quramy/prisma-fabbrica/lib/internal");
 var internal_2 = require("@quramy/prisma-fabbrica/lib/internal");
 Object.defineProperty(exports, "resetSequence", { enumerable: true, get: function () { return internal_2.resetSequence; } });
@@ -12,19 +12,60 @@ exports.initialize = initializer.initialize;
 const modelFieldDefinitions = [{
         name: "User",
         fields: [{
+                name: "Appointment",
+                type: "Appointment",
+                relationName: "AppointmentToUser"
+            }, {
                 name: "reminders",
                 type: "Reminder",
                 relationName: "ReminderToUser"
             }]
     }, {
         name: "Vehicle",
-        fields: []
+        fields: [{
+                name: "Appointment",
+                type: "Appointment",
+                relationName: "AppointmentToVehicle"
+            }]
+    }, {
+        name: "Appointment",
+        fields: [{
+                name: "vehicle",
+                type: "Vehicle",
+                relationName: "AppointmentToVehicle"
+            }, {
+                name: "user",
+                type: "User",
+                relationName: "AppointmentToUser"
+            }, {
+                name: "Inspection",
+                type: "Inspection",
+                relationName: "AppointmentToInspection"
+            }]
     }, {
         name: "Reminder",
         fields: [{
                 name: "user",
                 type: "User",
                 relationName: "ReminderToUser"
+            }]
+    }, {
+        name: "Inspection",
+        fields: [{
+                name: "appointment",
+                type: "Appointment",
+                relationName: "AppointmentToInspection"
+            }, {
+                name: "jobs",
+                type: "Job",
+                relationName: "InspectionToJob"
+            }]
+    }, {
+        name: "Job",
+        fields: [{
+                name: "inspection",
+                type: "Inspection",
+                relationName: "InspectionToJob"
             }]
     }];
 function autoGenerateUserScalarsOrEnums({ seq }) {
@@ -157,6 +198,82 @@ function defineVehicleFactory(options) {
     return defineVehicleFactoryInternal(options ?? {});
 }
 exports.defineVehicleFactory = defineVehicleFactory;
+function isAppointmentvehicleFactory(x) {
+    return x?._factoryFor === "Vehicle";
+}
+function isAppointmentuserFactory(x) {
+    return x?._factoryFor === "User";
+}
+function autoGenerateAppointmentScalarsOrEnums({ seq }) {
+    return {
+        clientName: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Appointment", fieldName: "clientName", isId: false, isUnique: false, seq }),
+        date: (0, internal_1.getScalarFieldValueGenerator)().DateTime({ modelName: "Appointment", fieldName: "date", isId: false, isUnique: false, seq }),
+        status: "PENDING"
+    };
+}
+function defineAppointmentFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Appointment", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateAppointmentScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                vehicle: isAppointmentvehicleFactory(defaultData.vehicle) ? {
+                    create: await defaultData.vehicle.build()
+                } : defaultData.vehicle,
+                user: isAppointmentuserFactory(defaultData.user) ? {
+                    create: await defaultData.user.build()
+                } : defaultData.user
+            };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient().appointment.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Appointment",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
+    };
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
+    };
+    return {
+        ...factory,
+        use: useTraits,
+    };
+}
+function defineAppointmentFactory(options) {
+    return defineAppointmentFactoryInternal(options);
+}
+exports.defineAppointmentFactory = defineAppointmentFactory;
 function isReminderuserFactory(x) {
     return x?._factoryFor === "User";
 }
@@ -228,3 +345,142 @@ function defineReminderFactory(options) {
     return defineReminderFactoryInternal(options ?? {});
 }
 exports.defineReminderFactory = defineReminderFactory;
+function isInspectionappointmentFactory(x) {
+    return x?._factoryFor === "Appointment";
+}
+function autoGenerateInspectionScalarsOrEnums({ seq }) {
+    return {
+        startDate: (0, internal_1.getScalarFieldValueGenerator)().DateTime({ modelName: "Inspection", fieldName: "startDate", isId: false, isUnique: false, seq }),
+        endDate: (0, internal_1.getScalarFieldValueGenerator)().DateTime({ modelName: "Inspection", fieldName: "endDate", isId: false, isUnique: false, seq }),
+        status: "PENDING"
+    };
+}
+function defineInspectionFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Inspection", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateInspectionScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                appointment: isInspectionappointmentFactory(defaultData.appointment) ? {
+                    create: await defaultData.appointment.build()
+                } : defaultData.appointment
+            };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient().inspection.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Inspection",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
+    };
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
+    };
+    return {
+        ...factory,
+        use: useTraits,
+    };
+}
+function defineInspectionFactory(options) {
+    return defineInspectionFactoryInternal(options);
+}
+exports.defineInspectionFactory = defineInspectionFactory;
+function isJobinspectionFactory(x) {
+    return x?._factoryFor === "Inspection";
+}
+function autoGenerateJobScalarsOrEnums({ seq }) {
+    return {
+        name: (0, internal_1.getScalarFieldValueGenerator)().String({ modelName: "Job", fieldName: "name", isId: false, isUnique: false, seq }),
+        status: "PENDING"
+    };
+}
+function defineJobFactoryInternal({ defaultData: defaultDataResolver, traits: traitsDefs = {} }) {
+    const getFactoryWithTraits = (traitKeys = []) => {
+        const seqKey = {};
+        const getSeq = () => (0, internal_1.getSequenceCounter)(seqKey);
+        const screen = (0, internal_1.createScreener)("Job", modelFieldDefinitions);
+        const build = async (inputData = {}) => {
+            const seq = getSeq();
+            const requiredScalarData = autoGenerateJobScalarsOrEnums({ seq });
+            const resolveValue = (0, internal_1.normalizeResolver)(defaultDataResolver ?? {});
+            const defaultData = await traitKeys.reduce(async (queue, traitKey) => {
+                const acc = await queue;
+                const resolveTraitValue = (0, internal_1.normalizeResolver)(traitsDefs[traitKey]?.data ?? {});
+                const traitData = await resolveTraitValue({ seq });
+                return {
+                    ...acc,
+                    ...traitData,
+                };
+            }, resolveValue({ seq }));
+            const defaultAssociations = {
+                inspection: isJobinspectionFactory(defaultData.inspection) ? {
+                    create: await defaultData.inspection.build()
+                } : defaultData.inspection
+            };
+            const data = { ...requiredScalarData, ...defaultData, ...defaultAssociations, ...inputData };
+            return data;
+        };
+        const buildList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => build(data)));
+        const pickForConnect = (inputData) => ({
+            id: inputData.id
+        });
+        const create = async (inputData = {}) => {
+            const data = await build(inputData).then(screen);
+            return await getClient().job.create({ data });
+        };
+        const createList = (inputData) => Promise.all((0, internal_1.normalizeList)(inputData).map(data => create(data)));
+        const createForConnect = (inputData = {}) => create(inputData).then(pickForConnect);
+        return {
+            _factoryFor: "Job",
+            build,
+            buildList,
+            buildCreateInput: build,
+            pickForConnect,
+            create,
+            createList,
+            createForConnect,
+        };
+    };
+    const factory = getFactoryWithTraits();
+    const useTraits = (name, ...names) => {
+        return getFactoryWithTraits([name, ...names]);
+    };
+    return {
+        ...factory,
+        use: useTraits,
+    };
+}
+function defineJobFactory(options) {
+    return defineJobFactoryInternal(options);
+}
+exports.defineJobFactory = defineJobFactory;
