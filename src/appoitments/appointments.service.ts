@@ -76,6 +76,10 @@ export class AppointmentsService {
     })
   }
 
+  /**
+   * Get all appointments
+   * @returns Promise<Appointment[]>
+   */
   async findAll() {
     return await this.prisma.appointment.findMany({
       include: {
@@ -88,6 +92,12 @@ export class AppointmentsService {
     })
   }
 
+  /**
+   * Find an appointment by id
+   * @param id number
+   * @returns Promise<Appointment>
+   * @throws {AppointmentNotFoundException} if the appointment does not exist
+   */
   async findOne(id: number) {
     const appointment = await this.appointment({ id })
 

@@ -5,7 +5,7 @@ import type { Reminder } from "@prisma/client";
 import type { Inspection } from "@prisma/client";
 import type { Job } from "@prisma/client";
 import type { Role } from "@prisma/client";
-import type { APOITMENT_STATUS } from "@prisma/client";
+import type { APPOITMENT_STATUS } from "@prisma/client";
 import type { Prisma } from "@prisma/client";
 import type { Resolver } from "@quramy/prisma-fabbrica/lib/internal";
 export { resetSequence, registerScalarFieldValueGenerator, resetScalarFieldValueGenerator } from "@quramy/prisma-fabbrica/lib/internal";
@@ -89,7 +89,7 @@ type AppointmentFactoryDefineInput = {
     clientName?: string;
     description?: string | null;
     date?: Date;
-    status?: APOITMENT_STATUS;
+    status?: APPOITMENT_STATUS;
     deletedAt?: Date | null;
     vehicle: AppointmentvehicleFactory | Prisma.VehicleCreateNestedOneWithoutAppointmentInput;
     user: AppointmentuserFactory | Prisma.UserCreateNestedOneWithoutAppointmentInput;
@@ -163,7 +163,7 @@ type InspectionappointmentFactory = {
 type InspectionFactoryDefineInput = {
     startDate?: Date;
     endDate?: Date;
-    status?: APOITMENT_STATUS;
+    status?: APPOITMENT_STATUS;
     appointment: InspectionappointmentFactory | Prisma.AppointmentCreateNestedOneWithoutInspectionInput;
     jobs?: Prisma.JobCreateNestedManyWithoutInspectionInput;
 };
@@ -196,7 +196,7 @@ type JobinspectionFactory = {
 };
 type JobFactoryDefineInput = {
     name?: string;
-    status?: APOITMENT_STATUS;
+    status?: APPOITMENT_STATUS;
     inspection: JobinspectionFactory | Prisma.InspectionCreateNestedOneWithoutJobsInput;
 };
 type JobFactoryDefineOptions = {

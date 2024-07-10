@@ -23,10 +23,12 @@ enum Role {
   SECRETARY
 }
 
-enum APOITMENT_STATUS {
+enum APPOITMENT_STATUS {
   PENDING
   COMPLETED
   CANCELED
+
+  @@map("APPOITMENT_STATUS")
 }
 
 model User {
@@ -56,14 +58,14 @@ model Vehicle {
 }
 
 model Appointment {
-  id          Int              @id @default(autoincrement())
+  id          Int               @id @default(autoincrement())
   clientName  String
   vehicleId   Int
   description String?
   date        DateTime
-  status      APOITMENT_STATUS
-  userId      String           @map("user_id")
-  deletedAt   DateTime?        @map("deleted_at")
+  status      APPOITMENT_STATUS
+  userId      String            @map("user_id")
+  deletedAt   DateTime?         @map("deleted_at")
 
   vehicle    Vehicle      @relation(fields: [vehicleId], references: [id])
   user       User         @relation(fields: [userId], references: [ci])
@@ -89,11 +91,11 @@ model Reminder {
 }
 
 model Inspection {
-  id            Int              @id @default(autoincrement())
+  id            Int               @id @default(autoincrement())
   appointmentId Int
-  startDate     DateTime         @map("start_date")
-  endDate       DateTime         @map("end_date")
-  status        APOITMENT_STATUS
+  startDate     DateTime          @map("start_date")
+  endDate       DateTime          @map("end_date")
+  status        APPOITMENT_STATUS
 
   appointment Appointment @relation(fields: [appointmentId], references: [id])
   jobs        Job[]
@@ -102,10 +104,10 @@ model Inspection {
 }
 
 model Job {
-  id           Int              @id @default(autoincrement())
+  id           Int               @id @default(autoincrement())
   inspectionId Int
   name         String
-  status       APOITMENT_STATUS
+  status       APPOITMENT_STATUS
 
   inspection Inspection @relation(fields: [inspectionId], references: [id])
 
