@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { APPOITMENT_STATUS } from '@prisma/client'
+import { APPOINTMENT_STATUS } from '@prisma/client'
 import { IsArray, IsDate, IsEnum, IsNumber, IsOptional } from 'class-validator'
 
 export class CreateInspectionDto {
@@ -7,9 +7,9 @@ export class CreateInspectionDto {
   @IsNumber()
   appointmentId: number
 
-  @ApiProperty({ example: 'PENDING', enum: APPOITMENT_STATUS })
-  @IsEnum(APPOITMENT_STATUS)
-  status: APPOITMENT_STATUS
+  @ApiProperty({ example: 'PENDING', enum: APPOINTMENT_STATUS })
+  @IsEnum(APPOINTMENT_STATUS)
+  status: APPOINTMENT_STATUS
 
   @ApiProperty({ example: ['job1', 'job2'] })
   @IsOptional()

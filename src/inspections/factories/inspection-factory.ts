@@ -1,4 +1,4 @@
-import { APPOITMENT_STATUS, PrismaClient } from '@prisma/client'
+import { APPOINTMENT_STATUS, PrismaClient } from '@prisma/client'
 import {
   defineInspectionFactory,
   initialize,
@@ -12,7 +12,7 @@ export const InspectionFactory = defineInspectionFactory({
   defaultData: {
     endDate: new Date(),
     startDate: new Date(),
-    status: APPOITMENT_STATUS.PENDING,
+    status: APPOINTMENT_STATUS.PENDING,
     appointment: {
       create: {
         clientName: 'John Doe',
@@ -27,7 +27,7 @@ export const InspectionFactory = defineInspectionFactory({
         },
         description: 'Description',
         date: new Date(),
-        status: APPOITMENT_STATUS.PENDING,
+        status: APPOINTMENT_STATUS.PENDING,
         user: {
           create: {
             ci: '1234567',

@@ -187,7 +187,6 @@ describe('AppointmentsService', () => {
         where: { id: appointment.id },
         data: { deletedAt: expect.any(Date) },
       })
-      console.log(result, { ...appointment, deletedAt: expect.any(Date) })
       expect(result).toEqual({ ...appointment, deletedAt: expect.any(Date) })
     })
   })

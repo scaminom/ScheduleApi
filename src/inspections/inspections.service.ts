@@ -2,7 +2,7 @@ import { Injectable } from '@nestjs/common'
 import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import { PrismaService } from '../prisma/prisma.service'
-import { APPOITMENT_STATUS, Inspection, Prisma } from '@prisma/client'
+import { APPOINTMENT_STATUS, Inspection, Prisma } from '@prisma/client'
 import { AppointmentsService } from '../appoitments/appointments.service'
 import {
   InspectionNotFoundException,
@@ -96,13 +96,13 @@ export class InspectionsService {
             ? {
                 create: jobs.map((job) => ({
                   name: job,
-                  status: APPOITMENT_STATUS.PENDING,
+                  status: APPOINTMENT_STATUS.PENDING,
                 })),
               }
             : undefined,
         startDate,
         endDate,
-        status: APPOITMENT_STATUS.PENDING,
+        status: APPOINTMENT_STATUS.PENDING,
       },
     })
   }
@@ -167,7 +167,7 @@ export class InspectionsService {
       data: {
         startDate,
         endDate,
-        status: APPOITMENT_STATUS.PENDING,
+        status: APPOINTMENT_STATUS.PENDING,
       },
     })
   }
