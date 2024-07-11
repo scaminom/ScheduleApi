@@ -5,6 +5,8 @@ TEST_ENV_FILE := .env.test
 PROD_ENV_FILE := .env.production
 COMPOSE_FILE := docker-compose.yaml
 COMPOSE_FILE_PROD := docker-compose-prod.yaml
+ECR_REPO := 471112695037.dkr.ecr.us-east-2.amazonaws.com/schedule-repo
+DEV_TAG := dev
 
 up-prod:
 	@echo "Starting production environment"
@@ -70,6 +72,17 @@ build-app:
 	@echo "Building the application"
 	docker compose -f $(COMPOSE_FILE) --env-file $(DEV_ENV_FILE) build app
 	@echo "Application built"
+
+tag-dev:
+	@echo "Tagging the development image"
+	docker tag scheduleapi-app:latest $(ECR_REPO):$(DEV_TAG)
+	@echo "Development image tagged"
+
+push-dev:
+	@echo "Pushing the development image to ECR"
+	aws ecr get-login-password --region us-east-2 | docker login --username AWS --password-stdin $(ECR_REPO)
+	docker push $(ECR_REPO):$(DEV_TAG)
+	@echo "Development image pushed to ECR"
 
 i-dep:
 	@echo "Installing dependencies"
