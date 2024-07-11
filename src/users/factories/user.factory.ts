@@ -7,13 +7,14 @@ const prisma = new PrismaClient()
 initialize({ prisma })
 export const UserFactory = defineUserFactory()
 
-export const generateValidCI = () => {
+/**
+ * Generates a valid Ecuatorian CI
+ * @returns {string} - A valid Ecuatorian CI
+ */
+export const generateValidCI = (): string => {
   let ci
   let isValid = false
 
-  // Función para validar el número de cédula según el algoritmo de Ecuador
-
-  // Generar y validar cédulas hasta obtener una válida
   while (!isValid) {
     ci = faker.string.numeric({
       length: 10,

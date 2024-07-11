@@ -23,13 +23,22 @@ enum Role {
   SECRETARY
 }
 
+enum APPOITMENT_STATUS {
+  PENDING
+  COMPLETED
+  CANCELED
+
+  @@map("APPOITMENT_STATUS")
+}
+
 model User {
-  ci        String    @id @unique
-  password  String
-  role      Role
-  firstName String    @map("first_name")
-  lastName  String    @map("last_name")
-  deletedAt DateTime? @map("deleted_at")
+  ci          String        @id @unique
+  password    String
+  role        Role
+  firstName   String        @map("first_name")
+  lastName    String        @map("last_name")
+  deletedAt   DateTime?     @map("deleted_at")
+  Appointment Appointment[]
 
   reminders Reminder[]
 
@@ -37,14 +46,32 @@ model User {
 }
 
 model Vehicle {
-  id    Int    @id @default(autoincrement())
-  plate String @unique
-  type  String
-  brand String
-  model String
-  color String
+  id          Int           @id @default(autoincrement())
+  plate       String        @unique
+  type        String
+  brand       String
+  model       String
+  color       String
+  Appointment Appointment[]
 
   @@map("vehicles")
+}
+
+model Appointment {
+  id          Int               @id @default(autoincrement())
+  clientName  String
+  vehicleId   Int
+  description String?
+  date        DateTime
+  status      APPOITMENT_STATUS
+  userId      String            @map("user_id")
+  deletedAt   DateTime?         @map("deleted_at")
+
+  vehicle    Vehicle      @relation(fields: [vehicleId], references: [id])
+  user       User         @relation(fields: [userId], references: [ci])
+  Inspection Inspection[]
+
+  @@map("appointments")
 }
 
 model Reminder {
@@ -61,4 +88,28 @@ model Reminder {
   user                      User?     @relation(fields: [userId], references: [ci])
 
   @@map("reminders")
+}
+
+model Inspection {
+  id            Int               @id @default(autoincrement())
+  appointmentId Int
+  startDate     DateTime          @map("start_date")
+  endDate       DateTime          @map("end_date")
+  status        APPOITMENT_STATUS
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  jobs        Job[]
+
+  @@map("inspections")
+}
+
+model Job {
+  id           Int               @id @default(autoincrement())
+  inspectionId Int
+  name         String
+  status       APPOITMENT_STATUS
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id])
+
+  @@map("jobs")
 }

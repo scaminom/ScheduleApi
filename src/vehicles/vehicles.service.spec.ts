@@ -62,4 +62,19 @@ describe('VehiclesService', () => {
     expect(vehicle.plate).not.toBe('ABC-125')
     expect(vehicle.plate).toBe('ABC-126')
   })
+
+  it('should throw an error if the vehicle is not found', async () => {
+    jest.spyOn(prismaMock.vehicle, 'findUnique').mockResolvedValue(null)
+
+    await expect(service.findOne(1)).rejects.toThrow()
+  })
+
+  it('should create a vehicle', async () => {
+    jest
+      .spyOn(prismaMock.vehicle, 'create')
+      .mockResolvedValue(await VehicleFactory.create())
+
+    const vehicle = await service.create(await VehicleFactory.create())
+    expect(vehicle).toHaveProperty('id')
+  })
 })
