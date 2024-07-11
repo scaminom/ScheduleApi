@@ -1,4 +1,4 @@
-import { registerAs } from '@nestjs/config';
+import { registerAs } from '@nestjs/config'
 
 export default registerAs('config', () => {
   return {
@@ -9,5 +9,7 @@ export default registerAs('config', () => {
     DB_USERNAME: process.env.DB_USERNAME,
     CONTAINER_NAME: process.env.CONTAINER_NAME,
     DATABASE_URL: process.env.DATABASE_URL,
-  };
-});
+    JWT_SECRET: process.env.JWT_SECRET,
+    JWT_EXPIRATION: process.env.JWT_EXPIRATION,
+  }
+})

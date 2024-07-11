@@ -8,13 +8,108 @@ generator client {
   provider = "prisma-client-js"
 }
 
+generator fabbrica {
+  provider = "prisma-fabbrica"
+}
+
 datasource db {
   provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  ADMIN
+  MECHANIC
+  SECRETARY
+}
+
+enum APPOINTMENT_STATUS {
+  PENDING
+  COMPLETED
+  CANCELED
+
+  @@map("APPOINTMENT_STATUS")
+}
+
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
+  ci          String        @id @unique
+  password    String
+  role        Role
+  firstName   String        @map("first_name")
+  lastName    String        @map("last_name")
+  deletedAt   DateTime?     @map("deleted_at")
+  Appointment Appointment[]
+
+  reminders Reminder[]
+
+  @@map("users")
+}
+
+model Vehicle {
+  id          Int           @id @default(autoincrement())
+  plate       String        @unique
+  type        String
+  brand       String
+  model       String
+  color       String
+  Appointment Appointment[]
+
+  @@map("vehicles")
+}
+
+model Appointment {
+  id          Int                @id @default(autoincrement())
+  clientName  String
+  vehicleId   Int
+  description String?
+  date        DateTime
+  status      APPOINTMENT_STATUS
+  userId      String             @map("user_id")
+  deletedAt   DateTime?          @map("deleted_at")
+
+  vehicle    Vehicle      @relation(fields: [vehicleId], references: [id])
+  user       User         @relation(fields: [userId], references: [ci])
+  Inspection Inspection[]
+
+  @@map("appointments")
+}
+
+model Reminder {
+  id                        Int       @id @default(autoincrement())
+  title                     String
+  description               String
+  isCompleted               Boolean?  @default(false) @map("is_completed")
+  createdAt                 DateTime? @map("created_at")
+  deletedAt                 DateTime? @map("deleted_at")
+  reminderDate              DateTime  @map("reminder_date")
+  notificationMinutesBefore Int       @map("notification_minutes_before")
+  notificationSent          Boolean   @default(false) @map("notification_sent")
+  userId                    String    @map("user_id")
+  user                      User?     @relation(fields: [userId], references: [ci])
+
+  @@map("reminders")
+}
+
+model Inspection {
+  id            Int                @id @default(autoincrement())
+  appointmentId Int
+  startDate     DateTime           @map("start_date")
+  endDate       DateTime           @map("end_date")
+  status        APPOINTMENT_STATUS
+
+  appointment Appointment @relation(fields: [appointmentId], references: [id])
+  jobs        Job[]
+
+  @@map("inspections")
+}
+
+model Job {
+  id           Int                @id @default(autoincrement())
+  inspectionId Int
+  name         String
+  status       APPOINTMENT_STATUS
+
+  inspection Inspection @relation(fields: [inspectionId], references: [id])
+
+  @@map("jobs")
 }
