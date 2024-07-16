@@ -8,10 +8,10 @@ import { environments } from './config/environments'
 import config from './config/config'
 import { AuthModule } from './auth/auth.module'
 import { VehiclesModule } from './vehicles/vehicles.module'
-import { ApointmentsModule } from './appoitments/appointments.module'
+import { AppointmentsModule } from './appoitments/appointments.module'
 import { RemindersModule } from './reminders/reminders.module'
-import { InspectionsModule } from './inspections/inspections.module';
-import { JobsModule } from './jobs/jobs.module';
+import { InspectionsModule } from './inspections/inspections.module'
+import { JobsModule } from './jobs/jobs.module'
 
 @Module({
   imports: [
@@ -24,7 +24,7 @@ import { JobsModule } from './jobs/jobs.module';
     RemindersModule,
     UsersModule,
     VehiclesModule,
-    ApointmentsModule,
+    AppointmentsModule,
     InspectionsModule,
     JobsModule,
   ],

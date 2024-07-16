@@ -10,5 +10,6 @@ import { PrismaModule } from 'src/prisma/prisma.module'
   controllers: [ApointmentsController],
   providers: [AppointmentsService, VehiclesService, AppoitmentValidator],
   imports: [VehiclesModule, PrismaModule],
+  exports: [AppoitmentValidator, AppointmentsService],
 })
-export class ApointmentsModule {}
+export class AppointmentsModule {}
