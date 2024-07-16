@@ -1,5 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { APPOITMENT_STATUS } from '@prisma/client'
+import { APPOINTMENT_STATUS } from '@prisma/client'
 import { IsEnum, IsNumber, IsString } from 'class-validator'
 
 export class CreateJobDto {
@@ -24,6 +24,6 @@ export class CreateJobDto {
     example: 'PENDING',
     required: true,
   })
-  @IsEnum(APPOITMENT_STATUS)
-  status: APPOITMENT_STATUS
+  @IsEnum(APPOINTMENT_STATUS)
+  status: APPOINTMENT_STATUS
 }
