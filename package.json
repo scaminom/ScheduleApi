@@ -13,7 +13,7 @@
     "start:dev": "NODE_ENV=development nest start --watch",
     "start:test": "NODE_ENV=test nest start --watch",
     "start:debug": "nest start --debug --watch",
-    "start:prod": "NODE_ENV=production nest start --watch",
+    "start:prod": "yarn dotenv -e .env.production  yarn start",
     "lint": "eslint \"{src,apps,libs,test}/**/*.ts\" --fix",
     "test": "dotenv -e .env.test jest",
     "test:watch": "NODE_ENV=test jest --watch",

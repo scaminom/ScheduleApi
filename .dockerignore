@@ -3,3 +3,12 @@ npm-debug.log
 /dist
 
 /__generated__
+*
+!/package.json
+!/package-lock.json
+!/yarn.lock
+!/tsconfig.json
+!/prisma
+!/.swcrc
+!/nest-cli.json
+!/src
