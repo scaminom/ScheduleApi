@@ -109,7 +109,7 @@ model Job {
   name         String
   status       APPOINTMENT_STATUS
 
-  inspection Inspection @relation(fields: [inspectionId], references: [id])
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
 
   @@map("jobs")
 }
