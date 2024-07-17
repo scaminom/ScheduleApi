@@ -12,7 +12,7 @@ COPY package.json yarn.lock ./
 RUN yarn install
 
 COPY ./prisma ./prisma
-RUN yarn prisma generate --schema ./prisma/schema.prisma
+RUN yarn prisma generate
 
 
 COPY tsconfig*.json .
