@@ -16,7 +16,7 @@ import { JobsModule } from './jobs/jobs.module'
 @Module({
   imports: [
     ConfigModule.forRoot({
-      envFilePath: environments[process.env.NODE_ENV],
+      envFilePath: environments[process.env.NODE_ENV || 'development'],
       load: [config],
       isGlobal: true,
     }),
