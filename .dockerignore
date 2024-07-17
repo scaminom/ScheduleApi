@@ -1,3 +1,9 @@
-node_modules
-npm-debug.log
-/dist
+*
+!/package.json
+!/package-lock.json
+!/yarn.lock
+!/tsconfig.json
+!/prisma
+!/.swcrc
+!/nest-cli.json
+!/src

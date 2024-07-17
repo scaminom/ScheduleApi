@@ -1,43 +1,69 @@
-# version: '3.8'
-
 services:
-  db-dev:
-    image: postgres:14.3
-    restart: always
-    ports:
-      - '5438:5432'
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    container_name: ${CONTAINER_NAME}
-    volumes:
-      - ./postgres-dev:/var/lib/postgresql/data
-
-  db-test:
-    image: postgres:14.3
-    restart: always
-    ports:
-      - '5437:5432'
-    environment:
-      POSTGRES_PASSWORD: ${DB_PASSWORD}
-      POSTGRES_DB: ${DB_NAME}
-    container_name: ${CONTAINER_NAME}
-    volumes:
-      - ./postgres-test:/var/lib/postgresql/data
-
-  app:
+  my-service-production:
+    container_name: schedule-api-production
     build:
+      target: production
       context: .
-      dockerfile: Dockerfile
-    restart: always
+      args:
+        - PORT=${PORT:-3000}
     ports:
-      - '${PROJECT_LOCAL_PORT}:${PROJECT_CONTAINER_PORT}'
-    environment:
-      NODE_ENV: development
-      DATABASE_URL: ${DATABASE_URL}
-      PORT: ${PROJECT_LOCAL_PORT}
+      - '80:${PORT:-3000}'
+    env_file: .env.production
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512m'
+        reservations:
+          cpus: '0.25'
+          memory: '256m'
+
+  my-service-dev:
+    container_name: schedule-api-dev
+    restart: unless-stopped
+    env_file: .env.development
+    build:
+      target: dev
+      context: .
+    ports:
+      - '80:${PORT:-3000}'
+    volumes:
+      - ./src:/app/src
     depends_on:
       - db-dev
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512m'
+        reservations:
+          cpus: '0.25'
+          memory: '256m'
+
+  db-dev:
+    container_name: db-dev
+    image: postgres:14.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_DEV:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_DEV:-root}
+      POSTGRES_DB: ${POSTGRES_DB_DEV:-development_db}
+    ports:
+      - '5434:5432'
     volumes:
-      - .:/usr/src/app
-      - /usr/src/app/node_modules
+      - db-data-dev:/var/lib/postgresql/data
+
+  db-testing:
+    container_name: db-testing
+    image: postgres:14.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_TEST:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_TEST:-root}
+      POSTGRES_DB: ${POSTGRES_DB_TEST:-testing_db}
+    ports:
+      - '5436:5432'
+    volumes:
+      - db-data-testing:/var/lib/postgresql/data
+
+volumes:
+  db-data-dev:
+  db-data-testing:
