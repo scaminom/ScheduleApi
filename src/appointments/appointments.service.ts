@@ -158,6 +158,12 @@ export class AppointmentsService {
    * @throws Error if the appointment is already deleted
    */
   async remove(id: number) {
+    const appointment = await this.findOne(id)
+
+    if (!appointment) {
+      throw new AppointmentNotFoundException(id)
+    }
+
     return await this.prisma.appointment.update({
       where: {
         id,
