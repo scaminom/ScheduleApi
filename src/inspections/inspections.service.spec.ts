@@ -6,7 +6,7 @@ import {
   InspectionPastDateException,
 } from './exceptions'
 import { InspectionFactory } from './factories/inspection-factory'
-import { AppointmentsService } from '../appoitments/appointments.service'
+import { AppointmentsService } from '../appointments/appointments.service'
 import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
 

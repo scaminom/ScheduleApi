@@ -10,6 +10,7 @@ import { AppointmentLimitPerHourException } from '../exceptions/appointment-limi
 import { BaseException } from '../../shared/exceptions/base-exception'
 import { BaseConflictException } from '../../shared/exceptions/conflict'
 import { UpdateAppointmentDto } from '../dto/update-appointment.dto'
+import { UserService } from '../../users/users.service'
 
 export class AppoitmentValidator {
   constructor(
@@ -18,6 +19,9 @@ export class AppoitmentValidator {
 
     @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentsService: AppointmentsService,
+
+    @Inject(UserService)
+    private readonly userService: UserService,
   ) {}
 
   public async validate(
@@ -28,7 +32,7 @@ export class AppoitmentValidator {
       this.validateDateAndTime(createAppointmentDto.date)
 
       await this.validateMechanic(
-        createAppointmentDto.userId,
+        createAppointmentDto.userCI,
         createAppointmentDto.date,
       )
       await this.validateAppointmentLimit(createAppointmentDto.date)
@@ -62,6 +66,8 @@ export class AppoitmentValidator {
     mechanicCI: string,
     date: Date,
   ): Promise<void> {
+    await this.userService.findOne(mechanicCI)
+
     const dateCopy = new Date(date)
     const minutesRange = [0, 20, 40]
     const minutesOfDate = dateCopy.getMinutes()
@@ -71,7 +77,7 @@ export class AppoitmentValidator {
 
     const alreadyHasAppointment = await this.appointmentsService.appointments({
       where: {
-        userId: mechanicCI,
+        userCI: mechanicCI,
         date: {
           lte: new Date(dateCopy.getTime() + 20 * 60 * 1000),
           gte: dateCopy,

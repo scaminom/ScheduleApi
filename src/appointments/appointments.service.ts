@@ -3,7 +3,7 @@ import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import { Appointment, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
-import { AppoitmentValidator } from './validators/CreateAppoitmentValidator'
+import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 
 @Injectable()
@@ -35,7 +35,14 @@ export class AppointmentsService {
       where: appointmentWhereUniqueInput,
       include: {
         vehicle: true,
-        user: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
       },
     })
   }
@@ -55,7 +62,14 @@ export class AppointmentsService {
       ...params,
       include: {
         vehicle: true,
-        user: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
       },
     })
   }
@@ -84,7 +98,14 @@ export class AppointmentsService {
     return await this.prisma.appointment.findMany({
       include: {
         vehicle: true,
-        user: true,
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
       },
       where: {
         deletedAt: null,
@@ -118,7 +139,10 @@ export class AppointmentsService {
    * @throws Error if the appointment is already deletedk
    */
   async update(id: number, updateApointmentDto: UpdateAppointmentDto) {
+    await this.findOne(id)
+
     await this.validateAppointment.validate(updateApointmentDto)
+
     return await this.prisma.appointment.update({
       where: {
         id,

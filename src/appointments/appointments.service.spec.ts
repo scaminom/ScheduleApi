@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppointmentsService } from './appointments.service'
 import { PrismaService } from '../prisma/prisma.service'
-import { AppoitmentValidator } from './validators/CreateAppoitmentValidator'
+import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import {
@@ -64,6 +64,8 @@ describe('AppointmentsService', () => {
       jest.spyOn(prismaService.appointment, 'create').mockResolvedValueOnce({
         id: 1,
         ...dto,
+        userId: dto.userCI,
+        deletedAt: null,
       } as Appointment)
 
       const result = await service.create(dto)
@@ -129,7 +131,7 @@ describe('AppointmentsService', () => {
 
       jest
         .spyOn(validateAppointment, 'validate')
-        .mockRejectedValue(new AppointmentAlreadyExitsException(dto.userId))
+        .mockRejectedValue(new AppointmentAlreadyExitsException(dto.userCI))
 
       await expect(service.create(dto)).rejects.toThrow(
         AppointmentAlreadyExitsException,

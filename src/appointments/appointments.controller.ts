@@ -11,8 +11,8 @@ import { AppointmentsService } from './appointments.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 
-@Controller('apointments')
-export class ApointmentsController {
+@Controller('appointments')
+export class AppointmentsController {
   constructor(private readonly apointmentsService: AppointmentsService) {}
 
   @Post()

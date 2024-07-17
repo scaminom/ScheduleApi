@@ -40,12 +40,8 @@ export class VehiclesService {
   private async vehicle(
     vehicleWhereUniqueInput: Prisma.VehicleWhereUniqueInput,
   ) {
-    const { id } = vehicleWhereUniqueInput
-
     const vehicle = await this.prisma.vehicle.findUnique({
-      where: {
-        id,
-      },
+      where: vehicleWhereUniqueInput,
     })
 
     return vehicle

@@ -28,5 +28,5 @@ export class CreateAppointmentDto
 
   @ApiProperty({ example: '1' })
   @IsString()
-  userId: string
+  userCI: string
 }

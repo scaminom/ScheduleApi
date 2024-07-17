@@ -14,7 +14,6 @@ export class CreateInspectionDto {
   @ApiProperty({ example: ['job1', 'job2'] })
   @IsOptional()
   @IsArray({
-    each: true,
     context: { each: 'Debe ser una cadena de texto' },
   })
   jobs?: string[]
