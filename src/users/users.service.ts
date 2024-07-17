@@ -75,6 +75,7 @@ export class UserService {
       },
       select: {
         ci: true,
+        color: true,
         firstName: true,
         lastName: true,
         role: true,

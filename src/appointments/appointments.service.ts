@@ -34,7 +34,6 @@ export class AppointmentsService {
     return await this.prisma.appointment.findUnique({
       where: appointmentWhereUniqueInput,
       include: {
-        vehicle: true,
         user: {
           select: {
             firstName: true,
@@ -61,7 +60,6 @@ export class AppointmentsService {
     return await this.prisma.appointment.findMany({
       ...params,
       include: {
-        vehicle: true,
         user: {
           select: {
             firstName: true,
@@ -97,7 +95,6 @@ export class AppointmentsService {
   async findAll() {
     return await this.prisma.appointment.findMany({
       include: {
-        vehicle: true,
         user: {
           select: {
             firstName: true,

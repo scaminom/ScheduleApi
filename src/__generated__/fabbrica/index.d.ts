@@ -1,5 +1,4 @@
 import type { User } from "@prisma/client";
-import type { Vehicle } from "@prisma/client";
 import type { Appointment } from "@prisma/client";
 import type { Reminder } from "@prisma/client";
 import type { Inspection } from "@prisma/client";
@@ -21,6 +20,7 @@ type CallbackDefineOptions<TCreated, TCreateInput, TTransients extends Record<st
 export declare const initialize: (options: import("@quramy/prisma-fabbrica/lib/initialize").InitializeOptions) => void;
 type UserFactoryDefineInput = {
     ci?: string;
+    color?: string;
     password?: string;
     role?: Role;
     firstName?: string;
@@ -60,60 +60,17 @@ interface UserFactoryBuilder {
     withTransientFields: <TTransients extends UserTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends UserFactoryDefineOptions<TTransients>>(options?: TOptions) => UserFactoryInterface<TTransients, UserTraitKeys<TOptions>>;
 }
 export declare const defineUserFactory: UserFactoryBuilder;
-type VehicleFactoryDefineInput = {
-    plate?: string;
-    type?: string;
-    brand?: string;
-    model?: string;
-    color?: string;
-    Appointment?: Prisma.AppointmentCreateNestedManyWithoutVehicleInput;
-};
-type VehicleTransientFields = Record<string, unknown> & Partial<Record<keyof VehicleFactoryDefineInput, never>>;
-type VehicleFactoryTrait<TTransients extends Record<string, unknown>> = {
-    data?: Resolver<Partial<VehicleFactoryDefineInput>, BuildDataOptions<TTransients>>;
-} & CallbackDefineOptions<Vehicle, Prisma.VehicleCreateInput, TTransients>;
-type VehicleFactoryDefineOptions<TTransients extends Record<string, unknown> = Record<string, unknown>> = {
-    defaultData?: Resolver<VehicleFactoryDefineInput, BuildDataOptions<TTransients>>;
-    traits?: {
-        [traitName: TraitName]: VehicleFactoryTrait<TTransients>;
-    };
-} & CallbackDefineOptions<Vehicle, Prisma.VehicleCreateInput, TTransients>;
-type VehicleTraitKeys<TOptions extends VehicleFactoryDefineOptions<any>> = Exclude<keyof TOptions["traits"], number>;
-export interface VehicleFactoryInterfaceWithoutTraits<TTransients extends Record<string, unknown>> {
-    readonly _factoryFor: "Vehicle";
-    build(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Prisma.VehicleCreateInput>;
-    buildCreateInput(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Prisma.VehicleCreateInput>;
-    buildList(list: readonly Partial<Prisma.VehicleCreateInput & TTransients>[]): PromiseLike<Prisma.VehicleCreateInput[]>;
-    buildList(count: number, item?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Prisma.VehicleCreateInput[]>;
-    pickForConnect(inputData: Vehicle): Pick<Vehicle, "id">;
-    create(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Vehicle>;
-    createList(list: readonly Partial<Prisma.VehicleCreateInput & TTransients>[]): PromiseLike<Vehicle[]>;
-    createList(count: number, item?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Vehicle[]>;
-    createForConnect(inputData?: Partial<Prisma.VehicleCreateInput & TTransients>): PromiseLike<Pick<Vehicle, "id">>;
-}
-export interface VehicleFactoryInterface<TTransients extends Record<string, unknown> = Record<string, unknown>, TTraitName extends TraitName = TraitName> extends VehicleFactoryInterfaceWithoutTraits<TTransients> {
-    use(name: TTraitName, ...names: readonly TTraitName[]): VehicleFactoryInterfaceWithoutTraits<TTransients>;
-}
-interface VehicleFactoryBuilder {
-    <TOptions extends VehicleFactoryDefineOptions>(options?: TOptions): VehicleFactoryInterface<{}, VehicleTraitKeys<TOptions>>;
-    withTransientFields: <TTransients extends VehicleTransientFields>(defaultTransientFieldValues: TTransients) => <TOptions extends VehicleFactoryDefineOptions<TTransients>>(options?: TOptions) => VehicleFactoryInterface<TTransients, VehicleTraitKeys<TOptions>>;
-}
-export declare const defineVehicleFactory: VehicleFactoryBuilder;
-type AppointmentvehicleFactory = {
-    _factoryFor: "Vehicle";
-    build: () => PromiseLike<Prisma.VehicleCreateNestedOneWithoutAppointmentInput["create"]>;
-};
 type AppointmentuserFactory = {
     _factoryFor: "User";
     build: () => PromiseLike<Prisma.UserCreateNestedOneWithoutAppointmentInput["create"]>;
 };
 type AppointmentFactoryDefineInput = {
     clientName?: string;
+    vehicleDescription?: string;
     description?: string | null;
     date?: Date;
     status?: APPOINTMENT_STATUS;
     deletedAt?: Date | null;
-    vehicle: AppointmentvehicleFactory | Prisma.VehicleCreateNestedOneWithoutAppointmentInput;
     user: AppointmentuserFactory | Prisma.UserCreateNestedOneWithoutAppointmentInput;
     Inspection?: Prisma.InspectionCreateNestedManyWithoutAppointmentInput;
 };

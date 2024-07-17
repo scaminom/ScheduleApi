@@ -16,21 +16,23 @@ export const InspectionFactory = defineInspectionFactory({
     appointment: {
       create: {
         clientName: 'John Doe',
-        vehicle: {
-          create: {
-            plate: 'ABC123',
-            type: 'Car',
-            brand: 'Toyota',
-            model: 'Corolla',
-            color: 'White',
-          },
-        },
+        // vehicle: {
+        //   create: {
+        //     plate: 'ABC123',
+        //     type: 'Car',
+        //     brand: 'Toyota',
+        //     model: 'Corolla',
+        //     color: 'White',
+        //   },
+        // },
+        vehicleDescription: 'MAZDA - BLANCO - PWQ-2394',
         description: 'Description',
         date: new Date(),
         status: APPOINTMENT_STATUS.PENDING,
         user: {
           create: {
             ci: '1234567',
+            color: 'Blue',
             firstName: 'John',
             lastName: 'Doe',
             role: 'MECHANIC',

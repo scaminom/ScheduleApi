@@ -26,6 +26,7 @@ export const AppointmentFactory = defineAppointmentFactory({
     user: {
       create: {
         ci: '1234567',
+        color: 'Blue',
         firstName: 'John',
         lastName: 'Doe',
         role: Role.MECHANIC,

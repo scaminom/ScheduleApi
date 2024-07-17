@@ -7,6 +7,10 @@ export class CreateUserDto implements Prisma.UserCreateInput {
   @IsNumberString({ no_symbols: true }, { message: 'CI must be a number' })
   ci: string
 
+  @ApiProperty({ example: 'azul', description: 'The color of the user' })
+  @IsString()
+  color: string
+
   @ApiProperty({ example: 'passW0rd', description: 'The password of the user' })
   @IsString()
   password: string

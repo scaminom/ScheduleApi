@@ -11,8 +11,10 @@ import { RemindersService } from './reminders.service'
 import { CreateReminderDto } from './dto/create-reminder.dto'
 import { UpdateReminderDto } from './dto/update-reminder.dto'
 import { Public } from 'src/auth/strategies/public.strategy'
+import { ApiTags } from '@nestjs/swagger'
 
 @Public()
+@ApiTags('reminders')
 @Controller('reminders')
 export class RemindersController {
   constructor(private readonly remindersService: RemindersService) {}

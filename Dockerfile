@@ -14,7 +14,6 @@ RUN yarn install
 COPY ./prisma ./prisma
 RUN yarn prisma generate
 
-
 COPY tsconfig*.json .
 COPY nest-cli.json .
 COPY src src

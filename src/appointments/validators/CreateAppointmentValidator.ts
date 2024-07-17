@@ -1,7 +1,5 @@
 import { forwardRef, Inject } from '@nestjs/common'
-import { VehiclesService } from '../../vehicles/vehicles.service'
 import { CreateAppointmentDto } from '../dto/create-appointment.dto'
-import { VehicleNotFoundException } from '../../vehicles/exceptions/vehicle-not-found'
 import { AppointmentPastDateException } from '../exceptions/appointment-past-date'
 import { AppointmentLaboralHoursException } from '../exceptions/appointment-laboral-hours'
 import { AppointmentsService } from '../appointments.service'
@@ -14,9 +12,6 @@ import { UserService } from '../../users/users.service'
 
 export class AppoitmentValidator {
   constructor(
-    @Inject(VehiclesService)
-    private readonly vehiclesService: VehiclesService,
-
     @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentsService: AppointmentsService,
 
@@ -28,8 +23,8 @@ export class AppoitmentValidator {
     createAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
   ): Promise<void> {
     try {
-      await this.validateVehicleId(createAppointmentDto.vehicleId)
-      this.validateDateAndTime(createAppointmentDto.date)
+      // await this.validateVehicleId(createAppointmentDto.vehicleId)
+      // this.validateDateAndTime(createAppointmentDto.date)
 
       await this.validateMechanic(
         createAppointmentDto.userCI,
@@ -45,13 +40,13 @@ export class AppoitmentValidator {
     }
   }
 
-  private async validateVehicleId(vehicleId: number): Promise<void> {
-    const vehicle = await this.vehiclesService.findOne(vehicleId)
+  // private async validateVehicleId(vehicleId: number): Promise<void> {
+  //   const vehicle = await this.vehiclesService.findOne(vehicleId)
 
-    if (!vehicle) {
-      throw new VehicleNotFoundException(vehicleId)
-    }
-  }
+  //   if (!vehicle) {
+  //     throw new VehicleNotFoundException(vehicleId)
+  //   }
+  // }
 
   private validateDateAndTime(date: Date): void {
     if (date < new Date()) {

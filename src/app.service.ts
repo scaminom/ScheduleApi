@@ -10,6 +10,6 @@ export class AppService {
   ) {}
 
   getHello(): string {
-    return this.configService.DATABASE_URL
+    return this.configService.CONTAINER_NAME
   }
 }

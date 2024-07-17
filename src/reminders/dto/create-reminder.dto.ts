@@ -20,5 +20,5 @@ export class CreateReminderDto implements Prisma.ReminderCreateInput {
   notificationMinutesBefore: number
 
   @IsNumberString({ no_symbols: true }, { message: 'CI must be a number' })
-  userId: string
+  userCI: string
 }
