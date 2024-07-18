@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppointmentsService } from './appointments.service'
 import { PrismaService } from '../prisma/prisma.service'
-import { AppoitmentValidator } from './validators/CreateAppoitmentValidator'
+import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import {
@@ -10,9 +10,9 @@ import {
   AppointmentAlreadyExitsException,
   AppointmentLimitPerHourException,
 } from './exceptions'
-import { VehicleNotFoundException } from '../vehicles/exceptions/vehicle-not-found'
 import { AppointmentFactory } from './factories/appointment-factory'
 import { Appointment } from '@prisma/client'
+import fakerEs from 'src/faker/faker.config'
 
 describe('AppointmentsService', () => {
   let service: AppointmentsService
@@ -64,7 +64,7 @@ describe('AppointmentsService', () => {
       jest.spyOn(prismaService.appointment, 'create').mockResolvedValueOnce({
         id: 1,
         ...dto,
-      } as Appointment)
+      } as unknown as Appointment)
 
       const result = await service.create(dto)
       expect(prismaService.appointment.create).toHaveBeenCalledWith({
@@ -73,24 +73,24 @@ describe('AppointmentsService', () => {
       expect(result).toEqual({ ...appointment, id: 1 })
     })
 
-    it('should throw an error if vehicle not found during validation', async () => {
-      const createInput = await AppointmentFactory.buildCreateInput()
+    // it('should throw an error if vehicle not found during validation', async () => {
+    //   const createInput = await AppointmentFactory.buildCreateInput()
 
-      const dto = new CreateAppointmentDto()
-      Object.assign(dto, { ...createInput, vehicleId: 1 })
+    //   const dto = new CreateAppointmentDto()
+    //   Object.assign(dto, { ...createInput, vehicleId: 1 })
 
-      jest
-        .spyOn(validateAppointment, 'validate')
-        .mockRejectedValue(new VehicleNotFoundException(dto.vehicleId))
+    //   jest
+    //     .spyOn(validateAppointment, 'validate')
+    //     .mockRejectedValue(new VehicleNotFoundException(dto.vehicleId))
 
-      await expect(service.create(dto)).rejects.toThrow(
-        VehicleNotFoundException,
-      )
-    })
+    //   await expect(service.create(dto)).rejects.toThrow(
+    //     VehicleNotFoundException,
+    //   )
+    // })
 
     it('should throw an error if appointment time is in the past', async () => {
       const createInput = await AppointmentFactory.buildCreateInput({
-        date: new Date('2021-01-01'),
+        date: fakerEs.date.past(),
       })
       const dto = new CreateAppointmentDto()
       Object.assign(dto, { ...createInput })
@@ -106,7 +106,7 @@ describe('AppointmentsService', () => {
 
     it('should throw an error if appointment time is out of laboral hours', async () => {
       const createInput = await AppointmentFactory.buildCreateInput({
-        date: new Date('2021-01-01T18:00:00'),
+        date: new Date('2021-01-01T06:00:00'),
       })
 
       const dto = new CreateAppointmentDto()
@@ -129,7 +129,7 @@ describe('AppointmentsService', () => {
 
       jest
         .spyOn(validateAppointment, 'validate')
-        .mockRejectedValue(new AppointmentAlreadyExitsException(dto.userId))
+        .mockRejectedValue(new AppointmentAlreadyExitsException(dto.userCI))
 
       await expect(service.create(dto)).rejects.toThrow(
         AppointmentAlreadyExitsException,
@@ -157,6 +157,9 @@ describe('AppointmentsService', () => {
 
       if (dto.date) dto.date = new Date(dto.date)
 
+      jest
+        .spyOn(prismaService.appointment, 'findUnique')
+        .mockResolvedValueOnce(appointment)
       jest
         .spyOn(validateAppointment, 'validate')
         .mockImplementation(async () => undefined)

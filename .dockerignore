@@ -1,3 +1,10 @@
+**/node_modules/
+**/dist
+.git
+npm-debug.log
+.coverage
+.coverage.*
+*/__generated__
 *
 !/package.json
 !/package-lock.json
@@ -7,3 +14,4 @@
 !/.swcrc
 !/nest-cli.json
 !/src
+!.env?

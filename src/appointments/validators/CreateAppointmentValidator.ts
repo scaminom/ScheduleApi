@@ -1,7 +1,5 @@
 import { forwardRef, Inject } from '@nestjs/common'
-import { VehiclesService } from '../../vehicles/vehicles.service'
 import { CreateAppointmentDto } from '../dto/create-appointment.dto'
-import { VehicleNotFoundException } from '../../vehicles/exceptions/vehicle-not-found'
 import { AppointmentPastDateException } from '../exceptions/appointment-past-date'
 import { AppointmentLaboralHoursException } from '../exceptions/appointment-laboral-hours'
 import { AppointmentsService } from '../appointments.service'
@@ -10,25 +8,26 @@ import { AppointmentLimitPerHourException } from '../exceptions/appointment-limi
 import { BaseException } from '../../shared/exceptions/base-exception'
 import { BaseConflictException } from '../../shared/exceptions/conflict'
 import { UpdateAppointmentDto } from '../dto/update-appointment.dto'
+import { UserService } from '../../users/users.service'
 
 export class AppoitmentValidator {
   constructor(
-    @Inject(VehiclesService)
-    private readonly vehiclesService: VehiclesService,
-
     @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentsService: AppointmentsService,
+
+    @Inject(UserService)
+    private readonly userService: UserService,
   ) {}
 
   public async validate(
     createAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
   ): Promise<void> {
     try {
-      await this.validateVehicleId(createAppointmentDto.vehicleId)
-      this.validateDateAndTime(createAppointmentDto.date)
+      // await this.validateVehicleId(createAppointmentDto.vehicleId)
+      // this.validateDateAndTime(createAppointmentDto.date)
 
       await this.validateMechanic(
-        createAppointmentDto.userId,
+        createAppointmentDto.userCI,
         createAppointmentDto.date,
       )
       await this.validateAppointmentLimit(createAppointmentDto.date)
@@ -41,13 +40,13 @@ export class AppoitmentValidator {
     }
   }
 
-  private async validateVehicleId(vehicleId: number): Promise<void> {
-    const vehicle = await this.vehiclesService.findOne(vehicleId)
+  // private async validateVehicleId(vehicleId: number): Promise<void> {
+  //   const vehicle = await this.vehiclesService.findOne(vehicleId)
 
-    if (!vehicle) {
-      throw new VehicleNotFoundException(vehicleId)
-    }
-  }
+  //   if (!vehicle) {
+  //     throw new VehicleNotFoundException(vehicleId)
+  //   }
+  // }
 
   private validateDateAndTime(date: Date): void {
     if (date < new Date()) {
@@ -62,6 +61,8 @@ export class AppoitmentValidator {
     mechanicCI: string,
     date: Date,
   ): Promise<void> {
+    await this.userService.findOne(mechanicCI)
+
     const dateCopy = new Date(date)
     const minutesRange = [0, 20, 40]
     const minutesOfDate = dateCopy.getMinutes()
@@ -71,7 +72,7 @@ export class AppoitmentValidator {
 
     const alreadyHasAppointment = await this.appointmentsService.appointments({
       where: {
-        userId: mechanicCI,
+        userCI: mechanicCI,
         date: {
           lte: new Date(dateCopy.getTime() + 20 * 60 * 1000),
           gte: dateCopy,

@@ -3,6 +3,7 @@ import {
   defineInspectionFactory,
   initialize,
 } from '../../__generated__/fabbrica'
+import { fakerAppointmentFactorySchema } from 'src/appointments/factories/appointment-factory'
 
 const prisma = new PrismaClient()
 
@@ -14,31 +15,7 @@ export const InspectionFactory = defineInspectionFactory({
     startDate: new Date(),
     status: APPOINTMENT_STATUS.PENDING,
     appointment: {
-      create: {
-        clientName: 'John Doe',
-        vehicle: {
-          create: {
-            plate: 'ABC123',
-            type: 'Car',
-            brand: 'Toyota',
-            model: 'Corolla',
-            color: 'White',
-          },
-        },
-        description: 'Description',
-        date: new Date(),
-        status: APPOINTMENT_STATUS.PENDING,
-        user: {
-          create: {
-            ci: '1234567',
-            firstName: 'John',
-            lastName: 'Doe',
-            role: 'MECHANIC',
-            password: 'passW0rd',
-            deletedAt: null,
-          },
-        },
-      },
+      create: fakerAppointmentFactorySchema,
     },
   },
 })

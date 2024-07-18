@@ -3,7 +3,7 @@ import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import { PrismaService } from '../prisma/prisma.service'
 import { APPOINTMENT_STATUS, Inspection, Prisma } from '@prisma/client'
-import { AppointmentsService } from '../appoitments/appointments.service'
+import { AppointmentsService } from '../appointments/appointments.service'
 import {
   InspectionNotFoundException,
   InspectionPastDateException,
@@ -30,6 +30,10 @@ export class InspectionsService {
   ): Promise<Inspection | null> {
     return await this.prismaService.inspection.findUnique({
       where: params,
+      include: {
+        jobs: true,
+        appointment: true,
+      },
     })
   }
 
@@ -46,6 +50,10 @@ export class InspectionsService {
   }) {
     return await this.prismaService.inspection.findMany({
       ...params,
+      include: {
+        jobs: true,
+        appointment: true,
+      },
     })
   }
 
@@ -112,7 +120,12 @@ export class InspectionsService {
    * @returns {Promise<Inspection[]>} - The inspections found
    */
   async findAll() {
-    return await this.prismaService.inspection.findMany()
+    return await this.prismaService.inspection.findMany({
+      include: {
+        jobs: true,
+        appointment: true,
+      },
+    })
   }
 
   /**
@@ -141,8 +154,21 @@ export class InspectionsService {
    */
   async update(id: number, updateInspectionDto: UpdateInspectionDto) {
     const { startDate, endDate } = updateInspectionDto
+    await this.findOne(id)
 
-    await this.appointmentService.findOne(id)
+    if (updateInspectionDto.appointmentId)
+      await this.appointmentService.findOne(updateInspectionDto.appointmentId)
+
+    if (
+      updateInspectionDto.startDate < new Date() ||
+      updateInspectionDto.endDate < new Date()
+    ) {
+      throw new InspectionPastDateException()
+    }
+
+    if (updateInspectionDto.endDate < updateInspectionDto.startDate) {
+      throw new InspectionPastDateException()
+    }
 
     const pastInspection = await this.prismaService.inspection.findFirst({
       where: {
@@ -167,7 +193,7 @@ export class InspectionsService {
       data: {
         startDate,
         endDate,
-        status: APPOINTMENT_STATUS.PENDING,
+        status: updateInspectionDto.status,
       },
     })
   }

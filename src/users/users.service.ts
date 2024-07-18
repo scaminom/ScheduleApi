@@ -1,12 +1,15 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
-import { Prisma, User } from '@prisma/client'
+import { Prisma, Role, User } from '@prisma/client'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserInvalidCIException } from './exceptions/user-invalid-ci'
 import { UserAlreadyExistsException } from './exceptions/user-already-exits'
 import { UserNotFoundException } from './exceptions/user-not-found'
 import { validateCI } from './validators/user-validator'
+import { genSalt, hash } from 'bcrypt'
+import { IResponseUser } from './dto/response-user.dto'
+import { UserCantAssignColorException } from './exceptions/user-cant-assign-color'
 
 @Injectable()
 export class UserService {
@@ -35,17 +38,19 @@ export class UserService {
   /**
    * Find a user by its CI
    * @param ci - The CI of the user
-   * @returns {Promise<User | null>} - The user or null if not found
+   * @returns {Promise<IResponseUser | null>} - The user or null if not found
    * @throws {UserNotFoundException} - If the user is not found
    */
-  async findOne(ci: string): Promise<User | null> {
+  async findOne(ci: string): Promise<IResponseUser | null> {
     const user = await this.user({ ci })
 
     if (!user) {
       throw new UserNotFoundException(ci)
     }
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password, ...result } = user
 
-    return user
+    return result
   }
 
   /**
@@ -59,7 +64,7 @@ export class UserService {
     cursor?: Prisma.UserWhereUniqueInput
     where?: Prisma.UserWhereInput
     orderBy?: Prisma.UserOrderByWithRelationInput
-  }): Promise<User[]> {
+  }): Promise<IResponseUser[]> {
     const { skip, take, cursor, where, orderBy } = params
     return this.prisma.user.findMany({
       skip,
@@ -68,6 +73,14 @@ export class UserService {
       where: {
         ...where,
         deletedAt: null,
+      },
+      select: {
+        ci: true,
+        color: true,
+        firstName: true,
+        lastName: true,
+        role: true,
+        deletedAt: true,
       },
       orderBy,
     })
@@ -79,6 +92,7 @@ export class UserService {
    * @returns {Promise<User>} - The created user
    * @throws {UserInvalidCIException} - If the CI is invalid
    * @throws {UserAlreadyExistsException} - If the user already exists
+   * @throws {UserCantAssignColorException} - If the user can't assign a color
    */
   async createUser(data: CreateUserDto): Promise<User> {
     const { ci } = data
@@ -93,9 +107,28 @@ export class UserService {
       throw new UserAlreadyExistsException(ci)
     }
 
+    if (data.role !== Role.MECHANIC && data.color != null) {
+      throw new UserCantAssignColorException()
+    }
+
+    const hashedPassword = await this.generateSaltPassword(data.password)
+
+    data.password = hashedPassword
     return this.prisma.user.create({
       data,
     })
+  }
+
+  /**
+   * Generate a salted password
+   * @param password - The password to hash
+   * @returns {Promise<string>} - The hashed password
+   */
+  async generateSaltPassword(password: string): Promise<string> {
+    const ROUNDS = 10
+    const SALT = await genSalt(ROUNDS)
+
+    return hash(password, SALT)
   }
 
   /**
@@ -114,6 +147,10 @@ export class UserService {
 
     if (!notExists) {
       throw new UserNotFoundException(ci)
+    }
+
+    if (params.data.role !== Role.MECHANIC && params.data.color != null) {
+      throw new UserCantAssignColorException()
     }
 
     const { where, data } = params

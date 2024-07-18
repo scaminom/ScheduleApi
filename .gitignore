@@ -63,3 +63,8 @@ postgres/
 .env.development
 .env.test
 .env.production
+
+
+#prisma
+__generated__
+

@@ -10,7 +10,7 @@ up-dev:
 
 down-dev:
 	@echo "Stopping development environment"
-	docker compose down my-service-dev db-dev
+	docker compose rm -s -v my-service-dev db-dev
 	@echo "Development environment stopped"
 
 up-test:
