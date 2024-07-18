@@ -66,5 +66,5 @@ postgres/
 
 
 #prisma
-__generated__
+src/__generated__/*
 
