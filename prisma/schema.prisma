@@ -33,7 +33,7 @@ enum APPOINTMENT_STATUS {
 
 model User {
   ci          String        @id @unique
-  color       String
+  color       String?
   password    String
   role        Role
   firstName   String        @map("first_name")

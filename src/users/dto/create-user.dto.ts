@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Prisma, Role } from '@prisma/client'
-import { IsEnum, IsNumberString, IsString } from 'class-validator'
+import { IsEnum, IsNumberString, IsOptional, IsString } from 'class-validator'
 
 export class CreateUserDto implements Prisma.UserCreateInput {
   @ApiProperty({ example: '0202020202', description: 'The CI of the user' })
@@ -8,8 +8,9 @@ export class CreateUserDto implements Prisma.UserCreateInput {
   ci: string
 
   @ApiProperty({ example: 'azul', description: 'The color of the user' })
+  @IsOptional()
   @IsString()
-  color: string
+  color?: string
 
   @ApiProperty({ example: 'passW0rd', description: 'The password of the user' })
   @IsString()

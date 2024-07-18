@@ -9,6 +9,7 @@ import { InspectionFactory } from './factories/inspection-factory'
 import { AppointmentsService } from '../appointments/appointments.service'
 import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
+import fakerEs from 'src/faker/faker.config'
 
 describe('InspectionsService', () => {
   let service: InspectionsService
@@ -68,7 +69,7 @@ describe('InspectionsService', () => {
 
     it('should throw InspectionPastDateException if the date is in the past', async () => {
       const createInput = await InspectionFactory.buildCreateInput({
-        startDate: new Date('2020-01-01'),
+        startDate: fakerEs.date.past(),
       })
       const dto = new CreateInspectionDto()
       Object.assign(dto, createInput)
@@ -99,7 +100,7 @@ describe('InspectionsService', () => {
     })
 
     it('should throw InspectionNotFoundException if the inspection does not exist', async () => {
-      const inspectionId = 100
+      const inspectionId = 9999999999
       jest
         .spyOn(prismaService.inspection, 'findUnique')
         .mockResolvedValueOnce(null)
@@ -115,9 +116,14 @@ describe('InspectionsService', () => {
       const inspection = await InspectionFactory.create()
       const dto = new UpdateInspectionDto()
       Object.assign(dto, {
-        startDate: new Date('2022-01-01'),
-        endDate: new Date('2022-01-02'),
+        startDate: fakerEs.date.soon({ days: 2 }),
+        endDate: fakerEs.date.future(),
         jobs: undefined,
+      })
+
+      jest.spyOn(prismaService.inspection, 'findUnique').mockResolvedValueOnce({
+        ...inspection,
+        ...dto,
       })
       jest
         .spyOn(appointmentsService, 'findOne')
@@ -154,7 +160,7 @@ describe('InspectionsService', () => {
     })
 
     it('should throw InspectionNotFoundException if the inspection to remove does not exist', async () => {
-      const inspectionId = 100
+      const inspectionId = 99999
       jest
         .spyOn(prismaService.inspection, 'findUnique')
         .mockResolvedValueOnce(null)

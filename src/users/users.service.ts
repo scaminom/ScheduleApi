@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
-import { Prisma, User } from '@prisma/client'
+import { Prisma, Role, User } from '@prisma/client'
 import { CreateUserDto } from './dto/create-user.dto'
 import { UpdateUserDto } from './dto/update-user.dto'
 import { UserInvalidCIException } from './exceptions/user-invalid-ci'
@@ -9,6 +9,7 @@ import { UserNotFoundException } from './exceptions/user-not-found'
 import { validateCI } from './validators/user-validator'
 import { genSalt, hash } from 'bcrypt'
 import { IResponseUser } from './dto/response-user.dto'
+import { UserCantAssignColorException } from './exceptions/user-cant-assign-color'
 
 @Injectable()
 export class UserService {
@@ -91,6 +92,7 @@ export class UserService {
    * @returns {Promise<User>} - The created user
    * @throws {UserInvalidCIException} - If the CI is invalid
    * @throws {UserAlreadyExistsException} - If the user already exists
+   * @throws {UserCantAssignColorException} - If the user can't assign a color
    */
   async createUser(data: CreateUserDto): Promise<User> {
     const { ci } = data
@@ -103,6 +105,10 @@ export class UserService {
 
     if (alreadyExists) {
       throw new UserAlreadyExistsException(ci)
+    }
+
+    if (data.role !== Role.MECHANIC && data.color != null) {
+      throw new UserCantAssignColorException()
     }
 
     const hashedPassword = await this.generateSaltPassword(data.password)
@@ -118,7 +124,7 @@ export class UserService {
    * @param password - The password to hash
    * @returns {Promise<string>} - The hashed password
    */
-  private async generateSaltPassword(password: string): Promise<string> {
+  async generateSaltPassword(password: string): Promise<string> {
     const ROUNDS = 10
     const SALT = await genSalt(ROUNDS)
 
@@ -141,6 +147,10 @@ export class UserService {
 
     if (!notExists) {
       throw new UserNotFoundException(ci)
+    }
+
+    if (params.data.role !== Role.MECHANIC && params.data.color != null) {
+      throw new UserCantAssignColorException()
     }
 
     const { where, data } = params

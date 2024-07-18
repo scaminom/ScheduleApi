@@ -5,8 +5,9 @@ import { UserInvalidCIException } from './exceptions/user-invalid-ci'
 import { UserAlreadyExistsException } from './exceptions/user-already-exits'
 import { UserNotFoundException } from './exceptions/user-not-found'
 import { UpdateUserDto } from './dto/update-user.dto'
-import { User } from '@prisma/client'
+import { Role, User } from '@prisma/client'
 import { generateValidCI, UserFactory } from './factories/user.factory'
+import { UserCantAssignColorException } from './exceptions/user-cant-assign-color'
 
 const prismaMock = {
   user: {
@@ -40,7 +41,7 @@ describe('UserService', () => {
 
     const result = await userService.findOne(userMock.ci)
 
-    expect(result).toEqual(userMock)
+    expect(result).toEqual({ ...userMock, password: undefined })
   })
 
   it('should return not found exception when user does not exist', async () => {
@@ -54,6 +55,7 @@ describe('UserService', () => {
   it('should create a new user when the CI is valid and it does not exist', async () => {
     const createUserDto = await UserFactory.buildCreateInput({
       ci: generateValidCI(),
+      color: undefined,
     })
     const userMock: User = await UserFactory.create(createUserDto)
     jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(null)
@@ -82,6 +84,20 @@ describe('UserService', () => {
 
     await expect(userService.createUser(createUserDto)).rejects.toThrow(
       UserAlreadyExistsException,
+    )
+  })
+
+  it('should throw UserCantAssignColorException when the user can not assign a color', async () => {
+    const createUserDto = await UserFactory.buildCreateInput({
+      ci: generateValidCI(),
+      color: 'red',
+      role: Role.ADMIN,
+    })
+
+    jest.spyOn(prismaMock.user, 'findUnique').mockResolvedValue(null)
+
+    await expect(userService.createUser(createUserDto)).rejects.toThrow(
+      UserCantAssignColorException,
     )
   })
 

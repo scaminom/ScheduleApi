@@ -12,6 +12,7 @@ import {
 } from './exceptions'
 import { AppointmentFactory } from './factories/appointment-factory'
 import { Appointment } from '@prisma/client'
+import fakerEs from 'src/faker/faker.config'
 
 describe('AppointmentsService', () => {
   let service: AppointmentsService
@@ -89,7 +90,7 @@ describe('AppointmentsService', () => {
 
     it('should throw an error if appointment time is in the past', async () => {
       const createInput = await AppointmentFactory.buildCreateInput({
-        date: new Date('2021-01-01'),
+        date: fakerEs.date.past(),
       })
       const dto = new CreateAppointmentDto()
       Object.assign(dto, { ...createInput })
@@ -105,7 +106,7 @@ describe('AppointmentsService', () => {
 
     it('should throw an error if appointment time is out of laboral hours', async () => {
       const createInput = await AppointmentFactory.buildCreateInput({
-        date: new Date('2021-01-01T18:00:00'),
+        date: new Date('2021-01-01T06:00:00'),
       })
 
       const dto = new CreateAppointmentDto()
@@ -156,6 +157,9 @@ describe('AppointmentsService', () => {
 
       if (dto.date) dto.date = new Date(dto.date)
 
+      jest
+        .spyOn(prismaService.appointment, 'findUnique')
+        .mockResolvedValueOnce(appointment)
       jest
         .spyOn(validateAppointment, 'validate')
         .mockImplementation(async () => undefined)
