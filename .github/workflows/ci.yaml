@@ -118,6 +118,12 @@ jobs:
       - name: Start Test Environment
         run: make up-test
 
+      - name: Install Dependencies
+        run: yarn install
+
+      - name: Generate Prisma Client
+        run: yarn prisma generate
+
       - run: yarn prisma db push
 
       - name: Run Tests
