@@ -49,7 +49,7 @@ jobs:
 
   build:
     runs-on: ubuntu-latest
-    needs: lint
+    needs: [lint, prisma-generate]
     steps:
       - uses: actions/checkout@v4
 
@@ -60,6 +60,9 @@ jobs:
 
       - name: Install Dependencies
         run: yarn install
+
+      - name: prisma generate
+        run: yarn prisma generate
 
       - run: yarn build
   test:
