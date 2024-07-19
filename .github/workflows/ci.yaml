@@ -2,7 +2,7 @@ name: Continuous Integration for ScheduleApi
 
 on:
   pull_request:
-    branches: ['develop']
+    branches: ['develop', 'feat/ci-integration']
 
 jobs:
   avoid-redundant-builds:
