@@ -94,6 +94,27 @@ jobs:
       - name: Install Make
         run: sudo apt-get update && sudo apt-get install -y make
 
+      - name: Create .env.test file
+        run: |
+          echo "PORT=${{ secrets.PORT }}" > .env.test
+          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test
+          echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" >> .env.test
+          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env.test
+          echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" >> .env.test
+          echo "POSTGRES_USER_TEST=${{ secrets.POSTGRES_USER_TEST }}" >> .env.test
+          echo "POSTGRES_PASSWORD_TEST=${{ secrets.POSTGRES_PASSWORD_TEST }}" >> .env.test
+          echo "POSTGRES_DB_TEST=${{ secrets.POSTGRES_DB_TEST }}" >> .env.test
+          echo "PRISMA_LOG_LEVEL=${{ secrets.PRISMA_LOG_LEVEL }}" >> .env.test
+          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env.test
+          echo "DEBUG=${{ secrets.DEBUG }}" >> .env.test
+
+      - name: Copy .env.test file to .env.production and .env.development
+        run: cp .env.test .env.production && cp .env.test .env.development
+
+      - name: Create .env file with database url
+        run: |
+          echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" > .env
+
       - name: Start Test Environment
         run: make up-test
 
