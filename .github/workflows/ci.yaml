@@ -118,11 +118,10 @@ jobs:
       - name: Start Test Environment
         run: make up-test
 
-      - name: Install Dependencies in Test Container
-        run: make i-dep
+      - run: yarn prisma db push
 
       - name: Run Tests
-        run: docker exec schedule-api-dev yarn test
+        run: yarn test
 
       - name: Stop Test Environment
         run: make down-test
