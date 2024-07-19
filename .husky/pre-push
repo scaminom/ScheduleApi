@@ -1,1 +1,1 @@
-yarn lint && yarn prisma generate && yarn build && yarn start || echo "Error en los comandos anteriores"
+yarn lint && yarn prisma generate && yarn build && (timeout 5s yarn start & wait) || echo "Error en los comandos anteriores"
