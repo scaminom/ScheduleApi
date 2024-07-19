@@ -129,9 +129,5 @@ jobs:
       - name: Run Tests
         run: yarn test
 
-      # start project
-      - name: Start Production Environment
-        run: yarn start
-
       - name: Stop Test Environment
         run: make down-test
