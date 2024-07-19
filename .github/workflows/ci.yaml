@@ -95,6 +95,10 @@ jobs:
   test:
     runs-on: ubuntu-latest
     needs: build
+    services:
+      docker:
+        image: docker:20.10.7
+        options: --privileged
     steps:
       - uses: actions/checkout@v4
 
@@ -111,6 +115,19 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-yarn-
 
-      - run: yarn install
+      - name: Install Docker Compose
+        run: |
+          curl -L "https://github.com/docker/compose/releases/download/1.29.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
 
-      - run: yarn test
+      - name: Start Test Environment
+        run: make up-test
+
+      - name: Install Dependencies in Test Container
+        run: make i-dep
+
+      - name: Run Tests
+        run: docker exec schedule-api-dev yarn test
+
+      - name: Stop Test Environment
+        run: make down-test
