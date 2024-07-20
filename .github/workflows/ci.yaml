@@ -24,7 +24,7 @@ jobs:
       - name: Get Yarn cache directory path
         id: yarn-cache-dir
         run: |
-          echo "::set-output name=cache-path::$(yarn cache dir)"
+          echo "cache-path=$(yarn cache dir)" >> $GITHUB_OUTPUT
           echo "Yarn cache directory path is $(yarn cache dir)"
 
       - name: Setup Node.js
@@ -83,7 +83,7 @@ jobs:
       - name: Get Yarn cache directory path
         id: yarn-cache-dir
         run: |
-          echo "::set-output name=cache-path::$(yarn cache dir)"
+          echo "cache-path=$(yarn cache dir)" >> $GITHUB_OUTPUT 
           echo "Yarn cache directory path is $(yarn cache dir)"
 
       - name: Setup Node.js
