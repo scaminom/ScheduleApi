@@ -3,6 +3,8 @@ name: Continuous Integration for ScheduleApi
 on:
   pull_request:
     branches: ['develop', 'main']
+  push:
+    branches: ['ci-integration']
 
 jobs:
   avoid-redundant-builds:
@@ -14,36 +16,8 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-  lint:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.10.0'
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: ~/.yarn/cache
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
-
-      - name: Install Dependencies
-        run: yarn install
-
-      - name: Lint
-        run: yarn lint
-
   build:
     runs-on: ubuntu-latest
-    needs: [lint]
     steps:
       - uses: actions/checkout@v4
 
@@ -66,6 +40,9 @@ jobs:
       - name: Generate Prisma Client
         run: yarn prisma generate
 
+      - name: Lint
+        run: yarn lint
+
       - run: yarn build
 
   test:
@@ -75,6 +52,19 @@ jobs:
       docker:
         image: docker:20.10.7
         options: --privileged
+    env:
+      PORT: ${{ secrets.PORT }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+      CONTAINER_NAME: ${{ secrets.CONTAINER_NAME }}
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
+      POSTGRES_USER_TEST: ${{ secrets.POSTGRES_USER_TEST }}
+      POSTGRES_PASSWORD_TEST: ${{ secrets.POSTGRES_PASSWORD_TEST }}
+      POSTGRES_DB_TEST: ${{ secrets.POSTGRES_DB_TEST }}
+      PRISMA_LOG_LEVEL: ${{ secrets.PRISMA_LOG_LEVEL }}
+      NODE_ENV: ${{ secrets.NODE_ENV }}
+      DEBUG: ${{ secrets.DEBUG }}
+
     steps:
       - uses: actions/checkout@v4
 
@@ -94,29 +84,8 @@ jobs:
       - name: Install Make
         run: sudo apt-get update && sudo apt-get install -y make
 
-      - name: Create .env.test file
-        run: |
-          echo "PORT=${{ secrets.PORT }}" > .env.test
-          echo "JWT_SECRET=${{ secrets.JWT_SECRET }}" >> .env.test
-          echo "JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }}" >> .env.test
-          echo "CONTAINER_NAME=${{ secrets.CONTAINER_NAME }}" >> .env.test
-          echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" >> .env.test
-          echo "POSTGRES_USER_TEST=${{ secrets.POSTGRES_USER_TEST }}" >> .env.test
-          echo "POSTGRES_PASSWORD_TEST=${{ secrets.POSTGRES_PASSWORD_TEST }}" >> .env.test
-          echo "POSTGRES_DB_TEST=${{ secrets.POSTGRES_DB_TEST }}" >> .env.test
-          echo "PRISMA_LOG_LEVEL=${{ secrets.PRISMA_LOG_LEVEL }}" >> .env.test
-          echo "NODE_ENV=${{ secrets.NODE_ENV }}" >> .env.test
-          echo "DEBUG=${{ secrets.DEBUG }}" >> .env.test
-
-      - name: Copy .env.test file to .env.production and .env.development
-        run: cp .env.test .env.production && cp .env.test .env.development
-
-      - name: Create .env file with database url
-        run: |
-          echo "DATABASE_URL=${{ secrets.TEST_DATABASE_URL }}" > .env
-
       - name: Start Test Environment
-        run: make up-test
+        run: docker-compose -f docker-compose.test.yaml up -d
 
       - name: Install Dependencies
         run: yarn install

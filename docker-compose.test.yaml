@@ -1,0 +1,15 @@
+services:
+  db-testing:
+    container_name: db-testing
+    image: postgres:14.3
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER_TEST:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_TEST:-root}
+      POSTGRES_DB: ${POSTGRES_DB_TEST:-testing_db}
+    ports:
+      - '5436:5432'
+    volumes:
+      - db-data-testing:/var/lib/postgresql/data
+
+volumes:
+  db-data-testing:
