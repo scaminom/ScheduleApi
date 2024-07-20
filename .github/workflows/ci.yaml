@@ -80,15 +80,27 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Get Yarn cache directory path
+        id: yarn-cache-dir
+        run: |
+          echo "::set-output name=cache-path::$(yarn cache dir)"
+          echo "Yarn cache directory path is $(yarn cache dir)"
+
       - name: Setup Node.js
+        id: setup-node
         uses: actions/setup-node@v4
         with:
           node-version: '20.10.0'
+          cache: 'yarn'
 
       - name: Cache Node.js modules
         uses: actions/cache@v4
         with:
-          path: ~/.yarn/cache
+          path: |
+            **/node_modules
+            **/.eslintcache
+            ${{ steps.yarn-cache-dir.outputs.cache-path }}
+
           key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
           restore-keys: |
             ${{ runner.os }}-yarn-
