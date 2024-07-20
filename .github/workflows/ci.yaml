@@ -3,8 +3,6 @@ name: Continuous Integration for ScheduleApi
 on:
   pull_request:
     branches: ['develop', 'main']
-  push:
-    branches: ['ci-integration']
 
 jobs:
   avoid-redundant-builds:
