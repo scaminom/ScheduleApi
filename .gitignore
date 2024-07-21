@@ -63,6 +63,7 @@ postgres/
 .env.development
 .env.test
 .env.production
+.env.aws
 
 # Ignore docker-compose.yaml
 docker-compose.yaml
