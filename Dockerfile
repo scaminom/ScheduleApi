@@ -14,15 +14,11 @@ FROM base AS dev
 ENV NODE_ENV=development
 
 COPY package.json yarn.lock ./
-
 RUN yarn install
 
-COPY ./prisma ./prisma
-RUN yarn prisma generate
+COPY . .
 
-COPY tsconfig*.json .
-COPY nest-cli.json .
-COPY src src
+RUN yarn prisma generate
 
 # Use build argument for port
 ARG PORT=3000
@@ -40,13 +36,10 @@ RUN apk update && apk add --no-cache dumb-init=${DUMB_INIT_VERSION}
 COPY package.json yarn.lock ./
 RUN yarn install
 
-COPY tsconfig*.json .
-COPY .swcrc .
-COPY nest-cli.json .
-COPY src src
+COPY . .
 
-RUN yarn build && \
-  yarn install --production --frozen-lockfile
+RUN yarn prisma generate
+RUN yarn build && yarn install --production --frozen-lockfile
 
 # Production stage
 FROM base AS production

@@ -20,31 +20,18 @@ jobs:
       docker:
         image: docker:20.10.7
         options: --privileged
+    env:
+      PORT: ${{ secrets.PORT }}
+      JWT_SECRET: ${{ secrets.JWT_SECRET }}
+      JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+      DATABASE_URL: 'postgresql://postgres:root@db-testing:5432/SchedulesDbDev?schema=public'
+      PRISMA_LOG_LEVEL: ${{ secrets.PRISMA_LOG_LEVEL }}
+      POSTGRES_USER_TEST: ${{ secrets.POSTGRES_USER_TEST }}
+      POSTGRES_PASSWORD_TEST: ${{ secrets.POSTGRES_PASSWORD_TEST }}
+      POSTGRES_DB_TEST: ${{ secrets.POSTGRES_DB_TEST }}
+
     steps:
       - uses: actions/checkout@v4
-
-      - name: Get Yarn cache directory path
-        id: yarn-cache-dir
-        run: |
-          echo "cache-path=$(yarn cache dir)" >> $GITHUB_OUTPUT
-          echo "Yarn cache directory path is $(yarn cache dir)"
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: '20.10.0'
-          cache: 'yarn'
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v4
-        with:
-          path: |
-            **/node_modules
-            **/.eslintcache
-            ${{ steps.yarn-cache-dir.outputs.cache-path }}
-          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-yarn-
 
       - name: Build Docker Images
         run: docker-compose -f docker-compose.test.yaml build
@@ -54,18 +41,18 @@ jobs:
 
       - name: Wait for Postgres to be ready
         run: |
-          until docker-compose -f docker-compose.test.yaml exec db-testing pg_isready -U ${{ secrets.POSTGRES_USER_TEST }}; do
+          until docker-compose -f docker-compose.test.yaml exec -T db-testing pg_isready -U ${{ secrets.POSTGRES_USER_TEST }}; do
             sleep 1;
           done
 
-      - name: Generate Prisma Client
-        run: docker-compose -f docker-compose.test.yaml exec my-service-dev yarn prisma generate
+      - name: Run lint
+        run: docker-compose -f docker-compose.test.yaml exec -T my-service-dev yarn lint
 
       - name: Push Database Schema
-        run: docker-compose -f docker-compose.test.yaml exec my-service-dev yarn prisma db push
+        run: docker-compose -f docker-compose.test.yaml exec -T my-service-dev yarn prisma db push
 
       - name: Run Tests
-        run: docker-compose -f docker-compose.test.yaml exec my-service-dev yarn test
+        run: docker-compose -f docker-compose.test.yaml exec -T my-service-dev yarn test
 
       - name: Stop Test Environment
         run: docker-compose -f docker-compose.test.yaml down
