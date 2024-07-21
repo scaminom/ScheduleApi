@@ -2,6 +2,7 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { RemindersService } from './reminders.service'
 import { PrismaService } from '../prisma/prisma.service'
 import { ReminderFactory } from './factories/reminder.factory'
+import { RemindersGateway } from './reminders.gateway'
 
 const prismaMock = {
   reminder: {
@@ -20,6 +21,7 @@ describe('RemindersService', () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
         RemindersService,
+        RemindersGateway,
         {
           provide: PrismaService,
           useValue: prismaMock,

@@ -5,6 +5,7 @@ import { Appointment, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
+import { AppointmentsGateway } from './appointments.gateway'
 
 @Injectable()
 /**
@@ -19,6 +20,7 @@ export class AppointmentsService {
 
     @Inject(forwardRef(() => AppoitmentValidator))
     private readonly validateAppointment: AppoitmentValidator,
+    private readonly appointmentsGateway: AppointmentsGateway,
   ) {}
 
   /**
@@ -81,11 +83,15 @@ export class AppointmentsService {
   async create(createApointmentDto: CreateAppointmentDto) {
     await this.validateAppointment.validate(createApointmentDto)
 
-    return await this.prisma.appointment.create({
+    const appointment = await this.prisma.appointment.create({
       data: {
         ...createApointmentDto,
       },
     })
+
+    this.appointmentsGateway.sendAppointmentToMechanics(appointment)
+
+    return appointment
   }
 
   /**

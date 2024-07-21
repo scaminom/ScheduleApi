@@ -1,10 +1,11 @@
 import {
+  ConnectedSocket,
   SubscribeMessage,
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets'
 import { Reminder } from '@prisma/client'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 
 @WebSocketGateway({
   cors: {
@@ -15,8 +16,12 @@ export class RemindersGateway {
   @WebSocketServer()
   server: Server
 
-  @SubscribeMessage('reminder')
-  sendReminder(reminder: Reminder) {
-    this.server.emit('reminder', reminder)
+  sendReminderToAdmins(reminder: Reminder) {
+    this.server.to('admins').emit('new-reminder', reminder)
+  }
+
+  @SubscribeMessage('joinAdminsRoom')
+  handleJoinReminderJoin(@ConnectedSocket() client: Socket) {
+    client.join('admins')
   }
 }
