@@ -78,6 +78,7 @@ COPY --from=build /usr/bin/dumb-init /usr/bin/dumb-init
 COPY --from=build $DIR/package.json $DIR/yarn.lock ./
 COPY --from=build $DIR/node_modules node_modules
 COPY --from=build $DIR/dist dist
+COPY --from=build $DIR/prisma prisma 
 
 USER $USER
 

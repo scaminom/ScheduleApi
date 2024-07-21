@@ -36,7 +36,7 @@ async function bootstrap() {
     backgroundService.checkReminders()
   }, 60000)
 
-  await app.listen(process.env.PORT || 3001)
+  await app.listen(process.env.PORT || 3000)
   Logger.log(`Application is running on: ${await app.getUrl()}`)
 }
 bootstrap()
