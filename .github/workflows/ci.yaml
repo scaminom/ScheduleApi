@@ -1,0 +1,58 @@
+name: Continuous Integration for ScheduleApi
+
+on:
+  pull_request:
+    branches: ['develop', 'main']
+
+jobs:
+  avoid-redundant-builds:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Cancel previous redundant runs
+        uses: styfle/cancel-workflow-action@0.8.0
+        with:
+          access_token: ${{ github.token }}
+
+  build-test:
+    runs-on: ubuntu-latest
+
+    services:
+      docker:
+        image: docker:20.10.7
+        options: --privileged --memory=2g --memory-swap=2g
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Docker Image for Development
+        run: |
+          docker build --target dev \
+            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --build-arg JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
+            --build-arg DATABASE_URL=${{ secrets.TEST_DATABASE_URL }} \
+            --build-arg PRISMA_LOG_LEVEL=${{ secrets.PRISMA_LOG_LEVEL }} \
+            -t scheduleapi .
+
+      - name: Start Test Environment
+        run: |
+          docker run -d --name db-testing -e POSTGRES_USER=${{ secrets.POSTGRES_USER_TEST }} -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD_TEST }} -e POSTGRES_DB=${{ secrets.POSTGRES_DB_TEST }} postgres:14.3
+          docker run -d --name scheduleapi-dev --link db-testing:db -p 3000:3000 \
+            scheduleapi
+
+      - name: Wait for Postgres to be ready
+        run: |
+          until docker exec db-testing pg_isready -U ${{ secrets.POSTGRES_USER_TEST }}; do
+            sleep 1;
+          done
+
+      - name: Push Database Schema
+        run: docker exec scheduleapi-dev yarn prisma db push
+
+      - name: Run Tests
+        run: docker exec scheduleapi-dev yarn test
+
+      - name: Stop Test Environment
+        run: |
+          docker stop scheduleapi-dev db-testing
+          docker rm scheduleapi-dev db-testing

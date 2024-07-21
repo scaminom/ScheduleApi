@@ -180,6 +180,10 @@ describe('AppointmentsService', () => {
   describe('remove', () => {
     it('should mark an appointment as deleted', async () => {
       const appointment = await AppointmentFactory.create()
+
+      jest
+        .spyOn(prismaService.appointment, 'findUnique')
+        .mockResolvedValueOnce(appointment)
       jest.spyOn(prismaService.appointment, 'update').mockResolvedValueOnce({
         ...appointment,
         deletedAt: new Date(),
