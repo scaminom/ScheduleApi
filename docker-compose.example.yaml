@@ -13,16 +13,18 @@ services:
       args:
         NODE_VERSION: 20-alpine3.18
         DUMB_INIT_VERSION: 1.2.5-r2
-        PORT: ${PORT:-3000}
+        PORT: ${PORT:-80}
     ports:
-      - '80:${PORT:-3000}'
-    environment:
-      - PORT=${PORT:-3000}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - DATABASE_URL=${DATABASE_URL}
-      - PRISMA_LOG_LEVEL=${PRISMA_LOG_LEVEL}
-      - NODE_ENV=production
+      - '${PORT:-80}:${PORT:-80}'
+    env_file: ./.env.production.example
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512m'
+        reservations:
+          cpus: '0.25'
+          memory: '256m'
     networks:
       - app-network
 
@@ -34,20 +36,23 @@ services:
       context: .
       args:
         NODE_VERSION: 20-alpine3.18
-        PORT: ${PORT:-3000}
+        DUMB_INIT_VERSION: 1.2.5-r2
+        PORT: ${PORT:-80}
     ports:
-      - '80:${PORT:-3000}'
+      - '${PORT:-80}:${PORT:-80}'
     volumes:
       - ./src:/app/src
     depends_on:
       - db-dev
-    environment:
-      - PORT=${PORT:-3000}
-      - JWT_SECRET=${JWT_SECRET}
-      - JWT_EXPIRATION=${JWT_EXPIRATION}
-      - DATABASE_URL=${DATABASE_URL}
-      - PRISMA_LOG_LEVEL=${PRISMA_LOG_LEVEL}
-      - NODE_ENV=development
+    env_file: ./.env.development.example
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: '512m'
+        reservations:
+          cpus: '0.25'
+          memory: '256m'
     networks:
       - app-network
 

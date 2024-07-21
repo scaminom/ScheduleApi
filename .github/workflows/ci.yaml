@@ -14,45 +14,45 @@ jobs:
         with:
           access_token: ${{ github.token }}
 
-  build:
+  build-test:
     runs-on: ubuntu-latest
+
     services:
       docker:
         image: docker:20.10.7
-        options: --privileged
-    env:
-      PORT: ${{ secrets.PORT }}
-      JWT_SECRET: ${{ secrets.JWT_SECRET }}
-      JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
-      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
-      PRISMA_LOG_LEVEL: ${{ secrets.PRISMA_LOG_LEVEL }}
-      POSTGRES_USER_TEST: ${{ secrets.POSTGRES_USER_TEST }}
-      POSTGRES_PASSWORD_TEST: ${{ secrets.POSTGRES_PASSWORD_TEST }}
-      POSTGRES_DB_TEST: ${{ secrets.POSTGRES_DB_TEST }}
+        options: --privileged --memory=2g --memory-swap=2g
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build Docker Images
-        run: docker-compose -f docker-compose.test.yaml build
+      - name: Build Docker Image for Development
+        run: |
+          docker build --target dev \
+            --build-arg JWT_SECRET=${{ secrets.JWT_SECRET }} \
+            --build-arg JWT_EXPIRATION=${{ secrets.JWT_EXPIRATION }} \
+            --build-arg DATABASE_URL=${{ secrets.TEST_DATABASE_URL }} \
+            --build-arg PRISMA_LOG_LEVEL=${{ secrets.PRISMA_LOG_LEVEL }} \
+            -t scheduleapi .
 
       - name: Start Test Environment
-        run: docker-compose -f docker-compose.test.yaml up -d db-testing my-service-dev
+        run: |
+          docker run -d --name db-testing -e POSTGRES_USER=${{ secrets.POSTGRES_USER_TEST }} -e POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD_TEST }} -e POSTGRES_DB=${{ secrets.POSTGRES_DB_TEST }} postgres:14.3
+          docker run -d --name scheduleapi-dev --link db-testing:db -p 3000:3000 \
+            scheduleapi
 
       - name: Wait for Postgres to be ready
         run: |
-          until docker-compose -f docker-compose.test.yaml exec -T db-testing pg_isready -U ${{ secrets.POSTGRES_USER_TEST }}; do
+          until docker exec db-testing pg_isready -U ${{ secrets.POSTGRES_USER_TEST }}; do
             sleep 1;
           done
 
-      - name: Run lint
-        run: docker-compose -f docker-compose.test.yaml exec -T my-service-dev yarn lint
-
       - name: Push Database Schema
-        run: docker-compose -f docker-compose.test.yaml exec -T my-service-dev yarn prisma db push
+        run: docker exec scheduleapi-dev yarn prisma db push
 
       - name: Run Tests
-        run: docker-compose -f docker-compose.test.yaml exec -T my-service-dev yarn test
+        run: docker exec scheduleapi-dev yarn test
 
       - name: Stop Test Environment
-        run: docker-compose -f docker-compose.test.yaml down
+        run: |
+          docker stop scheduleapi-dev db-testing
+          docker rm scheduleapi-dev db-testing
