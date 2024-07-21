@@ -10,6 +10,7 @@ import { CreateUserDto } from '../users/dto/create-user.dto'
 import { UserService } from '../users/users.service'
 import { compareSync } from 'bcrypt'
 import { IResponseUser } from 'src/users/dto/response-user.dto'
+import { TokenResponse } from './dto/token-response.dto'
 
 @Injectable()
 export class AuthService {
@@ -37,11 +38,11 @@ export class AuthService {
     const user = await this.userService.user({ ci })
 
     if (!user) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('Credenciales inválidas')
     }
 
     if (!this.comparePassword(pass, user.password)) {
-      throw new UnauthorizedException()
+      throw new UnauthorizedException('Credenciales inválidas')
     }
     const payload = { sub: user.ci, firstName: user.firstName }
 
@@ -60,6 +61,35 @@ export class AuthService {
     return {
       message: 'Logout successful',
       statusCode: HttpStatus.OK,
+    }
+  }
+
+  validateToken(req: Request): TokenResponse {
+    try {
+      const token = req.headers.authorization.split(' ')[1]
+
+      if (!token) {
+        return {
+          isValid: false,
+          message: 'Inicie sesión para continuar',
+        }
+      }
+
+      const payload = this.jwtService.verify(token)
+
+      if (!payload) {
+        return {
+          isValid: false,
+          message: 'Token inválido',
+        }
+      }
+
+      return { isValid: true }
+    } catch (error) {
+      return {
+        isValid: false,
+        message: 'Token inválido',
+      }
     }
   }
 }
