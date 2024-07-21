@@ -64,6 +64,8 @@ postgres/
 .env.test
 .env.production
 
+# Ignore docker-compose.yaml
+docker-compose.yaml
 
 #prisma
 src/__generated__/*
