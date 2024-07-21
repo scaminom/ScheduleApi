@@ -13,15 +13,18 @@ import {
 import { AppointmentFactory } from './factories/appointment-factory'
 import { Appointment } from '@prisma/client'
 import fakerEs from 'src/faker/faker.config'
+import { AppointmentsGateway } from './appointments.gateway'
 
 describe('AppointmentsService', () => {
   let service: AppointmentsService
   let prismaService: PrismaService
   let validateAppointment: AppoitmentValidator
+  let gateway: AppointmentsGateway
 
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
+        AppointmentsGateway,
         AppointmentsService,
         {
           provide: PrismaService,
@@ -46,6 +49,10 @@ describe('AppointmentsService', () => {
     service = module.get<AppointmentsService>(AppointmentsService)
     prismaService = module.get<PrismaService>(PrismaService)
     validateAppointment = module.get<AppoitmentValidator>(AppoitmentValidator)
+    gateway = module.get<AppointmentsGateway>(AppointmentsGateway)
+
+    const server = { to: jest.fn().mockReturnThis(), emit: jest.fn() } as any
+    gateway.server = server
   })
 
   describe('create', () => {
@@ -53,10 +60,7 @@ describe('AppointmentsService', () => {
       const appointment = await AppointmentFactory.buildCreateInput()
 
       const dto = new CreateAppointmentDto()
-
-      const createInput = await AppointmentFactory.buildCreateInput()
-
-      Object.assign(dto, createInput)
+      Object.assign(dto, appointment)
 
       jest
         .spyOn(validateAppointment, 'validate')
@@ -67,10 +71,16 @@ describe('AppointmentsService', () => {
       } as unknown as Appointment)
 
       const result = await service.create(dto)
+
       expect(prismaService.appointment.create).toHaveBeenCalledWith({
         data: dto,
       })
       expect(result).toEqual({ ...appointment, id: 1 })
+      expect(gateway.server.to).toHaveBeenCalledWith('mechanics')
+      expect(gateway.server.emit).toHaveBeenCalledWith('new-appointment', {
+        ...appointment,
+        id: 1,
+      })
     })
 
     // it('should throw an error if vehicle not found during validation', async () => {
