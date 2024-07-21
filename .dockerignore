@@ -6,7 +6,7 @@
 npm-debug.log
 .coverage
 .coverage.*
-*/__generated__
+**/__generated__
 *
 !/package.json
 !/yarn.lock
