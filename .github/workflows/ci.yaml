@@ -24,7 +24,7 @@ jobs:
       PORT: ${{ secrets.PORT }}
       JWT_SECRET: ${{ secrets.JWT_SECRET }}
       JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
-      DATABASE_URL: 'postgresql://postgres:root@db-testing:5432/SchedulesDbDev?schema=public'
+      DATABASE_URL: ${{ secrets.TEST_DATABASE_URL }}
       PRISMA_LOG_LEVEL: ${{ secrets.PRISMA_LOG_LEVEL }}
       POSTGRES_USER_TEST: ${{ secrets.POSTGRES_USER_TEST }}
       POSTGRES_PASSWORD_TEST: ${{ secrets.POSTGRES_PASSWORD_TEST }}
