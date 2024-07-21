@@ -7,17 +7,14 @@ $ yarn install
 ## Running the app
 
 ```bash
-# development
-$ yarn run start
-
 # test environment
 $ yarn start:test
 
-# watch mode
-$ yarn run start:dev
+# development
+$ yarn start:dev
 
 # production mode
-$ yarn run start:prod
+$ yarn start:prod
 
 ```
 
@@ -25,7 +22,7 @@ $ yarn run start:prod
 
 ```bash
 # unit tests
-$ yarn run test
+$ yarn test
 ```
 
 ## Make Commands
@@ -43,12 +40,6 @@ $ make up-test
 # down development database container
 $ make down-test
 
-# run migrations in development database
-$ make run-migrations-dev
-
-# run migrations in test database
-$ make run-migrations-test
-
 # connect to development database
 $ make connect-db-dev
 
@@ -65,3 +56,19 @@ In this proyect we'll have three environments
 - Test
 
 There is a file called .env.example where you can create each enviroment file with those environment options.
+
+## Instructions for Joining WebSocket Rooms and Subscribing to Events
+
+### Reminder WebSocket
+
+To join the reminder WebSocket:
+
+1. Join the room `joinAdminsRoom`.
+2. Subscribe to the event `new-reminder`.
+
+### Appointment WebSocket
+
+To join the appointment WebSocket:
+
+1. Join the room `joinMechanicsRoom`.
+2. Subscribe to the event `new-appointment`.

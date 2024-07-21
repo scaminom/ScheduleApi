@@ -4,6 +4,7 @@ import { UserService } from '../users/users.service'
 import { AuthService } from './auth.service'
 import { HttpStatus, UnauthorizedException } from '@nestjs/common'
 import { UserFactory } from '../users/factories/user.factory'
+import { genSalt, hash } from 'bcrypt'
 
 describe('AuthService', () => {
   let authService: AuthService
@@ -19,6 +20,7 @@ describe('AuthService', () => {
           useValue: {
             user: jest.fn(),
             createUser: jest.fn(),
+            comparePassword: jest.fn(),
           },
         },
         {
@@ -36,9 +38,23 @@ describe('AuthService', () => {
   })
 
   it('should return a valid token for correct credentials', async () => {
-    const userMock = await UserFactory.create()
+    const userMock = await UserFactory.buildCreateInput()
 
-    jest.spyOn(userService, 'user').mockResolvedValue(userMock)
+    const generateSaltPassword = async (password: string): Promise<string> => {
+      const ROUNDS = 10
+      const SALT = await genSalt(ROUNDS)
+
+      return hash(password, SALT)
+    }
+
+    const saltPassword = await generateSaltPassword(userMock.password)
+
+    const user = await UserFactory.create({
+      ...userMock,
+      password: saltPassword,
+    })
+
+    jest.spyOn(userService, 'user').mockResolvedValue(user)
     jest.spyOn(jwtService, 'signAsync').mockResolvedValue('token')
 
     const result = await authService.signIn(userMock.ci, userMock.password)

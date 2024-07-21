@@ -1,3 +1,3 @@
-import { fakerES_MX as faker } from '@faker-js/faker'
+import { fakerES_MX as fakerEs } from '@faker-js/faker'
 
-export default faker
+export default fakerEs

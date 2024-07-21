@@ -1,6 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { RemindersGateway } from './reminders.gateway'
-import { Server } from 'socket.io'
+import { Server, Socket } from 'socket.io'
 import { Reminder } from '@prisma/client'
 import { ReminderFactory } from './factories/reminder.factory'
 
@@ -14,20 +14,26 @@ describe('RemindersGateway', () => {
     }).compile()
 
     gateway = module.get<RemindersGateway>(RemindersGateway)
-    server = gateway.server = new Server()
+    server = { to: jest.fn().mockReturnThis(), emit: jest.fn() } as any
+    gateway.server = server
   })
 
-  it('should be defined', () => {
-    expect(gateway).toBeDefined()
-  })
-
-  it('should emit reminder', () => {
+  it('should send reminder to admins', () => {
     const reminder = ReminderFactory.create() as unknown as Reminder
 
-    const emitSpy = jest.spyOn(server, 'emit')
+    gateway.sendReminderToAdmins(reminder)
 
-    gateway.sendReminder(reminder)
+    expect(server.to).toHaveBeenCalledWith('admins')
+    expect(server.emit).toHaveBeenCalledWith('new-reminder', reminder)
+  })
 
-    expect(emitSpy).toHaveBeenCalledWith('reminder', reminder)
+  it('should handle join admins room', () => {
+    const client: Socket = {
+      join: jest.fn(),
+    } as any
+
+    gateway.handleJoinReminderJoin(client)
+
+    expect(client.join).toHaveBeenCalledWith('admins')
   })
 })

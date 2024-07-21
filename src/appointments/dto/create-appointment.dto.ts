@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { APPOINTMENT_STATUS, Prisma } from '@prisma/client'
-import { IsDate, IsEnum, IsNumber, IsOptional, IsString } from 'class-validator'
+import { IsDate, IsEnum, IsOptional, IsString } from 'class-validator'
 
 export class CreateAppointmentDto
   implements Omit<Prisma.AppointmentCreateInput, 'user' | 'vehicle'>
@@ -9,9 +9,9 @@ export class CreateAppointmentDto
   @IsString()
   clientName: string
 
-  @ApiProperty({ example: 1 })
-  @IsNumber()
-  vehicleId: number
+  @ApiProperty({ example: 'MAZDA - BLANCO - PWQ-2394' })
+  @IsString()
+  vehicleDescription: string
 
   @ApiProperty({ example: 'Inspection description' })
   @IsString()
@@ -28,5 +28,5 @@ export class CreateAppointmentDto
 
   @ApiProperty({ example: '1' })
   @IsString()
-  userId: string
+  userCI: string
 }

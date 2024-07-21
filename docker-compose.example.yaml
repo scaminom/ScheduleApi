@@ -1,3 +1,9 @@
+version: '3.8'
+
+networks:
+  app-network:
+    driver: bridge
+
 services:
   my-service-production:
     container_name: schedule-api-production
@@ -5,10 +11,12 @@ services:
       target: production
       context: .
       args:
-        - PORT=${PORT:-3000}
+        NODE_VERSION: 20-alpine3.18
+        DUMB_INIT_VERSION: 1.2.5-r2
+        PORT: ${PORT:-80}
     ports:
-      - '80:${PORT:-3000}'
-    env_file: .env.production
+      - '${PORT:-80}:${PORT:-80}'
+    env_file: ./.env.production.example
     deploy:
       resources:
         limits:
@@ -17,20 +25,26 @@ services:
         reservations:
           cpus: '0.25'
           memory: '256m'
+    networks:
+      - app-network
 
   my-service-dev:
     container_name: schedule-api-dev
     restart: unless-stopped
-    env_file: .env.development
     build:
       target: dev
       context: .
+      args:
+        NODE_VERSION: 20-alpine3.18
+        DUMB_INIT_VERSION: 1.2.5-r2
+        PORT: ${PORT:-80}
     ports:
-      - '80:${PORT:-3000}'
+      - '${PORT:-80}:${PORT:-80}'
     volumes:
       - ./src:/app/src
     depends_on:
       - db-dev
+    env_file: ./.env.development.example
     deploy:
       resources:
         limits:
@@ -39,6 +53,8 @@ services:
         reservations:
           cpus: '0.25'
           memory: '256m'
+    networks:
+      - app-network
 
   db-dev:
     container_name: db-dev
@@ -51,6 +67,8 @@ services:
       - '5434:5432'
     volumes:
       - db-data-dev:/var/lib/postgresql/data
+    networks:
+      - app-network
 
   db-testing:
     container_name: db-testing
@@ -60,9 +78,11 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD_TEST:-root}
       POSTGRES_DB: ${POSTGRES_DB_TEST:-testing_db}
     ports:
-      - '5433:5432'
+      - '5436:5432'
     volumes:
       - db-data-testing:/var/lib/postgresql/data
+    networks:
+      - app-network
 
 volumes:
   db-data-dev:

@@ -17,9 +17,9 @@ describe('AppService', () => {
     configService = module.get<ConfigService>(ConfigService)
   })
 
-  it('should return the DATABASE_URL from config', () => {
-    const databaseUrl = configService.get<string>('DATABASE_URL')
+  it('should return the CONTAINER_NAME from config', () => {
+    const containerName = configService.get<string>('CONTAINER_NAME')
     const result = appService.getHello()
-    expect(result).toEqual(databaseUrl)
+    expect(result).toEqual(containerName)
   })
 })

@@ -33,6 +33,7 @@ enum APPOINTMENT_STATUS {
 
 model User {
   ci          String        @id @unique
+  color       String?
   password    String
   role        Role
   firstName   String        @map("first_name")
@@ -45,30 +46,29 @@ model User {
   @@map("users")
 }
 
-model Vehicle {
-  id          Int           @id @default(autoincrement())
-  plate       String        @unique
-  type        String
-  brand       String
-  model       String
-  color       String
-  Appointment Appointment[]
+// model Vehicle {
+//   id          Int           @id @default(autoincrement())
+//   plate       String        @unique
+//   type        String
+//   brand       String
+//   model       String
+//   color       String
+//   Appointment Appointment[]
 
-  @@map("vehicles")
-}
+//   @@map("vehicles")
+// }
 
 model Appointment {
-  id          Int                @id @default(autoincrement())
-  clientName  String
-  vehicleId   Int
-  description String?
-  date        DateTime
-  status      APPOINTMENT_STATUS
-  userId      String             @map("user_id")
-  deletedAt   DateTime?          @map("deleted_at")
+  id                 Int                @id @default(autoincrement())
+  clientName         String
+  vehicleDescription String             @map("vehicle_description")
+  description        String?
+  date               DateTime
+  status             APPOINTMENT_STATUS
+  userCI             String             @map("user_ci")
+  deletedAt          DateTime?          @map("deleted_at")
 
-  vehicle    Vehicle      @relation(fields: [vehicleId], references: [id])
-  user       User         @relation(fields: [userId], references: [ci])
+  user       User         @relation(fields: [userCI], references: [ci])
   Inspection Inspection[]
 
   @@map("appointments")
@@ -84,8 +84,8 @@ model Reminder {
   reminderDate              DateTime  @map("reminder_date")
   notificationMinutesBefore Int       @map("notification_minutes_before")
   notificationSent          Boolean   @default(false) @map("notification_sent")
-  userId                    String    @map("user_id")
-  user                      User?     @relation(fields: [userId], references: [ci])
+  userCI                    String    @map("user_ci")
+  user                      User?     @relation(fields: [userCI], references: [ci])
 
   @@map("reminders")
 }
@@ -109,7 +109,7 @@ model Job {
   name         String
   status       APPOINTMENT_STATUS
 
-  inspection Inspection @relation(fields: [inspectionId], references: [id])
+  inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
 
   @@map("jobs")
 }
