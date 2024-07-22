@@ -58,7 +58,7 @@ describe('InspectionsService', () => {
         .mockImplementation(async () => undefined)
       jest
         .spyOn(prismaService.inspection, 'create')
-        .mockResolvedValueOnce({ id: 1, ...dto })
+        .mockResolvedValueOnce({ id: 1, ...dto, endDate: null })
 
       const result = await service.create(dto)
       expect(prismaService.inspection.create).toHaveBeenCalledWith({
@@ -80,6 +80,7 @@ describe('InspectionsService', () => {
       jest.spyOn(prismaService.inspection, 'findFirst').mockResolvedValueOnce({
         id: 1,
         ...dto,
+        endDate: null,
       })
 
       await expect(service.create(dto)).rejects.toThrow(

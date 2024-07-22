@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import { PrismaService } from '../prisma/prisma.service'
@@ -17,6 +17,8 @@ import { JobAlreadyExitsException } from '../jobs/exceptions'
 export class InspectionsService {
   constructor(
     private readonly prismaService: PrismaService,
+
+    @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentService: AppointmentsService,
   ) {}
 
@@ -66,27 +68,12 @@ export class InspectionsService {
    * @throws {Error} - If the appointment does not exist
    */
   async create(createInspectionDto: CreateInspectionDto) {
-    const { appointmentId, jobs, startDate, endDate } = createInspectionDto
+    const { appointmentId, jobs, startDate } = createInspectionDto
 
     await this.appointmentService.findOne(appointmentId)
 
-    const pastInspection = await this.prismaService.inspection.findFirst({
-      where: {
-        appointmentId,
-        startDate: {
-          lte: startDate,
-        },
-        endDate: {
-          gte: startDate,
-        },
-      },
-    })
-
-    if (pastInspection) {
-      throw new InspectionPastDateException()
-    }
-
     await this.appointmentService.findOne(appointmentId)
+
     // find jobs with the same name
     if (jobs) {
       const jobNames = jobs.map((job) => job.toLowerCase())
@@ -109,7 +96,6 @@ export class InspectionsService {
               }
             : undefined,
         startDate,
-        endDate,
         status: APPOINTMENT_STATUS.PENDING,
       },
     })
@@ -153,7 +139,6 @@ export class InspectionsService {
    * @throws {Error} - If the jobs have the same name
    */
   async update(id: number, updateInspectionDto: UpdateInspectionDto) {
-    const { startDate, endDate } = updateInspectionDto
     await this.findOne(id)
 
     if (updateInspectionDto.appointmentId)
@@ -170,30 +155,12 @@ export class InspectionsService {
       throw new InspectionPastDateException()
     }
 
-    const pastInspection = await this.prismaService.inspection.findFirst({
-      where: {
-        appointmentId: id,
-        startDate: {
-          lte: startDate,
-        },
-        endDate: {
-          gte: startDate,
-        },
-      },
-    })
-
-    if (pastInspection) {
-      throw new InspectionPastDateException()
-    }
-
     return await this.prismaService.inspection.update({
       where: {
         id,
       },
       data: {
-        startDate,
-        endDate,
-        status: updateInspectionDto.status,
+        ...updateInspectionDto,
       },
     })
   }

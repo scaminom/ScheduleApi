@@ -14,6 +14,7 @@ import { AppointmentFactory } from './factories/appointment-factory'
 import { Appointment } from '@prisma/client'
 import fakerEs from 'src/faker/faker.config'
 import { AppointmentsGateway } from './appointments.gateway'
+import { InspectionsService } from 'src/inspections/inspections.service'
 
 describe('AppointmentsService', () => {
   let service: AppointmentsService
@@ -44,6 +45,7 @@ describe('AppointmentsService', () => {
           },
         },
       ],
+      imports: [InspectionsService],
     }).compile()
 
     service = module.get<AppointmentsService>(AppointmentsService)

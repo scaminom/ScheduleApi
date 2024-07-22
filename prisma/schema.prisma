@@ -46,18 +46,6 @@ model User {
   @@map("users")
 }
 
-// model Vehicle {
-//   id          Int           @id @default(autoincrement())
-//   plate       String        @unique
-//   type        String
-//   brand       String
-//   model       String
-//   color       String
-//   Appointment Appointment[]
-
-//   @@map("vehicles")
-// }
-
 model Appointment {
   id                 Int                @id @default(autoincrement())
   clientName         String
@@ -78,6 +66,7 @@ model Reminder {
   id                        Int       @id @default(autoincrement())
   title                     String
   description               String
+  color                     String
   isCompleted               Boolean?  @default(false) @map("is_completed")
   createdAt                 DateTime? @map("created_at")
   deletedAt                 DateTime? @map("deleted_at")
@@ -94,7 +83,7 @@ model Inspection {
   id            Int                @id @default(autoincrement())
   appointmentId Int
   startDate     DateTime           @map("start_date")
-  endDate       DateTime           @map("end_date")
+  endDate       DateTime?          @map("end_date")
   status        APPOINTMENT_STATUS
 
   appointment Appointment @relation(fields: [appointmentId], references: [id])

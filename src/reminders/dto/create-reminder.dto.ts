@@ -10,11 +10,15 @@ export class CreateReminderDto {
   @IsString()
   description: string
 
+  @ApiProperty({ example: '#FFFFFF' })
+  @IsString()
+  color: string
+
   @ApiProperty({ example: '2021-08-01T00:00:00' })
   @IsDate()
   reminderDate: Date
 
-  @ApiProperty({ example: 15 })
+  @ApiProperty({ example: 15, description: 'Minutes before the reminder' })
   @IsNumber()
   notificationMinutesBefore: number
 

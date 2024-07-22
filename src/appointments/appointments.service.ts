@@ -1,11 +1,12 @@
 import { forwardRef, Inject, Injectable } from '@nestjs/common'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
-import { Appointment, Prisma } from '@prisma/client'
+import { Appointment, APPOINTMENT_STATUS, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 import { AppointmentsGateway } from './appointments.gateway'
+import { InspectionsService } from 'src/inspections/inspections.service'
 
 @Injectable()
 /**
@@ -20,6 +21,10 @@ export class AppointmentsService {
 
     @Inject(forwardRef(() => AppoitmentValidator))
     private readonly validateAppointment: AppoitmentValidator,
+
+    @Inject(forwardRef(() => InspectionsService))
+    private readonly inspectionsService: InspectionsService,
+
     private readonly appointmentsGateway: AppointmentsGateway,
   ) {}
 
@@ -87,6 +92,12 @@ export class AppointmentsService {
       data: {
         ...createApointmentDto,
       },
+    })
+
+    await this.inspectionsService.create({
+      appointmentId: appointment.id,
+      status: APPOINTMENT_STATUS.PENDING,
+      startDate: createApointmentDto.date,
     })
 
     this.appointmentsGateway.sendAppointmentToMechanics(appointment)
