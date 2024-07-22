@@ -23,5 +23,7 @@ export class RemindersGateway {
   @SubscribeMessage('joinAdminsRoom')
   handleJoinReminderJoin(@ConnectedSocket() client: Socket) {
     client.join('admins')
+
+    console.log('Admin joined' + client.id)
   }
 }

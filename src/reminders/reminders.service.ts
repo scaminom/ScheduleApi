@@ -10,21 +10,62 @@ import { getLocalDate } from 'src/shared/functions/local-date'
 export class RemindersService {
   public constructor(private readonly prisma: PrismaService) {}
 
-  async getPendingReminders(): Promise<Reminder[]> {
-    const now = getLocalDate()
-    const startOfWindow = new Date(now.getTime() - 60000)
-    const endOfWindow = new Date(now.getTime() + 60000)
-
-    return this.prisma.reminder.findMany({
+  async getPendingReminders(): Promise<{
+    firstReminders: Reminder[]
+    secondReminders: Reminder[]
+  }> {
+    const firstRemindersToFilter = await this.prisma.reminder.findMany({
       where: {
-        isCompleted: false,
-        reminderDate: {
-          gte: startOfWindow,
-          lte: endOfWindow,
-        },
+        notificationSent: false,
+        minutesBeforeNotificationSent: false,
         deletedAt: null,
       },
     })
+
+    const firstReminders = firstRemindersToFilter.filter((reminder) => {
+      const now = getLocalDate()
+      const reminderDate = new Date(reminder.reminderDate)
+      const dateMinutesBefore = new Date(
+        reminderDate.getTime() - reminder.notificationMinutesBefore * 60000,
+      )
+
+      return now >= dateMinutesBefore && now <= reminderDate
+    })
+
+    firstReminders.forEach(async (reminder) => {
+      await this.prisma.reminder.update({
+        where: { id: reminder.id },
+        data: { minutesBeforeNotificationSent: true },
+      })
+    })
+
+    const secondRemindersToFilter = await this.prisma.reminder.findMany({
+      where: {
+        notificationSent: false,
+        minutesBeforeNotificationSent: true,
+        deletedAt: null,
+      },
+    })
+
+    const secondReminders = secondRemindersToFilter.filter((reminder) => {
+      const now = getLocalDate()
+      const reminderDate = new Date(reminder.reminderDate)
+      const dateMinuteBefore = new Date(reminderDate.getTime() - 60000)
+      const dateMinuteAfter = new Date(reminderDate.getTime() + 60000)
+
+      return now >= dateMinuteBefore && now <= dateMinuteAfter
+    })
+
+    secondReminders.forEach(async (reminder) => {
+      await this.prisma.reminder.update({
+        where: { id: reminder.id },
+        data: { notificationSent: true },
+      })
+    })
+
+    console.log('reminders', firstReminders, secondReminders)
+
+    return { firstReminders, secondReminders }
   }
 
   // async getDueNotifications(): Promise<Reminder[]> {
@@ -50,10 +91,17 @@ export class RemindersService {
   //   })
   // }
 
-  async markReminderAsCompleted(id: number): Promise<Reminder> {
+  async markReminderCompleteSent(id: number): Promise<Reminder> {
     return this.prisma.reminder.update({
       where: { id },
-      data: { isCompleted: true },
+      data: { notificationSent: true },
+    })
+  }
+
+  async markReminderPartialSent(id: number): Promise<Reminder> {
+    return this.prisma.reminder.update({
+      where: { id },
+      data: { minutesBeforeNotificationSent: true },
     })
   }
 
