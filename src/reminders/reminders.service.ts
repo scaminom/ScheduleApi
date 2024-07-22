@@ -32,13 +32,6 @@ export class RemindersService {
       return now >= dateMinutesBefore && now <= reminderDate
     })
 
-    firstReminders.forEach(async (reminder) => {
-      await this.prisma.reminder.update({
-        where: { id: reminder.id },
-        data: { minutesBeforeNotificationSent: true },
-      })
-    })
-
     const secondRemindersToFilter = await this.prisma.reminder.findMany({
       where: {
         notificationSent: false,
@@ -55,15 +48,6 @@ export class RemindersService {
 
       return now >= dateMinuteBefore && now <= dateMinuteAfter
     })
-
-    secondReminders.forEach(async (reminder) => {
-      await this.prisma.reminder.update({
-        where: { id: reminder.id },
-        data: { notificationSent: true },
-      })
-    })
-
-    console.log('reminders', firstReminders, secondReminders)
 
     return { firstReminders, secondReminders }
   }
