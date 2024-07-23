@@ -16,7 +16,10 @@ export class SubscriptionsController {
     description: 'The record  has been successfully created.',
   })
   async create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
-    Logger.log('Received subscription:', createSubscriptionDto.endpoint)
+    Logger.log(
+      'Received subscription:',
+      createSubscriptionDto.subscription.endpoint,
+    )
 
     return await this.subscriptionsService.create(createSubscriptionDto)
   }

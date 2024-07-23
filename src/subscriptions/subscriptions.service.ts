@@ -11,7 +11,10 @@ export class SubscriptionsService {
     createSubscriptionDto: CreateSubscriptionDto,
   ): Promise<Subscription> {
     return await this.prisma.subscription.create({
-      data: createSubscriptionDto,
+      data: {
+        userRole: createSubscriptionDto.userRole,
+        ...createSubscriptionDto.subscription,
+      },
     })
   }
 
