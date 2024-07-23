@@ -12,17 +12,22 @@ export class BackgroundService {
   ) {}
 
   async checkReminders() {
-    // const dueNotifications = await this.remindersService.getDueNotifications()
-    // for (const reminder of dueNotifications) {
-    //   this.remindersGateway.sendReminder(reminder)
-    //   this.logger.log(`Pre-notification sent: ${reminder.title}`)
-    //   await this.remindersService.markNotificationAsSent(reminder.id)
-    // }
-    const dueReminders = await this.remindersService.getPendingReminders()
-    for (const reminder of dueReminders) {
-      this.remindersGateway.sendReminderToAdmins(reminder)
+    const { firstReminders, secondReminders } =
+      await this.remindersService.getPendingReminders()
+    for (const reminder of firstReminders) {
+      console.log('Sending reminder...')
+      this.remindersGateway.sendReminderToAdmins()
       this.logger.log(`Reminder sent: ${reminder.title}`)
-      await this.remindersService.markReminderAsCompleted(reminder.id)
+
+      await this.remindersService.markReminderPartialSent(reminder.id)
+    }
+
+    for (const reminder of secondReminders) {
+      console.log('Sending reminder...')
+      this.remindersGateway.sendReminderToAdmins()
+      this.logger.log(`Reminder sent: ${reminder.title}`)
+
+      await this.remindersService.markReminderCompleteSent(reminder.id)
     }
   }
 }

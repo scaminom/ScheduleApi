@@ -9,7 +9,8 @@ generator client {
 }
 
 generator fabbrica {
-  provider = "prisma-fabbrica"
+  provider    = "prisma-fabbrica"
+  noTranspile = true
 }
 
 datasource db {
@@ -20,6 +21,7 @@ datasource db {
 enum Role {
   ADMIN
   MECHANIC
+  TECHNICIAN_MECHANIC
   SECRETARY
 }
 
@@ -46,18 +48,6 @@ model User {
   @@map("users")
 }
 
-// model Vehicle {
-//   id          Int           @id @default(autoincrement())
-//   plate       String        @unique
-//   type        String
-//   brand       String
-//   model       String
-//   color       String
-//   Appointment Appointment[]
-
-//   @@map("vehicles")
-// }
-
 model Appointment {
   id                 Int                @id @default(autoincrement())
   clientName         String
@@ -75,17 +65,18 @@ model Appointment {
 }
 
 model Reminder {
-  id                        Int       @id @default(autoincrement())
-  title                     String
-  description               String
-  isCompleted               Boolean?  @default(false) @map("is_completed")
-  createdAt                 DateTime? @map("created_at")
-  deletedAt                 DateTime? @map("deleted_at")
-  reminderDate              DateTime  @map("reminder_date")
-  notificationMinutesBefore Int       @map("notification_minutes_before")
-  notificationSent          Boolean   @default(false) @map("notification_sent")
-  userCI                    String    @map("user_ci")
-  user                      User?     @relation(fields: [userCI], references: [ci])
+  id                            Int       @id @default(autoincrement())
+  title                         String
+  description                   String
+  color                         String
+  createdAt                     DateTime? @map("created_at")
+  deletedAt                     DateTime? @map("deleted_at")
+  reminderDate                  DateTime  @map("reminder_date")
+  notificationMinutesBefore     Int       @map("notification_minutes_before")
+  notificationSent              Boolean?  @default(false) @map("notification_sent")
+  minutesBeforeNotificationSent Boolean?  @default(false) @map("minutes_before_notification_sent")
+  userCI                        String    @map("user_ci")
+  user                          User?     @relation(fields: [userCI], references: [ci])
 
   @@map("reminders")
 }
@@ -94,7 +85,7 @@ model Inspection {
   id            Int                @id @default(autoincrement())
   appointmentId Int
   startDate     DateTime           @map("start_date")
-  endDate       DateTime           @map("end_date")
+  endDate       DateTime?          @map("end_date")
   status        APPOINTMENT_STATUS
 
   appointment Appointment @relation(fields: [appointmentId], references: [id])

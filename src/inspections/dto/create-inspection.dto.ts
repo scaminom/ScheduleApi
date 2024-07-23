@@ -21,8 +21,4 @@ export class CreateInspectionDto {
   @ApiProperty({ example: '2021-08-01T00:00:00' })
   @IsDate()
   startDate: Date
-
-  @ApiProperty({ example: '2021-08-01T00:00:00' })
-  @IsDate()
-  endDate: Date
 }

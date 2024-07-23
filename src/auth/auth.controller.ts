@@ -16,6 +16,7 @@ import { Public } from './strategies/public.strategy'
 import { SignInDto } from './dto/sign-in.dto'
 import { ApiOperation, ApiResponse, ApiBody, ApiTags } from '@nestjs/swagger'
 import { AuthGuard } from './guards/auth.guard'
+import { TokenResponse } from './dto/token-response.dto'
 
 @ApiTags('auth')
 @Controller('auth')
@@ -53,5 +54,29 @@ export class AuthController {
   @Get('logout')
   logout(@Req() request: Request): Promise<any> {
     return this.authService.logout(request)
+  }
+
+  @Public()
+  @HttpCode(HttpStatus.OK)
+  @ApiOperation({ summary: 'Validate Token' })
+  @ApiResponse({
+    status: 200,
+    description: 'Schema with isValid and message, message is nullable',
+    schema: {
+      type: 'object',
+      properties: {
+        isValid: {
+          type: 'boolean',
+        },
+        message: {
+          type: 'string',
+          nullable: true,
+        },
+      },
+    },
+  })
+  @Get('validate-token')
+  validateToken(@Req() request: Request): TokenResponse {
+    return this.authService.validateToken(request)
   }
 }

@@ -1,4 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger'
+import { Transform } from 'class-transformer'
 import { IsString, IsNumber, IsNumberString, IsDate } from 'class-validator'
 
 export class CreateReminderDto {
@@ -10,11 +11,17 @@ export class CreateReminderDto {
   @IsString()
   description: string
 
-  @ApiProperty({ example: '2021-08-01T00:00:00' })
+  @ApiProperty({ example: '#FFFFFF' })
+  @IsString()
+  color: string
+
+  // gmt
+  @ApiProperty({ example: '2024-07-22 01:14:00-05' })
   @IsDate()
+  @Transform(({ value }) => new Date(value))
   reminderDate: Date
 
-  @ApiProperty({ example: 15 })
+  @ApiProperty({ example: 15, description: 'Minutes before the reminder' })
   @IsNumber()
   notificationMinutesBefore: number
 

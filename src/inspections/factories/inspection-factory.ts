@@ -11,7 +11,6 @@ initialize({ prisma })
 
 export const InspectionFactory = defineInspectionFactory({
   defaultData: {
-    endDate: new Date(),
     startDate: new Date(),
     status: APPOINTMENT_STATUS.PENDING,
     appointment: {

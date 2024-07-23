@@ -1,11 +1,18 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
+import {
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
-import { Appointment, Prisma } from '@prisma/client'
+import { Appointment, APPOINTMENT_STATUS, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 import { AppointmentsGateway } from './appointments.gateway'
+import { InspectionsService } from 'src/inspections/inspections.service'
+import { IAppointementFilters } from './interfaces/i-appointment-filters'
 
 @Injectable()
 /**
@@ -20,6 +27,10 @@ export class AppointmentsService {
 
     @Inject(forwardRef(() => AppoitmentValidator))
     private readonly validateAppointment: AppoitmentValidator,
+
+    @Inject(forwardRef(() => InspectionsService))
+    private readonly inspectionsService: InspectionsService,
+
     private readonly appointmentsGateway: AppointmentsGateway,
   ) {}
 
@@ -75,6 +86,52 @@ export class AppointmentsService {
   }
 
   /**
+   * Find appointments by filters
+   * @param params IAppointementFilters
+   * @returns Promise<Appointment[]>
+   * @throws {ConflictException} if the start date is greater than the end date
+   */
+  async findByFilters(params: IAppointementFilters): Promise<Appointment[]> {
+    if (
+      params.startDate &&
+      params.endDate &&
+      params.startDate > params.endDate
+    ) {
+      throw new ConflictException(
+        'Fecha de inicio no puede ser mayor a la fecha de fin',
+      )
+    }
+
+    return await this.prisma.appointment.findMany({
+      where: {
+        ...params,
+        date:
+          params.startDate && params.endDate
+            ? {
+                lte: params.endDate,
+                gte: params.startDate,
+              }
+            : params.startDate
+              ? { gte: params.startDate }
+              : params.endDate
+                ? { lte: params.endDate }
+                : undefined,
+        deletedAt: null,
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
+      },
+    })
+  }
+
+  /**
    * Create a new appointment, validate the appointment
    * @param createApointmentDto CreateAppointmentDto
    * @returns Promise<Appointment>
@@ -89,7 +146,13 @@ export class AppointmentsService {
       },
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics(appointment)
+    await this.inspectionsService.create({
+      appointmentId: appointment.id,
+      status: APPOINTMENT_STATUS.PENDING,
+      startDate: createApointmentDto.date,
+    })
+
+    this.appointmentsGateway.sendAppointmentToMechanics()
 
     return appointment
   }
@@ -146,7 +209,7 @@ export class AppointmentsService {
 
     await this.validateAppointment.validate(updateApointmentDto)
 
-    return await this.prisma.appointment.update({
+    const appointment = await this.prisma.appointment.update({
       where: {
         id,
       },
@@ -154,6 +217,9 @@ export class AppointmentsService {
         ...updateApointmentDto,
       },
     })
+
+    this.appointmentsGateway.sendAppointmentToMechanics()
+    return appointment
   }
 
   /**

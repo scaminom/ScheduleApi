@@ -23,8 +23,7 @@ export class AppoitmentValidator {
     createAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
   ): Promise<void> {
     try {
-      // await this.validateVehicleId(createAppointmentDto.vehicleId)
-      // this.validateDateAndTime(createAppointmentDto.date)
+      this.validateDateAndTime(createAppointmentDto.date)
 
       await this.validateMechanic(
         createAppointmentDto.userCI,
@@ -39,14 +38,6 @@ export class AppoitmentValidator {
       throw new BaseConflictException('Error al validar la cita', error)
     }
   }
-
-  // private async validateVehicleId(vehicleId: number): Promise<void> {
-  //   const vehicle = await this.vehiclesService.findOne(vehicleId)
-
-  //   if (!vehicle) {
-  //     throw new VehicleNotFoundException(vehicleId)
-  //   }
-  // }
 
   private validateDateAndTime(date: Date): void {
     if (date < new Date()) {
@@ -64,7 +55,7 @@ export class AppoitmentValidator {
     await this.userService.findOne(mechanicCI)
 
     const dateCopy = new Date(date)
-    const minutesRange = [0, 20, 40]
+    const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
     const minutes = minutesRange.find((minute) => minute <= minutesOfDate)
     dateCopy.setMinutes(minutes)
@@ -74,7 +65,7 @@ export class AppoitmentValidator {
       where: {
         userCI: mechanicCI,
         date: {
-          lte: new Date(dateCopy.getTime() + 20 * 60 * 1000),
+          lte: new Date(dateCopy.getTime() + 30 * 60 * 1000),
           gte: dateCopy,
         },
         deletedAt: null,
