@@ -18,7 +18,7 @@ export class CreateAppointmentDto
   @IsOptional()
   description?: string
 
-  @ApiProperty({ example: '2021-08-01T00:00:00' })
+  @ApiProperty({ example: '2024-07-22 01:14:00-05' })
   @IsDate()
   date: Date
 
@@ -26,7 +26,7 @@ export class CreateAppointmentDto
   @IsEnum(APPOINTMENT_STATUS)
   status: APPOINTMENT_STATUS
 
-  @ApiProperty({ example: '1' })
+  @ApiProperty({ example: '0202020202' })
   @IsString()
   userCI: string
 }

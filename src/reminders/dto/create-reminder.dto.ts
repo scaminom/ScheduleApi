@@ -16,7 +16,7 @@ export class CreateReminderDto {
   color: string
 
   // gmt
-  @ApiProperty({ example: '2024-07-22 00:00 America/Bogota' })
+  @ApiProperty({ example: '2024-07-22 01:14:00-05' })
   @IsDate()
   @Transform(({ value }) => new Date(value))
   reminderDate: Date

@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
+import {
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import { Appointment, APPOINTMENT_STATUS, Prisma } from '@prisma/client'
@@ -7,6 +12,7 @@ import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 import { AppointmentsGateway } from './appointments.gateway'
 import { InspectionsService } from 'src/inspections/inspections.service'
+import { IAppointementFilters } from './interfaces/i-appointment-filters'
 
 @Injectable()
 /**
@@ -66,6 +72,52 @@ export class AppointmentsService {
   }) {
     return await this.prisma.appointment.findMany({
       ...params,
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
+      },
+    })
+  }
+
+  /**
+   * Find appointments by filters
+   * @param params IAppointementFilters
+   * @returns Promise<Appointment[]>
+   * @throws {ConflictException} if the start date is greater than the end date
+   */
+  async findByFilters(params: IAppointementFilters): Promise<Appointment[]> {
+    if (
+      params.startDate &&
+      params.endDate &&
+      params.startDate > params.endDate
+    ) {
+      throw new ConflictException(
+        'Fecha de inicio no puede ser mayor a la fecha de fin',
+      )
+    }
+
+    return await this.prisma.appointment.findMany({
+      where: {
+        ...params,
+        date:
+          params.startDate && params.endDate
+            ? {
+                lte: params.endDate,
+                gte: params.startDate,
+              }
+            : params.startDate
+              ? { gte: params.startDate }
+              : params.endDate
+                ? { lte: params.endDate }
+                : undefined,
+        deletedAt: null,
+      },
       include: {
         user: {
           select: {

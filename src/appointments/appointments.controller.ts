@@ -6,6 +6,7 @@ import {
   Delete,
   Body,
   Param,
+  Query,
 } from '@nestjs/common'
 import {
   ApiTags,
@@ -17,6 +18,7 @@ import {
 import { AppointmentsService } from './appointments.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
+import { IAppointementFilters } from './interfaces/i-appointment-filters'
 
 @ApiTags('appointments')
 @Controller('appointments')
@@ -40,6 +42,13 @@ export class AppointmentsController {
   @ApiResponse({ status: 200, description: 'List of appointments.' })
   findAll() {
     return this.appointmentsService.findAll()
+  }
+
+  @Get()
+  @ApiOperation({ summary: 'Get all appointments by filters' })
+  @ApiResponse({ status: 200, description: 'List of appointments.' })
+  findByFilters(@Query() filters: IAppointementFilters) {
+    return this.appointmentsService.findByFilters(filters)
   }
 
   @Get(':id')

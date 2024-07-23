@@ -9,7 +9,8 @@ generator client {
 }
 
 generator fabbrica {
-  provider = "prisma-fabbrica"
+  provider    = "prisma-fabbrica"
+  noTranspile = true
 }
 
 datasource db {
@@ -20,6 +21,7 @@ datasource db {
 enum Role {
   ADMIN
   MECHANIC
+  TECHNICIAN_MECHANIC
   SECRETARY
 }
 

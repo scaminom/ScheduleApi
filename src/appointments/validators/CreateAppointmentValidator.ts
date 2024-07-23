@@ -55,7 +55,7 @@ export class AppoitmentValidator {
     await this.userService.findOne(mechanicCI)
 
     const dateCopy = new Date(date)
-    const minutesRange = [0, 20, 40]
+    const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
     const minutes = minutesRange.find((minute) => minute <= minutesOfDate)
     dateCopy.setMinutes(minutes)
@@ -65,7 +65,7 @@ export class AppoitmentValidator {
       where: {
         userCI: mechanicCI,
         date: {
-          lte: new Date(dateCopy.getTime() + 20 * 60 * 1000),
+          lte: new Date(dateCopy.getTime() + 30 * 60 * 1000),
           gte: dateCopy,
         },
         deletedAt: null,

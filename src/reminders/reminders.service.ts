@@ -1,10 +1,11 @@
-import { Injectable } from '@nestjs/common'
+import { ConflictException, Injectable } from '@nestjs/common'
 import { CreateReminderDto } from './dto/create-reminder.dto'
 import { UpdateReminderDto } from './dto/update-reminder.dto'
 import { Reminder } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { ReminderNotFoundException } from './exceptions/reminder-not-found'
 import { getLocalDate } from 'src/shared/functions/local-date'
+import { IReminderFilters } from './interfaces/i-reminder-filters'
 
 @Injectable()
 export class RemindersService {
@@ -86,6 +87,51 @@ export class RemindersService {
     return this.prisma.reminder.update({
       where: { id },
       data: { minutesBeforeNotificationSent: true },
+    })
+  }
+
+  /** Find reminders by filters
+   * @param params IReminderFilters
+   * @returns Promise<Reminder[]>
+   * @throws {ConflictException} if the start date is greater than the end date
+   */
+  async findByFilters(params: IReminderFilters): Promise<Reminder[]> {
+    if (
+      params.startDate &&
+      params.endDate &&
+      params.startDate > params.endDate
+    ) {
+      throw new ConflictException(
+        'Fecha de inicio no puede ser mayor a la fecha de fin',
+      )
+    }
+
+    return await this.prisma.reminder.findMany({
+      where: {
+        ...params,
+        reminderDate:
+          params.startDate && params.endDate
+            ? {
+                lte: params.endDate,
+                gte: params.startDate,
+              }
+            : params.startDate
+              ? { gte: params.startDate }
+              : params.endDate
+                ? { lte: params.endDate }
+                : undefined,
+        deletedAt: null,
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
+      },
     })
   }
 
