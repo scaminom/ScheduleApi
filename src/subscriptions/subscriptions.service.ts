@@ -10,6 +10,8 @@ export class SubscriptionsService {
   async create(
     createSubscriptionDto: CreateSubscriptionDto,
   ): Promise<Subscription> {
+    delete createSubscriptionDto.subscription.expirationTime
+
     return await this.prisma.subscription.create({
       data: {
         userRole: createSubscriptionDto.userRole,

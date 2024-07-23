@@ -19,6 +19,7 @@ export class CreateSubscriptionDto {
       p256dh: string
       auth: string
     }
+    expirationTime?: number
   }
 
   @ApiProperty({ example: Role.ADMIN })
