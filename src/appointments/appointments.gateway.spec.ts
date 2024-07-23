@@ -1,8 +1,6 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppointmentsGateway } from './appointments.gateway'
 import { Server, Socket } from 'socket.io'
-import { Appointment } from '@prisma/client'
-import { AppointmentFactory } from './factories/appointment-factory'
 
 describe('AppointmentsGateway', () => {
   let gateway: AppointmentsGateway
@@ -19,12 +17,10 @@ describe('AppointmentsGateway', () => {
   })
 
   it('should send appointment to mechanics', () => {
-    const appointment = AppointmentFactory.create() as unknown as Appointment
-
-    gateway.sendAppointmentToMechanics(appointment)
+    gateway.sendAppointmentToMechanics()
 
     expect(server.to).toHaveBeenCalledWith('mechanics')
-    expect(server.emit).toHaveBeenCalledWith('new-appointment', appointment)
+    expect(server.emit).toHaveBeenCalledWith('appointments-change')
   })
 
   it('should handle join mechanics room', () => {

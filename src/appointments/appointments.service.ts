@@ -152,7 +152,7 @@ export class AppointmentsService {
       startDate: createApointmentDto.date,
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics(appointment)
+    this.appointmentsGateway.sendAppointmentToMechanics()
 
     return appointment
   }
@@ -209,7 +209,7 @@ export class AppointmentsService {
 
     await this.validateAppointment.validate(updateApointmentDto)
 
-    return await this.prisma.appointment.update({
+    const appointment = await this.prisma.appointment.update({
       where: {
         id,
       },
@@ -217,6 +217,9 @@ export class AppointmentsService {
         ...updateApointmentDto,
       },
     })
+
+    this.appointmentsGateway.sendAppointmentToMechanics()
+    return appointment
   }
 
   /**

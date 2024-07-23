@@ -4,7 +4,6 @@ import {
   SubscribeMessage,
   ConnectedSocket,
 } from '@nestjs/websockets'
-import { Appointment } from '@prisma/client'
 import { Server, Socket } from 'socket.io'
 
 @WebSocketGateway({
@@ -16,8 +15,8 @@ export class AppointmentsGateway {
   @WebSocketServer()
   server: Server
 
-  sendAppointmentToMechanics(appointment: Appointment) {
-    this.server.to('mechanics').emit('new-appointment', appointment)
+  sendAppointmentToMechanics() {
+    this.server.to('mechanics').emit('appointments-change')
   }
 
   @SubscribeMessage('joinMechanicsRoom')
