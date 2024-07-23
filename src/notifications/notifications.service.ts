@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import * as webpush from 'web-push'
 import { IEnvConfig } from '../config/config'
@@ -19,9 +19,9 @@ export class NotificationsService {
   ) {
     try {
       await webpush.sendNotification(subscription, JSON.stringify(data))
-      console.log('Push notification sent successfully')
+      Logger.log('Push notification sent successfully')
     } catch (error) {
-      console.error('Error sending push notification', error)
+      Logger.error('Error sending push notification', error)
     }
   }
 }

@@ -169,7 +169,7 @@ export class RemindersService {
   }
 
   async createReminder(data: CreateReminderDto): Promise<Reminder> {
-    return await this.prisma.reminder.create({
+    const reminder = await this.prisma.reminder.create({
       data: {
         ...data,
         createdAt: new Date(),
@@ -178,6 +178,10 @@ export class RemindersService {
         user: true,
       },
     })
+
+    this.remindersGateway.sendReminderToAdmins(reminder)
+
+    return reminder
   }
 
   async updateReminder(id: number, data: UpdateReminderDto): Promise<Reminder> {
@@ -192,7 +196,7 @@ export class RemindersService {
       data,
     })
 
-    this.remindersGateway.sendReminderToAdmins()
+    this.remindersGateway.sendReminderToAdmins(reminder)
 
     return reminderUpdated
   }

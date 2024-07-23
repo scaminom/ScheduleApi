@@ -152,7 +152,7 @@ export class AppointmentsService {
       startDate: createApointmentDto.date,
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics()
+    this.appointmentsGateway.sendAppointmentToMechanics(appointment)
 
     return appointment
   }
@@ -218,7 +218,7 @@ export class AppointmentsService {
       },
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics()
+    this.appointmentsGateway.sendAppointmentToMechanics(appointment)
     return appointment
   }
 
@@ -236,7 +236,7 @@ export class AppointmentsService {
       throw new AppointmentNotFoundException(id)
     }
 
-    return await this.prisma.appointment.update({
+    const deletedAppointment = await this.prisma.appointment.update({
       where: {
         id,
       },
@@ -244,5 +244,9 @@ export class AppointmentsService {
         deletedAt: new Date(),
       },
     })
+
+    this.appointmentsGateway.sendAppointmentToMechanics(deletedAppointment)
+
+    return deletedAppointment
   }
 }
