@@ -1,22 +1,24 @@
 import { ApiProperty } from '@nestjs/swagger'
 import { Role } from '@prisma/client'
-import { IsEnum, IsObject, IsString } from 'class-validator'
+import { IsEnum, IsObject } from 'class-validator'
 
 export class CreateSubscriptionDto {
-  @ApiProperty({ example: 'https://fcm.googleapis.com/fcm/send/123456' })
-  @IsString()
-  endpoint: string
-
   @ApiProperty({
     example: {
-      p256dh: 'p256dh',
-      auth: 'auth',
+      endpoint: 'https://fcm.googleapis.com/fcm/send/fj4j3j4',
+      keys: {
+        p256dh: 'BGFJH',
+        auth: 'FJHJF',
+      },
     },
   })
   @IsObject()
-  keys: {
-    p256dh: string
-    auth: string
+  subscription: {
+    endpoint: string
+    keys: {
+      p256dh: string
+      auth: string
+    }
   }
 
   @ApiProperty({ example: Role.ADMIN })
