@@ -7,6 +7,7 @@ import { ReminderNotFoundException } from './exceptions/reminder-not-found'
 import { getLocalDate } from 'src/shared/functions/local-date'
 import { IReminderFilters } from './interfaces/i-reminder-filters'
 import { RemindersGateway } from './reminders.gateway'
+import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
 
 @Injectable()
 export class RemindersService {
@@ -169,6 +170,10 @@ export class RemindersService {
   }
 
   async createReminder(data: CreateReminderDto): Promise<Reminder> {
+    const { userCI } = data
+
+    validateUserExistence(this.prisma, userCI)
+
     return await this.prisma.reminder.create({
       data: {
         ...data,
@@ -181,6 +186,10 @@ export class RemindersService {
   }
 
   async updateReminder(id: number, data: UpdateReminderDto): Promise<Reminder> {
+    const { userCI } = data
+
+    validateUserExistence(this.prisma, userCI)
+
     const reminder = await this.getReminderById(id)
 
     if (!reminder) {
@@ -204,11 +213,14 @@ export class RemindersService {
       throw new ReminderNotFoundException(id)
     }
 
-    return await this.prisma.reminder.update({
+    const reminderUpdated = await this.prisma.reminder.update({
       data: {
         deletedAt: new Date(),
       },
       where: { id },
     })
+
+    this.remindersGateway.sendReminderToAdmins()
+    return reminderUpdated
   }
 }

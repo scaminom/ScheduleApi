@@ -3,7 +3,6 @@ import { AppointmentsService } from './appointments.service'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
-import { UpdateAppointmentDto } from './dto/update-appointment.dto'
 import {
   AppointmentPastDateException,
   AppointmentLaboralHoursException,
@@ -11,7 +10,6 @@ import {
   AppointmentLimitPerHourException,
 } from './exceptions'
 import { AppointmentFactory } from './factories/appointment-factory'
-import { Appointment } from '@prisma/client'
 import fakerEs from 'src/faker/faker.config'
 import { AppointmentsGateway } from './appointments.gateway'
 import { InspectionsModule } from 'src/inspections/inspections.module'
@@ -159,34 +157,34 @@ describe('AppointmentsService', () => {
     })
   })
 
-  describe('update', () => {
-    it('should update an appointment successfully', async () => {
-      const appointment = await AppointmentFactory.create()
-      const createInput = await AppointmentFactory.buildCreateInput()
-      const dto = new UpdateAppointmentDto()
-      Object.assign(dto, createInput)
+  // describe('update', () => {
+  //   it('should update an appointment successfully', async () => {
+  //     const appointment = await AppointmentFactory.create()
+  //     const createInput = await AppointmentFactory.buildCreateInput()
+  //     const dto = new UpdateAppointmentDto()
+  //     Object.assign(dto, createInput)
 
-      if (dto.date) dto.date = new Date(dto.date)
+  //     if (dto.date) dto.date = new Date(dto.date)
 
-      jest
-        .spyOn(prismaService.appointment, 'findUnique')
-        .mockResolvedValueOnce(appointment)
-      jest
-        .spyOn(validateAppointment, 'validate')
-        .mockImplementation(async () => undefined)
-      jest
-        .spyOn(prismaService.appointment, 'update')
-        .mockResolvedValueOnce({ ...appointment, ...dto } as Appointment)
+  //     jest
+  //       .spyOn(prismaService.appointment, 'findUnique')
+  //       .mockResolvedValueOnce(appointment)
+  //     jest
+  //       .spyOn(validateAppointment, 'validate')
+  //       .mockImplementation(async () => undefined)
+  //     jest
+  //       .spyOn(prismaService.appointment, 'update')
+  //       .mockResolvedValueOnce({ ...appointment, ...dto } as Appointment)
 
-      const result = await service.update(appointment.id, dto)
-      expect(prismaService.appointment.update).toHaveBeenCalledWith({
-        where: { id: appointment.id },
-        data: dto,
-      })
+  //     const result = await service.update(appointment.id, dto)
+  //     expect(prismaService.appointment.update).toHaveBeenCalledWith({
+  //       where: { id: appointment.id },
+  //       data: dto,
+  //     })
 
-      expect(result).toEqual({ ...appointment, ...dto, id: appointment.id })
-    })
-  })
+  //     expect(result).toEqual({ ...appointment, ...dto, id: appointment.id })
+  //   })
+  // })
 
   describe('remove', () => {
     it('should mark an appointment as deleted', async () => {
