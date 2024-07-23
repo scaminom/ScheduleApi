@@ -6,10 +6,14 @@ import { PrismaService } from '../prisma/prisma.service'
 import { ReminderNotFoundException } from './exceptions/reminder-not-found'
 import { getLocalDate } from 'src/shared/functions/local-date'
 import { IReminderFilters } from './interfaces/i-reminder-filters'
+import { RemindersGateway } from './reminders.gateway'
 
 @Injectable()
 export class RemindersService {
-  public constructor(private readonly prisma: PrismaService) {}
+  public constructor(
+    private readonly prisma: PrismaService,
+    private readonly remindersGateway: RemindersGateway,
+  ) {}
 
   async getPendingReminders(): Promise<{
     firstReminders: Reminder[]
@@ -183,10 +187,14 @@ export class RemindersService {
       throw new ReminderNotFoundException(id)
     }
 
-    return await this.prisma.reminder.update({
+    const reminderUpdated = await this.prisma.reminder.update({
       where: { id },
       data,
     })
+
+    this.remindersGateway.sendReminderOnUpdate()
+
+    return reminderUpdated
   }
 
   async deleteReminder(id: number): Promise<Reminder> {

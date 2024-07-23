@@ -16,7 +16,7 @@ export class BackgroundService {
       await this.remindersService.getPendingReminders()
     for (const reminder of firstReminders) {
       console.log('Sending reminder...')
-      this.remindersGateway.sendReminderToAdmins(reminder)
+      this.remindersGateway.sendReminderOnCreate()
       this.logger.log(`Reminder sent: ${reminder.title}`)
 
       await this.remindersService.markReminderPartialSent(reminder.id)
@@ -24,7 +24,7 @@ export class BackgroundService {
 
     for (const reminder of secondReminders) {
       console.log('Sending reminder...')
-      this.remindersGateway.sendReminderToAdmins(reminder)
+      this.remindersGateway.sendReminderOnCreate()
       this.logger.log(`Reminder sent: ${reminder.title}`)
 
       await this.remindersService.markReminderCompleteSent(reminder.id)
