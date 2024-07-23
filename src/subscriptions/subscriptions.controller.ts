@@ -1,4 +1,4 @@
-import { Controller, Post, Body, Get, Query } from '@nestjs/common'
+import { Controller, Post, Body, Get, Query, Logger } from '@nestjs/common'
 import { SubscriptionsService } from './subscriptions.service'
 import { CreateSubscriptionDto } from './dto/create-subscription.dto'
 import { Role } from '@prisma/client'
@@ -16,6 +16,8 @@ export class SubscriptionsController {
     description: 'The record  has been successfully created.',
   })
   async create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
+    Logger.log('Received subscription:', createSubscriptionDto.endpoint)
+
     return await this.subscriptionsService.create(createSubscriptionDto)
   }
 

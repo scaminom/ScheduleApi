@@ -37,13 +37,14 @@ model User {
   ci          String        @id @unique
   color       String?
   password    String
-  role        Role
+  role        Role          @unique
   firstName   String        @map("first_name")
   lastName    String        @map("last_name")
   deletedAt   DateTime?     @map("deleted_at")
   Appointment Appointment[]
 
-  reminders Reminder[]
+  reminders    Reminder[]
+  Subscription Subscription[]
 
   @@map("users")
 }
@@ -109,6 +110,10 @@ model Subscription {
   id        Int      @id @default(autoincrement())
   endpoint  String
   keys      Json
-  userRole  String
+  userRole  Role     @map("user_role")
   createdAt DateTime @default(now())
+
+  user User @relation(fields: [userRole], references: [role])
+
+  @@map("subscriptions")
 }

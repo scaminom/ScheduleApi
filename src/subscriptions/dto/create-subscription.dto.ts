@@ -21,5 +21,5 @@ export class CreateSubscriptionDto {
 
   @ApiProperty({ example: Role.ADMIN })
   @IsEnum(Role)
-  userRole: string
+  userRole: Role
 }
