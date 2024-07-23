@@ -104,3 +104,11 @@ model Job {
 
   @@map("jobs")
 }
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  endpoint  String
+  keys      Json
+  userRole  String
+  createdAt DateTime @default(now())
+}
