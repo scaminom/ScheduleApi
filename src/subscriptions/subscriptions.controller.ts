@@ -1,11 +1,4 @@
-import {
-  Controller,
-  Post,
-  Body,
-  Get,
-  Query,
-  ParseEnumPipe,
-} from '@nestjs/common'
+import { Controller, Post, Body, Get, Query } from '@nestjs/common'
 import { SubscriptionsService } from './subscriptions.service'
 import { CreateSubscriptionDto } from './dto/create-subscription.dto'
 import { Role } from '@prisma/client'
@@ -36,7 +29,7 @@ export class SubscriptionsController {
   @Get('by-role')
   @ApiOperation({ summary: 'Get all subscriptions by role' })
   @ApiResponse({ status: 200, description: 'List of subscriptions.' })
-  async findByRole(@Query('role', ParseEnumPipe<Role>) role: Role) {
+  async findByRole(@Query('role') role: Role) {
     return await this.subscriptionsService.findByRole(role)
   }
 }

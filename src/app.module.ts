@@ -11,8 +11,8 @@ import { AppointmentsModule } from './appointments/appointments.module'
 import { RemindersModule } from './reminders/reminders.module'
 import { InspectionsModule } from './inspections/inspections.module'
 import { JobsModule } from './jobs/jobs.module'
-import { NotificationsModule } from './notifications/notifications.module';
-import { SubscriptionsModule } from './subscriptions/subscriptions.module';
+import { NotificationsModule } from './notifications/notifications.module'
+import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 
 @Module({
   imports: [
