@@ -15,12 +15,8 @@ export class AppointmentsGateway {
   @WebSocketServer()
   server: Server
 
-  sendAppointmentOnCreate() {
-    this.server.to('mechanics').emit('new-appointment')
-  }
-
-  sendAppointmentOnUpdate() {
-    this.server.to('mechanics').emit('appointment-updated')
+  sendAppointmentToMechanics() {
+    this.server.to('mechanics').emit('appointments-change')
   }
 
   @SubscribeMessage('joinMechanicsRoom')

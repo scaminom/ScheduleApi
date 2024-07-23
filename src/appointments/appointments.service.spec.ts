@@ -14,7 +14,6 @@ import { AppointmentFactory } from './factories/appointment-factory'
 import { Appointment } from '@prisma/client'
 import fakerEs from 'src/faker/faker.config'
 import { AppointmentsGateway } from './appointments.gateway'
-import { InspectionsService } from 'src/inspections/inspections.service'
 import { InspectionsModule } from 'src/inspections/inspections.module'
 import { forwardRef } from '@nestjs/common'
 

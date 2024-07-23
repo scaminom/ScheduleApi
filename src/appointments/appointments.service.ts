@@ -152,7 +152,7 @@ export class AppointmentsService {
       startDate: createApointmentDto.date,
     })
 
-    this.appointmentsGateway.sendAppointmentOnCreate()
+    this.appointmentsGateway.sendAppointmentToMechanics()
 
     return appointment
   }
@@ -218,7 +218,7 @@ export class AppointmentsService {
       },
     })
 
-    this.appointmentsGateway.sendAppointmentOnUpdate()
+    this.appointmentsGateway.sendAppointmentToMechanics()
     return appointment
   }
 

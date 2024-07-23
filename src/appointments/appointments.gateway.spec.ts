@@ -17,10 +17,10 @@ describe('AppointmentsGateway', () => {
   })
 
   it('should send appointment to mechanics', () => {
-    gateway.sendAppointmentOnCreate()
+    gateway.sendAppointmentToMechanics()
 
     expect(server.to).toHaveBeenCalledWith('mechanics')
-    expect(server.emit).toHaveBeenCalledWith('new-appointment')
+    expect(server.emit).toHaveBeenCalledWith('appointments-change')
   })
 
   it('should handle join mechanics room', () => {

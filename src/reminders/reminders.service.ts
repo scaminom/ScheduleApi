@@ -192,7 +192,7 @@ export class RemindersService {
       data,
     })
 
-    this.remindersGateway.sendReminderOnUpdate()
+    this.remindersGateway.sendReminderToAdmins()
 
     return reminderUpdated
   }

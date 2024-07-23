@@ -15,12 +15,8 @@ export class RemindersGateway {
   @WebSocketServer()
   server: Server
 
-  sendReminderOnCreate() {
-    this.server.to('admins').emit('new-reminder')
-  }
-
-  sendReminderOnUpdate() {
-    this.server.to('admins').emit('reminder-updated')
+  sendReminderToAdmins() {
+    this.server.to('admins').emit('reminders-change')
   }
 
   @SubscribeMessage('joinAdminsRoom')

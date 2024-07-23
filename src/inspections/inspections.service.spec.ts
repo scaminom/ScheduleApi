@@ -1,13 +1,9 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { InspectionsService } from './inspections.service'
 import { PrismaService } from '../prisma/prisma.service'
-import {
-  InspectionNotFoundException,
-  InspectionPastDateException,
-} from './exceptions'
+import { InspectionNotFoundException } from './exceptions'
 import { InspectionFactory } from './factories/inspection-factory'
 import { AppointmentsService } from '../appointments/appointments.service'
-import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import fakerEs from 'src/faker/faker.config'
 import { forwardRef } from '@nestjs/common'

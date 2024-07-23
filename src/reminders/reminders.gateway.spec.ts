@@ -17,10 +17,10 @@ describe('RemindersGateway', () => {
   })
 
   it('should send reminder to admins', () => {
-    gateway.sendReminderOnCreate()
+    gateway.sendReminderToAdmins()
 
     expect(server.to).toHaveBeenCalledWith('admins')
-    expect(server.emit).toHaveBeenCalledWith('new-reminder')
+    expect(server.emit).toHaveBeenCalledWith('reminders-change')
   })
 
   it('should handle join admins room', () => {
