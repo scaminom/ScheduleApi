@@ -40,7 +40,7 @@ export class AppointmentsGateway {
         },
         {
           title: 'Nueva cita',
-          body: `Nueva cita: Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
         },
       )
     })
@@ -60,7 +60,7 @@ export class AppointmentsGateway {
         },
         {
           title: 'Cita actualizada',
-          body: `Cita actualizada: Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
         },
       )
     })
@@ -80,7 +80,7 @@ export class AppointmentsGateway {
         },
         {
           title: 'Cita cancelada',
-          body: `Cita cancelada: Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
         },
       )
     })
@@ -98,7 +98,7 @@ export class AppointmentsGateway {
         },
         {
           title: 'Cita agendada en 10 minutos',
-          body: `Cita agendada: Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
         },
       )
     })
@@ -116,7 +116,7 @@ export class AppointmentsGateway {
         },
         {
           title: 'Cita agendada para este momento',
-          body: `Cita agendada: Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
         },
       )
     })

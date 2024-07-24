@@ -36,7 +36,7 @@ export class RemindersGateway {
         },
         {
           title: 'Nueva cita administrativa',
-          body: `Nueva cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
         },
       )
     })
@@ -54,7 +54,7 @@ export class RemindersGateway {
         },
         {
           title: 'Actualización de cita administrativa',
-          body: `Actualización de cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
         },
       )
     })
@@ -72,7 +72,7 @@ export class RemindersGateway {
         },
         {
           title: 'Eliminación de cita administrativa',
-          body: `Eliminación de cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
         },
       )
     })
@@ -90,7 +90,7 @@ export class RemindersGateway {
         },
         {
           title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
-          body: `Cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
         },
       )
     })
@@ -108,7 +108,7 @@ export class RemindersGateway {
         },
         {
           title: `Cita administrativa agendada en 1 minuto`,
-          body: `Cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
         },
       )
     })
