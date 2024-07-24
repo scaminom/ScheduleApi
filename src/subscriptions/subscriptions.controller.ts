@@ -4,7 +4,6 @@ import {
   Body,
   Get,
   Query,
-  Logger,
   Patch,
   Param,
   ParseIntPipe,
@@ -30,11 +29,6 @@ export class SubscriptionsController {
   async create(
     @Body() createSubscriptionDto: CreateSubscriptionDto,
   ): Promise<{ id: number; userCI: string; available: boolean }> {
-    Logger.log(
-      'Received subscription:',
-      createSubscriptionDto.subscription.endpoint,
-    )
-
     return await this.subscriptionsService.create(createSubscriptionDto)
   }
 

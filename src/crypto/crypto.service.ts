@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
-import { createCipheriv, createDecipheriv } from 'crypto'
+import { createCipheriv, createDecipheriv, getCiphers } from 'crypto'
 import { IEnvConfig } from 'src/config/config'
 
 @Injectable()
@@ -14,6 +14,8 @@ export class CryptoService {
     const key = this.config.get<IEnvConfig>('config').CRYPTO_SECRET
     this.securityKey = Buffer.from(key)
     this.ivKey = Buffer.from(this.config.get<IEnvConfig>('config').CRYPTO_KEY)
+
+    console.log(this.algorithm, console.log(getCiphers()))
   }
 
   async encryptString(text: string): Promise<string> {
