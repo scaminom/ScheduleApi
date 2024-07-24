@@ -3,8 +3,8 @@ import { RemindersService } from './reminders.service'
 import { RemindersGateway } from './reminders.gateway'
 
 @Injectable()
-export class BackgroundService {
-  private readonly logger = new Logger(BackgroundService.name)
+export class RemindersBackgroundService {
+  private readonly logger = new Logger(RemindersBackgroundService.name)
 
   constructor(
     private readonly remindersService: RemindersService,
@@ -16,7 +16,7 @@ export class BackgroundService {
       await this.remindersService.getPendingReminders()
     for (const reminder of firstReminders) {
       console.log('Sending reminder...')
-      this.remindersGateway.sendReminderToAdmins()
+      this.remindersGateway.broadcastReminderFirstNotification(reminder)
       this.logger.log(`Reminder sent: ${reminder.title}`)
 
       await this.remindersService.markReminderPartialSent(reminder.id)
@@ -24,7 +24,7 @@ export class BackgroundService {
 
     for (const reminder of secondReminders) {
       console.log('Sending reminder...')
-      this.remindersGateway.sendReminderToAdmins()
+      this.remindersGateway.broadcastReminderSecondNotification(reminder)
       this.logger.log(`Reminder sent: ${reminder.title}`)
 
       await this.remindersService.markReminderCompleteSent(reminder.id)

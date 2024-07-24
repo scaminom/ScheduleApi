@@ -6,13 +6,14 @@ import {
 } from '@nestjs/common'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
-import { Appointment, APPOINTMENT_STATUS, Prisma } from '@prisma/client'
+import { APPOINTMENT_STATUS, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 import { AppointmentsGateway } from './appointments.gateway'
 import { InspectionsService } from 'src/inspections/inspections.service'
 import { IAppointementFilters } from './interfaces/i-appointment-filters'
+import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
 import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
 
 @Injectable()
@@ -44,7 +45,7 @@ export class AppointmentsService {
    */
   async appointment(
     appointmentWhereUniqueInput: Prisma.AppointmentWhereUniqueInput,
-  ): Promise<Appointment | null> {
+  ): Promise<IAppointmentWithUser | null> {
     return await this.prisma.appointment.findUnique({
       where: appointmentWhereUniqueInput,
       include: {
@@ -92,7 +93,9 @@ export class AppointmentsService {
    * @returns Promise<Appointment[]>
    * @throws {ConflictException} if the start date is greater than the end date
    */
-  async findByFilters(params: IAppointementFilters): Promise<Appointment[]> {
+  async findByFilters(
+    params: IAppointementFilters,
+  ): Promise<IAppointmentWithUser[]> {
     if (
       params.startDate &&
       params.endDate &&
@@ -103,19 +106,22 @@ export class AppointmentsService {
       )
     }
 
+    const { startDate, endDate, date, ...rest } = params
+
     return await this.prisma.appointment.findMany({
       where: {
-        ...params,
-        date:
-          params.startDate && params.endDate
+        ...rest,
+        date: params.date
+          ? date
+          : params.startDate && params.endDate
             ? {
-                lte: params.endDate,
-                gte: params.startDate,
+                lte: endDate,
+                gte: startDate,
               }
             : params.startDate
-              ? { gte: params.startDate }
+              ? { gte: startDate }
               : params.endDate
-                ? { lte: params.endDate }
+                ? { lte: endDate }
                 : undefined,
         deletedAt: null,
       },
@@ -138,7 +144,9 @@ export class AppointmentsService {
    * @returns Promise<Appointment>
    * @throws Error if the appointment is invalid
    */
-  async create(createApointmentDto: CreateAppointmentDto) {
+  async create(
+    createApointmentDto: CreateAppointmentDto,
+  ): Promise<IAppointmentWithUser> {
     await this.validateAppointment.validate(createApointmentDto)
 
     const { userCI } = createApointmentDto
@@ -149,6 +157,16 @@ export class AppointmentsService {
       data: {
         ...createApointmentDto,
       },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
+      },
     })
 
     await this.inspectionsService.create({
@@ -157,7 +175,7 @@ export class AppointmentsService {
       startDate: createApointmentDto.date,
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics()
+    this.appointmentsGateway.broadcastAppointmentCreation(appointment)
 
     return appointment
   }
@@ -225,9 +243,19 @@ export class AppointmentsService {
       data: {
         ...updateApointmentDto,
       },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
+      },
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics()
+    this.appointmentsGateway.broadcastAppointmentUpdate(appointment)
     return appointment
   }
 
@@ -238,23 +266,34 @@ export class AppointmentsService {
    * @throws Error if the appointment does not exist
    * @throws Error if the appointment is already deleted
    */
-  async remove(id: number) {
+  async remove(id: number): Promise<IAppointmentWithUser> {
     const appointment = await this.findOne(id)
 
     if (!appointment) {
       throw new AppointmentNotFoundException(id)
     }
 
-    const appointmentUpdated = await this.prisma.appointment.update({
+    const deletedAppointment = await this.prisma.appointment.update({
       where: {
         id,
       },
       data: {
         deletedAt: new Date(),
       },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+          },
+        },
+      },
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics()
-    return appointmentUpdated
+    this.appointmentsGateway.broadcastAppointmentDeletion(deletedAppointment)
+
+    return deletedAppointment
   }
 }

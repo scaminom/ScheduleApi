@@ -32,7 +32,7 @@ export class RemindersService {
       const now = getLocalDate()
       const reminderDate = new Date(reminder.reminderDate)
       const dateMinutesBefore = new Date(
-        reminderDate.getTime() - reminder.notificationMinutesBefore * 60000,
+        reminderDate.getTime() - reminder.notificationMinutesBefore * 60000 - 1,
       )
 
       return now >= dateMinutesBefore && now <= reminderDate
@@ -49,8 +49,8 @@ export class RemindersService {
     const secondReminders = secondRemindersToFilter.filter((reminder) => {
       const now = getLocalDate()
       const reminderDate = new Date(reminder.reminderDate)
-      const dateMinuteBefore = new Date(reminderDate.getTime() - 60000)
-      const dateMinuteAfter = new Date(reminderDate.getTime() + 60000)
+      const dateMinuteBefore = new Date(reminderDate.getTime() - 60000 - 1)
+      const dateMinuteAfter = new Date(reminderDate.getTime() + 60000 - 1)
 
       return now >= dateMinuteBefore && now <= dateMinuteAfter
     })
@@ -111,19 +111,20 @@ export class RemindersService {
       )
     }
 
+    const { startDate, endDate, ...rest } = params
     return await this.prisma.reminder.findMany({
       where: {
-        ...params,
+        ...rest,
         reminderDate:
           params.startDate && params.endDate
             ? {
-                lte: params.endDate,
-                gte: params.startDate,
+                lte: endDate,
+                gte: startDate,
               }
             : params.startDate
-              ? { gte: params.startDate }
+              ? { gte: startDate }
               : params.endDate
-                ? { lte: params.endDate }
+                ? { lte: endDate }
                 : undefined,
         deletedAt: null,
       },
@@ -174,7 +175,7 @@ export class RemindersService {
 
     validateUserExistence(this.prisma, userCI)
 
-    return await this.prisma.reminder.create({
+    const reminder = await this.prisma.reminder.create({
       data: {
         ...data,
         createdAt: new Date(),
@@ -183,6 +184,10 @@ export class RemindersService {
         user: true,
       },
     })
+
+    this.remindersGateway.broadCastReminderCreation(reminder)
+
+    return reminder
   }
 
   async updateReminder(id: number, data: UpdateReminderDto): Promise<Reminder> {
@@ -201,7 +206,7 @@ export class RemindersService {
       data,
     })
 
-    this.remindersGateway.sendReminderToAdmins()
+    this.remindersGateway.broadCastReminderUpdate(reminder)
 
     return reminderUpdated
   }
@@ -213,14 +218,15 @@ export class RemindersService {
       throw new ReminderNotFoundException(id)
     }
 
-    const reminderUpdated = await this.prisma.reminder.update({
+    const reminderDeleted = await this.prisma.reminder.update({
       data: {
         deletedAt: new Date(),
       },
       where: { id },
     })
 
-    this.remindersGateway.sendReminderToAdmins()
-    return reminderUpdated
+    this.remindersGateway.broadCastReminderDeletion(reminderDeleted)
+
+    return reminderDeleted
   }
 }

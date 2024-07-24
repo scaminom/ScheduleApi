@@ -34,16 +34,17 @@ enum APPOINTMENT_STATUS {
 }
 
 model User {
-  ci          String        @id @unique
-  color       String?
-  password    String
-  role        Role
-  firstName   String        @map("first_name")
-  lastName    String        @map("last_name")
-  deletedAt   DateTime?     @map("deleted_at")
-  Appointment Appointment[]
+  ci           String        @id @unique
+  color        String?
+  password     String
+  role         Role
+  firstName    String        @map("first_name")
+  lastName     String        @map("last_name")
+  deletedAt    DateTime?     @map("deleted_at")
+  appointments Appointment[]
 
-  reminders Reminder[]
+  reminders     Reminder[]
+  subscriptions Subscription[]
 
   @@map("users")
 }
@@ -103,4 +104,17 @@ model Job {
   inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
 
   @@map("jobs")
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  endpoint  String
+  keys      Json
+  userCI    String   @map("user_ci")
+  createdAt DateTime @default(now())
+  available Boolean  @default(true)
+
+  user User @relation(fields: [userCI], references: [ci])
+
+  @@map("subscriptions")
 }
