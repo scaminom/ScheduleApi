@@ -113,7 +113,7 @@ export class AppointmentsService {
     const whereOptions: Prisma.AppointmentWhereInput = {
       ...rest,
       date: params.date
-        ? date
+        ? new Date(date)
         : params.startDate && params.endDate
           ? {
               lte: new Date(endDate),
