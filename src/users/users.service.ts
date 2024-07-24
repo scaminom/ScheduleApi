@@ -10,10 +10,14 @@ import { validateCI } from './validators/user-validator'
 import { genSalt, hash } from 'bcrypt'
 import { IResponseUser } from './dto/response-user.dto'
 import { UserCantAssignColorException } from './exceptions/user-cant-assign-color'
+import { SubscriptionsService } from 'src/subscriptions/subscriptions.service'
 
 @Injectable()
 export class UserService {
-  constructor(private prisma: PrismaService) {}
+  constructor(
+    private prisma: PrismaService,
+    private readonly subscriptionService: SubscriptionsService,
+  ) {}
 
   /**
    * Find a user by its unique identifier
@@ -153,7 +157,14 @@ export class UserService {
       throw new UserCantAssignColorException()
     }
 
+    if (params.data.password) {
+      const pa = await this.generateSaltPassword(params.data.password)
+
+      Object.assign(params.data, { password: pa })
+    }
+
     const { where, data } = params
+
     return this.prisma.user.update({
       data,
       where,
@@ -174,6 +185,9 @@ export class UserService {
     if (!notExists) {
       throw new UserNotFoundException(ci)
     }
+
+    this.subscriptionService.disableSubscriptionsByUser(ci)
+
     return this.prisma.user.update({
       data: {
         deletedAt: new Date(),

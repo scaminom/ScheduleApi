@@ -1,11 +1,20 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
+import {
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
-import { Appointment, Prisma } from '@prisma/client'
+import { APPOINTMENT_STATUS, Prisma } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 import { AppointmentsGateway } from './appointments.gateway'
+import { InspectionsService } from 'src/inspections/inspections.service'
+import { IAppointementFilters } from './interfaces/i-appointment-filters'
+import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
+import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
 
 @Injectable()
 /**
@@ -20,6 +29,10 @@ export class AppointmentsService {
 
     @Inject(forwardRef(() => AppoitmentValidator))
     private readonly validateAppointment: AppoitmentValidator,
+
+    @Inject(forwardRef(() => InspectionsService))
+    private readonly inspectionsService: InspectionsService,
+
     private readonly appointmentsGateway: AppointmentsGateway,
   ) {}
 
@@ -32,7 +45,7 @@ export class AppointmentsService {
    */
   async appointment(
     appointmentWhereUniqueInput: Prisma.AppointmentWhereUniqueInput,
-  ): Promise<Appointment | null> {
+  ): Promise<IAppointmentWithUser | null> {
     return await this.prisma.appointment.findUnique({
       where: appointmentWhereUniqueInput,
       include: {
@@ -42,6 +55,7 @@ export class AppointmentsService {
             lastName: true,
             ci: true,
             role: true,
+            color: true,
           },
         },
       },
@@ -68,6 +82,59 @@ export class AppointmentsService {
             lastName: true,
             ci: true,
             role: true,
+            color: true,
+          },
+        },
+      },
+    })
+  }
+
+  /**
+   * Find appointments by filters
+   * @param params IAppointementFilters
+   * @returns Promise<Appointment[]>
+   * @throws {ConflictException} if the start date is greater than the end date
+   */
+  async findByFilters(
+    params: IAppointementFilters,
+  ): Promise<IAppointmentWithUser[]> {
+    if (
+      params.startDate &&
+      params.endDate &&
+      params.startDate > params.endDate
+    ) {
+      throw new ConflictException(
+        'Fecha de inicio no puede ser mayor a la fecha de fin',
+      )
+    }
+
+    const { startDate, endDate, date, ...rest } = params
+
+    return await this.prisma.appointment.findMany({
+      where: {
+        ...rest,
+        date: params.date
+          ? date
+          : params.startDate && params.endDate
+            ? {
+                lte: endDate,
+                gte: startDate,
+              }
+            : params.startDate
+              ? { gte: startDate }
+              : params.endDate
+                ? { lte: endDate }
+                : undefined,
+        deletedAt: null,
+      },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+            color: true,
           },
         },
       },
@@ -80,16 +147,39 @@ export class AppointmentsService {
    * @returns Promise<Appointment>
    * @throws Error if the appointment is invalid
    */
-  async create(createApointmentDto: CreateAppointmentDto) {
+  async create(
+    createApointmentDto: CreateAppointmentDto,
+  ): Promise<IAppointmentWithUser> {
     await this.validateAppointment.validate(createApointmentDto)
+
+    const { userCI } = createApointmentDto
+
+    validateUserExistence(this.prisma, userCI)
 
     const appointment = await this.prisma.appointment.create({
       data: {
         ...createApointmentDto,
       },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+            color: true,
+          },
+        },
+      },
     })
 
-    this.appointmentsGateway.sendAppointmentToMechanics(appointment)
+    await this.inspectionsService.create({
+      appointmentId: appointment.id,
+      status: APPOINTMENT_STATUS.PENDING,
+      startDate: createApointmentDto.date,
+    })
+
+    this.appointmentsGateway.broadcastAppointmentCreation(appointment)
 
     return appointment
   }
@@ -107,6 +197,7 @@ export class AppointmentsService {
             lastName: true,
             ci: true,
             role: true,
+            color: true,
           },
         },
       },
@@ -146,14 +237,32 @@ export class AppointmentsService {
 
     await this.validateAppointment.validate(updateApointmentDto)
 
-    return await this.prisma.appointment.update({
+    const { userCI } = updateApointmentDto
+
+    validateUserExistence(this.prisma, userCI)
+
+    const appointment = await this.prisma.appointment.update({
       where: {
         id,
       },
       data: {
         ...updateApointmentDto,
       },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+            color: true,
+          },
+        },
+      },
     })
+
+    this.appointmentsGateway.broadcastAppointmentUpdate(appointment)
+    return appointment
   }
 
   /**
@@ -163,20 +272,35 @@ export class AppointmentsService {
    * @throws Error if the appointment does not exist
    * @throws Error if the appointment is already deleted
    */
-  async remove(id: number) {
+  async remove(id: number): Promise<IAppointmentWithUser> {
     const appointment = await this.findOne(id)
 
     if (!appointment) {
       throw new AppointmentNotFoundException(id)
     }
 
-    return await this.prisma.appointment.update({
+    const deletedAppointment = await this.prisma.appointment.update({
       where: {
         id,
       },
       data: {
         deletedAt: new Date(),
       },
+      include: {
+        user: {
+          select: {
+            firstName: true,
+            lastName: true,
+            ci: true,
+            role: true,
+            color: true,
+          },
+        },
+      },
     })
+
+    this.appointmentsGateway.broadcastAppointmentDeletion(deletedAppointment)
+
+    return deletedAppointment
   }
 }

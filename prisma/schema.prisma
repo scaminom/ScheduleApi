@@ -9,7 +9,8 @@ generator client {
 }
 
 generator fabbrica {
-  provider = "prisma-fabbrica"
+  provider    = "prisma-fabbrica"
+  noTranspile = true
 }
 
 datasource db {
@@ -20,6 +21,7 @@ datasource db {
 enum Role {
   ADMIN
   MECHANIC
+  TECHNICIAN_MECHANIC
   SECRETARY
 }
 
@@ -32,31 +34,20 @@ enum APPOINTMENT_STATUS {
 }
 
 model User {
-  ci          String        @id @unique
-  color       String?
-  password    String
-  role        Role
-  firstName   String        @map("first_name")
-  lastName    String        @map("last_name")
-  deletedAt   DateTime?     @map("deleted_at")
-  Appointment Appointment[]
+  ci           String        @id @unique
+  color        String?
+  password     String
+  role         Role
+  firstName    String        @map("first_name")
+  lastName     String        @map("last_name")
+  deletedAt    DateTime?     @map("deleted_at")
+  appointments Appointment[]
 
-  reminders Reminder[]
+  reminders     Reminder[]
+  subscriptions Subscription[]
 
   @@map("users")
 }
-
-// model Vehicle {
-//   id          Int           @id @default(autoincrement())
-//   plate       String        @unique
-//   type        String
-//   brand       String
-//   model       String
-//   color       String
-//   Appointment Appointment[]
-
-//   @@map("vehicles")
-// }
 
 model Appointment {
   id                 Int                @id @default(autoincrement())
@@ -75,17 +66,18 @@ model Appointment {
 }
 
 model Reminder {
-  id                        Int       @id @default(autoincrement())
-  title                     String
-  description               String
-  isCompleted               Boolean?  @default(false) @map("is_completed")
-  createdAt                 DateTime? @map("created_at")
-  deletedAt                 DateTime? @map("deleted_at")
-  reminderDate              DateTime  @map("reminder_date")
-  notificationMinutesBefore Int       @map("notification_minutes_before")
-  notificationSent          Boolean   @default(false) @map("notification_sent")
-  userCI                    String    @map("user_ci")
-  user                      User?     @relation(fields: [userCI], references: [ci])
+  id                            Int       @id @default(autoincrement())
+  title                         String
+  description                   String
+  color                         String
+  createdAt                     DateTime? @map("created_at")
+  deletedAt                     DateTime? @map("deleted_at")
+  reminderDate                  DateTime  @map("reminder_date")
+  notificationMinutesBefore     Int       @map("notification_minutes_before")
+  notificationSent              Boolean?  @default(false) @map("notification_sent")
+  minutesBeforeNotificationSent Boolean?  @default(false) @map("minutes_before_notification_sent")
+  userCI                        String    @map("user_ci")
+  user                          User?     @relation(fields: [userCI], references: [ci])
 
   @@map("reminders")
 }
@@ -94,7 +86,7 @@ model Inspection {
   id            Int                @id @default(autoincrement())
   appointmentId Int
   startDate     DateTime           @map("start_date")
-  endDate       DateTime           @map("end_date")
+  endDate       DateTime?          @map("end_date")
   status        APPOINTMENT_STATUS
 
   appointment Appointment @relation(fields: [appointmentId], references: [id])
@@ -112,4 +104,17 @@ model Job {
   inspection Inspection @relation(fields: [inspectionId], references: [id], onDelete: Cascade)
 
   @@map("jobs")
+}
+
+model Subscription {
+  id        Int      @id @default(autoincrement())
+  endpoint  String
+  keys      Json
+  userCI    String   @map("user_ci")
+  createdAt DateTime @default(now())
+  available Boolean  @default(true)
+
+  user User @relation(fields: [userCI], references: [ci])
+
+  @@map("subscriptions")
 }

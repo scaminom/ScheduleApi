@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { RemindersGateway } from './reminders.gateway'
 import { Server, Socket } from 'socket.io'
-import { Reminder } from '@prisma/client'
 import { ReminderFactory } from './factories/reminder.factory'
+import { UserFactory } from 'src/users/factories/user.factory'
 
 describe('RemindersGateway', () => {
   let gateway: RemindersGateway
@@ -18,13 +18,20 @@ describe('RemindersGateway', () => {
     gateway.server = server
   })
 
-  it('should send reminder to admins', () => {
-    const reminder = ReminderFactory.create() as unknown as Reminder
+  it('should send reminder to admins', async () => {
+    const user = await UserFactory.create()
+    const reminder = await ReminderFactory.create({
+      user: {
+        create: {
+          ...user,
+        },
+      },
+    })
 
-    gateway.sendReminderToAdmins(reminder)
+    gateway.broadCastReminderCreation(reminder)
 
     expect(server.to).toHaveBeenCalledWith('admins')
-    expect(server.emit).toHaveBeenCalledWith('new-reminder', reminder)
+    expect(server.emit).toHaveBeenCalledWith('reminders-change')
   })
 
   it('should handle join admins room', () => {
