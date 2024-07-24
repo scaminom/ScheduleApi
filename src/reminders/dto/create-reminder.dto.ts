@@ -25,7 +25,7 @@ export class CreateReminderDto {
   @IsNumber()
   notificationMinutesBefore: number
 
-  @ApiProperty({ example: '1' })
+  @ApiProperty({ example: '0202020202' })
   @IsNumberString({ no_symbols: true }, { message: 'CI must be a number' })
   userCI: string
 }

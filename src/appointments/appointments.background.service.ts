@@ -15,6 +15,7 @@ export class AppointmentsBackgroundService {
   async checkAppointments() {
     const now = new Date()
     const minutes = now.getMinutes()
+    console.log('Checking appointments...', minutes)
 
     if (minutes === 20 || minutes === 50) {
       this.remindAppointments(minutes)
@@ -25,6 +26,8 @@ export class AppointmentsBackgroundService {
 
   private async remindAppointments(minutes: number) {
     const dateCopy = new Date()
+    dateCopy.setSeconds(0)
+    dateCopy.setMilliseconds(0)
 
     if (minutes === 20) {
       dateCopy.setMinutes(30)
@@ -33,11 +36,13 @@ export class AppointmentsBackgroundService {
       dateCopy.setHours(dateCopy.getHours() + 1)
     }
 
+    console.log('Reminding appointments...', dateCopy)
     const appointments = await this.appointmentsService.findByFilters({
       date: dateCopy,
       status: APPOINTMENT_STATUS.PENDING,
     })
 
+    console.log('Appointments found:', appointments.length)
     for (const appointment of appointments) {
       this.logger.log(`Sending notification for appointment ${appointment.id}`)
       this.appointmentsGateway.broadcastAppointmentReminder(appointment)
@@ -47,6 +52,8 @@ export class AppointmentsBackgroundService {
 
   private async notifyAppointments(minutes: number) {
     const dateCopy = new Date()
+    dateCopy.setSeconds(0)
+    dateCopy.setMilliseconds(0)
 
     if (minutes === 29) {
       dateCopy.setMinutes(30)
@@ -55,10 +62,14 @@ export class AppointmentsBackgroundService {
       dateCopy.setHours(dateCopy.getHours() + 1)
     }
 
+    console.log('Notifying appointments...', dateCopy)
+
     const appointments = await this.appointmentsService.findByFilters({
       date: dateCopy,
       status: APPOINTMENT_STATUS.PENDING,
     })
+
+    console.log('Appointments found:', appointments.length)
 
     for (const appointment of appointments) {
       this.logger.log(

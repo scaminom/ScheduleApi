@@ -23,7 +23,7 @@ export class AppoitmentValidator {
     createAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
   ): Promise<void> {
     try {
-      this.validateDateAndTime(createAppointmentDto.date)
+      // this.validateDateAndTime(createAppointmentDto.date)
 
       await this.validateMechanic(
         createAppointmentDto.userCI,
