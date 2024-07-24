@@ -24,7 +24,7 @@ export class RemindersGateway {
   @WebSocketServer()
   server: Server
 
-  async sendReminderToAdmins(reminder: Reminder) {
+  async broadCastReminderCreation(reminder: Reminder) {
     this.server.to('admins').emit('reminders-change')
 
     const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
@@ -37,6 +37,78 @@ export class RemindersGateway {
         {
           title: 'Nueva cita administrativa',
           body: `Nueva cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        },
+      )
+    })
+  }
+
+  async broadCastReminderUpdate(reminder: Reminder) {
+    this.server.to('admins').emit('reminders-change')
+
+    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    subscriptions.forEach((subscription) => {
+      this.notificationsService.sendPushNotification(
+        {
+          endpoint: subscription.endpoint,
+          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
+        },
+        {
+          title: 'Actualización de cita administrativa',
+          body: `Actualización de cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        },
+      )
+    })
+  }
+
+  async broadCastReminderDeletion(reminder: Reminder) {
+    this.server.to('admins').emit('reminders-change')
+
+    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    subscriptions.forEach((subscription) => {
+      this.notificationsService.sendPushNotification(
+        {
+          endpoint: subscription.endpoint,
+          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
+        },
+        {
+          title: 'Eliminación de cita administrativa',
+          body: `Eliminación de cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        },
+      )
+    })
+  }
+
+  async broadcastReminderFirstNotification(reminder: Reminder) {
+    this.server.to('admins').emit('reminders-change')
+
+    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    subscriptions.forEach((subscription) => {
+      this.notificationsService.sendPushNotification(
+        {
+          endpoint: subscription.endpoint,
+          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
+        },
+        {
+          title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
+          body: `Cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        },
+      )
+    })
+  }
+
+  async broadcastReminderSecondNotification(reminder: Reminder) {
+    this.server.to('admins').emit('reminders-change')
+
+    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    subscriptions.forEach((subscription) => {
+      this.notificationsService.sendPushNotification(
+        {
+          endpoint: subscription.endpoint,
+          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
+        },
+        {
+          title: `Cita administrativa agendada en 1 minuto`,
+          body: `Cita administrativa: ${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
         },
       )
     })

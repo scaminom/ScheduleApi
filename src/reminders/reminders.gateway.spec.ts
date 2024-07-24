@@ -1,6 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
 import { RemindersGateway } from './reminders.gateway'
 import { Server, Socket } from 'socket.io'
+import { ReminderFactory } from './factories/reminder.factory'
+import { UserFactory } from 'src/users/factories/user.factory'
 
 describe('RemindersGateway', () => {
   let gateway: RemindersGateway
@@ -16,8 +18,17 @@ describe('RemindersGateway', () => {
     gateway.server = server
   })
 
-  it('should send reminder to admins', () => {
-    gateway.sendReminderToAdmins()
+  it('should send reminder to admins', async () => {
+    const user = await UserFactory.create()
+    const reminder = await ReminderFactory.create({
+      user: {
+        create: {
+          ...user,
+        },
+      },
+    })
+
+    gateway.broadCastReminderCreation(reminder)
 
     expect(server.to).toHaveBeenCalledWith('admins')
     expect(server.emit).toHaveBeenCalledWith('reminders-change')

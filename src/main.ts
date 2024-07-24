@@ -2,7 +2,8 @@ import { NestFactory } from '@nestjs/core'
 import { AppModule } from './app.module'
 import { Logger, ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
-import { BackgroundService } from './reminders/background.service'
+import { RemindersBackgroundService } from './reminders/reminders.background.service'
+import { AppointmentsBackgroundService } from './appointments/appointments.background.service'
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule)
@@ -30,10 +31,13 @@ async function bootstrap() {
 
   SwaggerModule.setup('api', app, document)
 
-  const backgroundService = app.get(BackgroundService)
+  const reminderBackgroundService = app.get(RemindersBackgroundService)
+
+  const appointmentBackgroundService = app.get(AppointmentsBackgroundService)
 
   setInterval(() => {
-    backgroundService.checkReminders()
+    reminderBackgroundService.checkReminders()
+    appointmentBackgroundService.checkAppointments()
   }, 60000)
 
   app.enableCors()

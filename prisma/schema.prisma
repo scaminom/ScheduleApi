@@ -34,17 +34,17 @@ enum APPOINTMENT_STATUS {
 }
 
 model User {
-  ci          String        @id @unique
-  color       String?
-  password    String
-  role        Role          @unique
-  firstName   String        @map("first_name")
-  lastName    String        @map("last_name")
-  deletedAt   DateTime?     @map("deleted_at")
-  Appointment Appointment[]
+  ci           String        @id @unique
+  color        String?
+  password     String
+  role         Role          @unique
+  firstName    String        @map("first_name")
+  lastName     String        @map("last_name")
+  deletedAt    DateTime?     @map("deleted_at")
+  appointments Appointment[]
 
-  reminders    Reminder[]
-  Subscription Subscription[]
+  reminders     Reminder[]
+  subscriptions Subscription[]
 
   @@map("users")
 }
