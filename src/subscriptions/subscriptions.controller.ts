@@ -24,7 +24,7 @@ export class SubscriptionsController {
   @ApiResponse({
     status: 201,
     description: 'The record encypted.',
-    example: { subscriptionId: 1 },
+    example: { id: '1', userCI: '123', available: true },
   })
   async create(
     @Body() createSubscriptionDto: CreateSubscriptionDto,
