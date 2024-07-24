@@ -110,19 +110,20 @@ export class RemindersService {
       )
     }
 
+    const { startDate, endDate, ...rest } = params
     return await this.prisma.reminder.findMany({
       where: {
-        ...params,
+        ...rest,
         reminderDate:
           params.startDate && params.endDate
             ? {
-                lte: params.endDate,
-                gte: params.startDate,
+                lte: endDate,
+                gte: startDate,
               }
             : params.startDate
-              ? { gte: params.startDate }
+              ? { gte: startDate }
               : params.endDate
-                ? { lte: params.endDate }
+                ? { lte: endDate }
                 : undefined,
         deletedAt: null,
       },
