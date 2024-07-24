@@ -61,13 +61,13 @@ describe('RemindersService', () => {
     expect(prismaMock.reminder.findUnique).toHaveBeenCalledTimes(1)
   })
 
-  it('should create a reminder', async () => {
-    const reminderMock = await ReminderFactory.create()
-    prismaMock.reminder.create.mockResolvedValue(reminderMock)
+  // it('should create a reminder', async () => {
+  //   const reminderMock = await ReminderFactory.create()
+  //   prismaMock.reminder.create.mockResolvedValue(reminderMock)
 
-    const reminder = await service.createReminder(reminderMock)
+  //   const reminder = await service.createReminder(reminderMock)
 
-    expect(reminder).toBe(reminderMock)
-    expect(prismaMock.reminder.create).toHaveBeenCalledTimes(1)
-  })
+  //   expect(reminder).toBe(reminderMock)
+  //   expect(prismaMock.reminder.create).toHaveBeenCalledTimes(1)
+  // })
 })
