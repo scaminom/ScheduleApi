@@ -23,13 +23,17 @@ export class AppoitmentValidator {
     createAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
   ): Promise<void> {
     try {
-      this.validateDateAndTime(createAppointmentDto.date)
+      if (createAppointmentDto.date)
+        this.validateDateAndTime(createAppointmentDto.date)
 
-      await this.validateMechanic(
-        createAppointmentDto.userCI,
-        createAppointmentDto.date,
-      )
-      await this.validateAppointmentLimit(createAppointmentDto.date)
+      if (createAppointmentDto.userCI)
+        await this.validateMechanic(
+          createAppointmentDto.userCI,
+          createAppointmentDto.date,
+        )
+
+      if (createAppointmentDto.date)
+        await this.validateAppointmentLimit(createAppointmentDto.date)
     } catch (error) {
       if (error instanceof BaseException) {
         throw error
