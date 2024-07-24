@@ -21,9 +21,7 @@ export class SubscriptionsService {
     })
   }
 
-  async create(
-    createSubscriptionDto: CreateSubscriptionDto,
-  ): Promise<{ id: number; userCI: string; available: boolean }> {
+  async create(createSubscriptionDto: CreateSubscriptionDto) {
     delete createSubscriptionDto.subscription.expirationTime
 
     const encriptedEndpoint = await this.cryptoService.encryptString(
@@ -78,7 +76,7 @@ export class SubscriptionsService {
     })
   }
 
-  async findOne(id: number): Promise<Subscription> {
+  async findOneComplete(id: number): Promise<Subscription> {
     const subscription = await this.subscription({ id })
 
     if (!subscription) {
@@ -86,5 +84,28 @@ export class SubscriptionsService {
     }
 
     return subscription
+  }
+
+  async findOne(
+    id: number,
+  ): Promise<{ id: number; userCI: string; available: boolean }> {
+    const subscription = await this.subscription({ id })
+
+    if (!subscription) {
+      throw new SubscriptionNotFoundException()
+    }
+
+    return {
+      id: subscription.id,
+      userCI: subscription.userCI,
+      available: subscription.available,
+    }
+  }
+
+  async disableSubscriptionsByUser(userCI: string) {
+    return await this.prisma.subscription.updateMany({
+      where: { userCI },
+      data: { available: false },
+    })
   }
 }

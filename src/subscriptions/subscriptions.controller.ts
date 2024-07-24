@@ -45,6 +45,15 @@ export class SubscriptionsController {
   //   return await this.subscriptionsService.findAll()
   // }
 
+  @Get(':id')
+  @ApiOperation({ summary: 'Get a subscription by id' })
+  @ApiResponse({ status: 200, description: 'The subscription.' })
+  async findOne(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<{ id: number; userCI: string; available: boolean }> {
+    return await this.subscriptionsService.findOne(id)
+  }
+
   @Get('by-role')
   @ApiOperation({ summary: 'Get all subscriptions by role' })
   @ApiResponse({ status: 200, description: 'List of subscriptions.' })
