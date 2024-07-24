@@ -1,6 +1,6 @@
 import { APPOINTMENT_STATUS } from '@prisma/client'
 
-export interface IAppointementFilters {
+export interface IAppointmentFilters {
   startDate?: Date
   endDate?: Date
   date?: Date

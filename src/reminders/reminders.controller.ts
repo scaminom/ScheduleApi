@@ -18,8 +18,10 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger'
 import { IReminderFilters } from './interfaces/i-reminder-filters'
+import { ReminderFiltersDto } from './dto/reminder-filters.dto'
 
 @Public()
 @ApiTags('reminders')
@@ -40,15 +42,9 @@ export class RemindersController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all reminders' })
-  @ApiResponse({ status: 200, description: 'List of reminders.' })
-  findAll() {
-    return this.remindersService.getAllReminders()
-  }
-
-  @Get()
   @ApiOperation({ summary: 'Get all reminders by filters' })
   @ApiResponse({ status: 200, description: 'List of reminders.' })
+  @ApiQuery({ type: ReminderFiltersDto })
   findByFilters(@Query() filters: IReminderFilters) {
     return this.remindersService.findByFilters(filters)
   }
