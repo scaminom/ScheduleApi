@@ -37,7 +37,7 @@ model User {
   ci           String        @id @unique
   color        String?
   password     String
-  role         Role          @unique
+  role         Role
   firstName    String        @map("first_name")
   lastName     String        @map("last_name")
   deletedAt    DateTime?     @map("deleted_at")

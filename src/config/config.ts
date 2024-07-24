@@ -16,6 +16,7 @@ export default registerAs('config', () => {
     VAPID_SUBJECT: process.env.VAPID_SUBJECT,
     CRYPTO_SECRET: process.env.CRYPTO_SECRET,
     CRYPTO_ALGORITHM: process.env.CRYPTO_ALGORITHM,
+    CRYPTO_KEY: process.env.CRYPTO_KEY,
   }
 })
 
@@ -34,4 +35,5 @@ export interface IEnvConfig {
   VAPID_SUBJECT: string
   CRYPTO_SECRET: string
   CRYPTO_ALGORITHM: string
+  CRYPTO_KEY: string
 }
