@@ -153,7 +153,14 @@ export class UserService {
       throw new UserCantAssignColorException()
     }
 
+    if (params.data.password) {
+      const pa = await this.generateSaltPassword(params.data.password)
+
+      Object.assign(params.data, { password: pa })
+    }
+
     const { where, data } = params
+
     return this.prisma.user.update({
       data,
       where,

@@ -1,6 +1,6 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { Role } from '@prisma/client'
-import { IsEnum, IsObject } from 'class-validator'
+import { IsNumberString, IsObject } from 'class-validator'
+import { ISubscriptionPayload } from '../interfaces/i-subscription-payload'
 
 export class CreateSubscriptionDto {
   @ApiProperty({
@@ -13,16 +13,9 @@ export class CreateSubscriptionDto {
     },
   })
   @IsObject()
-  subscription: {
-    endpoint: string
-    keys: {
-      p256dh: string
-      auth: string
-    }
-    expirationTime?: number
-  }
+  subscription: ISubscriptionPayload
 
-  @ApiProperty({ example: Role.ADMIN })
-  @IsEnum(Role)
-  userRole: Role
+  @ApiProperty({ example: '0202020202' })
+  @IsNumberString()
+  userCI: string
 }

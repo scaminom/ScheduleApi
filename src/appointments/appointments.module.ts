@@ -8,10 +8,16 @@ import { AppointmentsGateway } from './appointments.gateway'
 import { InspectionsModule } from 'src/inspections/inspections.module'
 import { SubscriptionsModule } from 'src/subscriptions/subscriptions.module'
 import { NotificationsModule } from 'src/notifications/notifications.module'
+import { AppointmentsBackgroundService } from './appointments.background.service'
 
 @Module({
   controllers: [AppointmentsController],
-  providers: [AppointmentsService, AppoitmentValidator, AppointmentsGateway],
+  providers: [
+    AppointmentsService,
+    AppoitmentValidator,
+    AppointmentsGateway,
+    AppointmentsBackgroundService,
+  ],
   imports: [
     PrismaModule,
     UsersModule,
@@ -19,6 +25,10 @@ import { NotificationsModule } from 'src/notifications/notifications.module'
     NotificationsModule,
     forwardRef(() => InspectionsModule),
   ],
-  exports: [AppoitmentValidator, AppointmentsService],
+  exports: [
+    AppoitmentValidator,
+    AppointmentsService,
+    AppointmentsBackgroundService,
+  ],
 })
 export class AppointmentsModule {}

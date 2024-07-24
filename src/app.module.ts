@@ -13,6 +13,7 @@ import { InspectionsModule } from './inspections/inspections.module'
 import { JobsModule } from './jobs/jobs.module'
 import { NotificationsModule } from './notifications/notifications.module'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
+import { CryptoModule } from './crypto/crypto.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { SubscriptionsModule } from './subscriptions/subscriptions.module'
     JobsModule,
     NotificationsModule,
     SubscriptionsModule,
+    CryptoModule,
   ],
   controllers: [AppController],
   providers: [AppService],
