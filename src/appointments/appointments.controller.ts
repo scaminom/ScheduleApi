@@ -14,11 +14,13 @@ import {
   ApiResponse,
   ApiBody,
   ApiParam,
+  ApiQuery,
 } from '@nestjs/swagger'
 import { AppointmentsService } from './appointments.service'
 import { CreateAppointmentDto } from './dto/create-appointment.dto'
 import { UpdateAppointmentDto } from './dto/update-appointment.dto'
-import { IAppointementFilters } from './interfaces/i-appointment-filters'
+import { IAppointmentFilters } from './interfaces/i-appointment-filters'
+import { AppointmentFiltersDto } from './dto/appointment-filters.dto'
 
 @ApiTags('appointments')
 @Controller('appointments')
@@ -38,16 +40,13 @@ export class AppointmentsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all appointments' })
-  @ApiResponse({ status: 200, description: 'List of appointments.' })
-  findAll() {
-    return this.appointmentsService.findAll()
-  }
-
-  @Get()
   @ApiOperation({ summary: 'Get all appointments by filters' })
   @ApiResponse({ status: 200, description: 'List of appointments.' })
-  findByFilters(@Query() filters: IAppointementFilters) {
+  @ApiQuery({ type: AppointmentFiltersDto })
+  findByFilters(
+    @Query()
+    filters: IAppointmentFilters,
+  ) {
     return this.appointmentsService.findByFilters(filters)
   }
 

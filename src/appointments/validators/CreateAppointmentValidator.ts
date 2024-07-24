@@ -44,10 +44,11 @@ export class AppoitmentValidator {
   }
 
   private validateDateAndTime(date: Date): void {
-    if (date < new Date()) {
+    const dateCopy = new Date(date)
+    if (dateCopy < new Date()) {
       throw new AppointmentPastDateException()
     }
-    if (date.getHours() < 8 || date.getHours() > 17) {
+    if (dateCopy.getHours() < 8 || dateCopy.getHours() > 17) {
       throw new AppointmentLaboralHoursException()
     }
   }

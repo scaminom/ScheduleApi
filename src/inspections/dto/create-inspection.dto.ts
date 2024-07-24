@@ -18,7 +18,7 @@ export class CreateInspectionDto {
   })
   jobs?: string[]
 
-  @ApiProperty({ example: '2021-08-01T00:00:00' })
+  @ApiProperty({ example: '2024-07-24 14:14:00-05' })
   @IsDate()
   startDate: Date
 }
