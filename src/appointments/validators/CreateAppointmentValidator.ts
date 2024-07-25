@@ -94,6 +94,7 @@ export class AppoitmentValidator {
     const mechanics = await this.userService.users({
       where: {
         role: 'MECHANIC',
+        deletedAt: null,
       },
     })
 
