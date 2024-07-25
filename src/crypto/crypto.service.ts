@@ -17,6 +17,8 @@ export class CryptoService {
       this.config.get<IEnvConfig>('config').CRYPTO_KEY,
       'utf8',
     )
+
+    console.log({ algorithm: this.algorithm, key, iv: this.ivKey.toString() })
   }
 
   async encryptString(text: string): Promise<string> {
