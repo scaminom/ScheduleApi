@@ -9,6 +9,7 @@ import { BaseException } from '../../shared/exceptions/base-exception'
 import { BaseConflictException } from '../../shared/exceptions/conflict'
 import { UpdateAppointmentDto } from '../dto/update-appointment.dto'
 import { UserService } from '../../users/users.service'
+import { toEsEcDate } from '../../shared/functions/local-date'
 
 export class AppoitmentValidator {
   constructor(
@@ -44,7 +45,9 @@ export class AppoitmentValidator {
   }
 
   private validateDateAndTime(date: Date): void {
-    const dateCopy = new Date(date)
+    const dateCopy = toEsEcDate(new Date(date))
+
+    console.log(dateCopy, new Date(date), date)
     if (dateCopy < new Date()) {
       throw new AppointmentPastDateException()
     }
@@ -84,11 +87,18 @@ export class AppoitmentValidator {
 
   private async validateAppointmentLimit(date: Date): Promise<void> {
     const dateCopy = new Date(date)
-    const minutesRange = [0, 20, 40]
+    const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
     const minutes = minutesRange.find((minute) => minute <= minutesOfDate)
     dateCopy.setMinutes(minutes)
     dateCopy.setSeconds(0)
+
+    const mechanics = await this.userService.users({
+      where: {
+        role: 'MECHANIC',
+        deletedAt: null,
+      },
+    })
 
     const appointments = await this.appointmentsService.appointments({
       where: {
@@ -100,7 +110,7 @@ export class AppoitmentValidator {
       },
     })
 
-    if (appointments.length >= 3) {
+    if (appointments.length >= mechanics.length) {
       throw new AppointmentLimitPerHourException()
     }
   }
