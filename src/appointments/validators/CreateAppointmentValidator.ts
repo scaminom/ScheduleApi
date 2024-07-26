@@ -46,6 +46,8 @@ export class AppoitmentValidator {
 
   private validateDateAndTime(date: Date): void {
     const dateCopy = toEsEcDate(new Date(date))
+
+    console.log(dateCopy, new Date(date), date)
     if (dateCopy < new Date()) {
       throw new AppointmentPastDateException()
     }
