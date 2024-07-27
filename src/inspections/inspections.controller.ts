@@ -6,6 +6,7 @@ import {
   Patch,
   Param,
   Delete,
+  Query,
 } from '@nestjs/common'
 import { InspectionsService } from './inspections.service'
 import { CreateInspectionDto } from './dto/create-inspection.dto'
@@ -14,9 +15,12 @@ import {
   ApiBody,
   ApiOperation,
   ApiParam,
+  ApiQuery,
   ApiResponse,
   ApiTags,
 } from '@nestjs/swagger'
+import { IInspectionFilters } from './interfaces/i-inspection-filters'
+import { InspectionFiltersDto } from './dto/appointment-filters.dto'
 
 @ApiTags('inspections')
 @Controller('inspections')
@@ -36,10 +40,14 @@ export class InspectionsController {
   }
 
   @Get()
-  @ApiOperation({ summary: 'Get all inspections' })
+  @ApiOperation({ summary: 'Get all inspections by filters' })
   @ApiResponse({ status: 200, description: 'List of inspections.' })
-  findAll() {
-    return this.inspectionsService.findAll()
+  @ApiQuery({ type: InspectionFiltersDto })
+  findByFilters(
+    @Query()
+    filters: IInspectionFilters,
+  ) {
+    return this.inspectionsService.findByFilters(filters)
   }
 
   @Get(':id')
