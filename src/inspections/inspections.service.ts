@@ -103,6 +103,7 @@ export class InspectionsService {
       where: whereOptions,
       include: {
         jobs: true,
+        appointment: true,
       },
     })
   }
@@ -145,6 +146,10 @@ export class InspectionsService {
             : undefined,
         startDate,
         status: APPOINTMENT_STATUS.PENDING,
+      },
+      include: {
+        jobs: true,
+        appointment: true,
       },
     })
   }
@@ -209,6 +214,10 @@ export class InspectionsService {
       },
       data: {
         ...updateInspectionDto,
+      },
+      include: {
+        jobs: true,
+        appointment: true,
       },
     })
   }
