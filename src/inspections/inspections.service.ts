@@ -1,4 +1,9 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
+import {
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { CreateInspectionDto } from './dto/create-inspection.dto'
 import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import { PrismaService } from '../prisma/prisma.service'
@@ -9,6 +14,7 @@ import {
   InspectionPastDateException,
 } from './exceptions'
 import { JobAlreadyExitsException } from '../jobs/exceptions'
+import { IInspectionFilters } from './interfaces/i-inspection-filters'
 
 /*
  *
@@ -55,6 +61,48 @@ export class InspectionsService {
       include: {
         jobs: true,
         appointment: true,
+      },
+    })
+  }
+
+  /**
+   * Find inspections by filters
+   * @param {IInspectionFilters} params - The filters to find the inspections
+   * @returns {Promise<Inspection[]>} - The inspections found
+   * @throws {ConflictException} - If the start date is greater than the end date
+   */
+  async findByFilters(params: IInspectionFilters) {
+    if (
+      params.startDate &&
+      params.endDate &&
+      params.startDate > params.endDate
+    ) {
+      throw new ConflictException(
+        'Fecha de inicio no puede ser mayor a la fecha de fin',
+      )
+    }
+
+    const { startDate, endDate, ...rest } = params
+
+    const whereOptions: Prisma.InspectionWhereInput = {
+      ...rest,
+      startDate:
+        params.startDate && params.endDate
+          ? {
+              lte: new Date(endDate),
+              gte: new Date(startDate),
+            }
+          : params.startDate
+            ? { gte: new Date(startDate) }
+            : params.endDate
+              ? { lte: new Date(endDate) }
+              : undefined,
+    }
+
+    return await this.prismaService.inspection.findMany({
+      where: whereOptions,
+      include: {
+        jobs: true,
       },
     })
   }
