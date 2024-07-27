@@ -40,7 +40,11 @@ export class InspectionsService {
       where: params,
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: { select: { firstName: true, lastName: true, ci: true } },
+          },
+        },
       },
     })
   }
@@ -60,7 +64,11 @@ export class InspectionsService {
       ...params,
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: { select: { firstName: true, lastName: true, ci: true } },
+          },
+        },
       },
     })
   }
@@ -103,7 +111,11 @@ export class InspectionsService {
       where: whereOptions,
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: { select: { firstName: true, lastName: true, ci: true } },
+          },
+        },
       },
     })
   }
@@ -149,7 +161,11 @@ export class InspectionsService {
       },
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: { select: { firstName: true, lastName: true, ci: true } },
+          },
+        },
       },
     })
   }
@@ -162,7 +178,11 @@ export class InspectionsService {
     return await this.prismaService.inspection.findMany({
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: { select: { firstName: true, lastName: true, ci: true } },
+          },
+        },
       },
     })
   }
@@ -217,7 +237,11 @@ export class InspectionsService {
       },
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: { select: { firstName: true, lastName: true, ci: true } },
+          },
+        },
       },
     })
   }
