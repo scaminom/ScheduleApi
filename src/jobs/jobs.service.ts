@@ -6,6 +6,7 @@ import { InspectionsService } from 'src/inspections/inspections.service'
 import { JobAlreadyExitsException } from './exceptions/job-already-exists'
 import { Prisma } from '@prisma/client'
 import { InspectionNotFoundException } from 'src/inspections/exceptions/inspection-not-found'
+import { JobsGateway } from './jobs.gateway'
 
 @Injectable()
 /*
@@ -17,6 +18,7 @@ export class JobsService {
   constructor(
     private readonly prismaService: PrismaService,
     private readonly inspectionsService: InspectionsService,
+    private readonly jobsGateway: JobsGateway,
   ) {}
 
   /**
@@ -67,9 +69,13 @@ export class JobsService {
       throw new JobAlreadyExitsException(createJobDto.inspectionId)
     }
 
-    return await this.prismaService.job.create({
+    const job = await this.prismaService.job.create({
       data: createJobDto,
     })
+
+    this.jobsGateway.broadcastJobCreation()
+
+    return job
   }
 
   /**
@@ -119,12 +125,16 @@ export class JobsService {
       throw new JobAlreadyExitsException(updateJobDto.inspectionId)
     }
 
-    return await this.prismaService.job.update({
+    const updatedJob = await this.prismaService.job.update({
       where: {
         id,
       },
       data: updateJobDto,
     })
+
+    this.jobsGateway.broadcastJobUpdate()
+
+    return updatedJob
   }
 
   /**
@@ -135,10 +145,14 @@ export class JobsService {
   async remove(id: number) {
     await this.findOne(id)
 
-    return await this.prismaService.job.delete({
+    const deletedJob = await this.prismaService.job.delete({
       where: {
         id,
       },
     })
+
+    this.jobsGateway.broadcastJobDeletion()
+
+    return deletedJob
   }
 }

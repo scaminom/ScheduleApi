@@ -15,6 +15,7 @@ import { InspectionsService } from 'src/inspections/inspections.service'
 import { IAppointmentFilters } from './interfaces/i-appointment-filters'
 import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
 import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
+import { UserSelectInput } from 'src/shared/constants/user-select'
 
 @Injectable()
 /**
@@ -49,15 +50,7 @@ export class AppointmentsService {
     return await this.prisma.appointment.findUnique({
       where: appointmentWhereUniqueInput,
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
   }
@@ -76,15 +69,7 @@ export class AppointmentsService {
     return await this.prisma.appointment.findMany({
       ...params,
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
   }
@@ -130,15 +115,7 @@ export class AppointmentsService {
     return await this.prisma.appointment.findMany({
       where: whereOptions,
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
   }
@@ -163,15 +140,7 @@ export class AppointmentsService {
         ...createApointmentDto,
       },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
 
@@ -193,15 +162,7 @@ export class AppointmentsService {
   async findAll() {
     return await this.prisma.appointment.findMany({
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
       where: {
         deletedAt: null,
@@ -251,15 +212,7 @@ export class AppointmentsService {
         ...updateApointmentDto,
       },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
 
@@ -289,15 +242,7 @@ export class AppointmentsService {
         deletedAt: new Date(),
       },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
 
