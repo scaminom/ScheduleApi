@@ -114,15 +114,21 @@ export class JobsService {
       throw new InspectionNotFoundException(id)
     }
 
-    const jobs = await this.prismaService.job.findMany({
-      where: {
-        inspectionId: updateJobDto.inspectionId,
-        name: updateJobDto.name,
-      },
-    })
+    if (
+      (updateJobDto.inspectionId &&
+        updateJobDto.inspectionId !== job.inspectionId) ||
+      (updateJobDto.name && updateJobDto.name !== job.name)
+    ) {
+      const jobs = await this.prismaService.job.findMany({
+        where: {
+          inspectionId: updateJobDto.inspectionId ?? job.inspectionId,
+          name: updateJobDto.name,
+        },
+      })
 
-    if (jobs.length > 0) {
-      throw new JobAlreadyExitsException(updateJobDto.inspectionId)
+      if (jobs.length > 0) {
+        throw new JobAlreadyExitsException(updateJobDto.inspectionId)
+      }
     }
 
     const updatedJob = await this.prismaService.job.update({
