@@ -4,17 +4,18 @@ import {
   Inject,
   Injectable,
 } from '@nestjs/common'
-import { CreateInspectionDto } from './dto/create-inspection.dto'
-import { UpdateInspectionDto } from './dto/update-inspection.dto'
-import { PrismaService } from '../prisma/prisma.service'
 import { APPOINTMENT_STATUS, Inspection, Prisma } from '@prisma/client'
 import { AppointmentsService } from '../appointments/appointments.service'
+import { JobAlreadyExitsException } from '../jobs/exceptions'
+import { PrismaService } from '../prisma/prisma.service'
+import { CreateInspectionDto } from './dto/create-inspection.dto'
+import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import {
   InspectionNotFoundException,
   InspectionPastDateException,
 } from './exceptions'
-import { JobAlreadyExitsException } from '../jobs/exceptions'
 import { IInspectionFilters } from './interfaces/i-inspection-filters'
+import { UserSelectInput } from 'src/shared/constants/user-select'
 
 /*
  *
@@ -42,7 +43,7 @@ export class InspectionsService {
         jobs: true,
         appointment: {
           include: {
-            user: { select: { firstName: true, lastName: true, ci: true } },
+            user: UserSelectInput,
           },
         },
       },
@@ -66,7 +67,7 @@ export class InspectionsService {
         jobs: true,
         appointment: {
           include: {
-            user: { select: { firstName: true, lastName: true, ci: true } },
+            user: UserSelectInput,
           },
         },
       },
@@ -113,7 +114,7 @@ export class InspectionsService {
         jobs: true,
         appointment: {
           include: {
-            user: { select: { firstName: true, lastName: true, ci: true } },
+            user: UserSelectInput,
           },
         },
       },
@@ -163,7 +164,7 @@ export class InspectionsService {
         jobs: true,
         appointment: {
           include: {
-            user: { select: { firstName: true, lastName: true, ci: true } },
+            user: UserSelectInput,
           },
         },
       },
@@ -180,7 +181,7 @@ export class InspectionsService {
         jobs: true,
         appointment: {
           include: {
-            user: { select: { firstName: true, lastName: true, ci: true } },
+            user: UserSelectInput,
           },
         },
       },
@@ -239,7 +240,7 @@ export class InspectionsService {
         jobs: true,
         appointment: {
           include: {
-            user: { select: { firstName: true, lastName: true, ci: true } },
+            user: UserSelectInput,
           },
         },
       },
