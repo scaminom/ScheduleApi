@@ -16,6 +16,7 @@ import {
 } from './exceptions'
 import { IInspectionFilters } from './interfaces/i-inspection-filters'
 import { UserSelectInput } from 'src/shared/constants/user-select'
+import { InspectionsGateway } from './inspections.gateway'
 
 /*
  *
@@ -27,6 +28,8 @@ export class InspectionsService {
 
     @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentService: AppointmentsService,
+
+    private readonly inspectionsGateway: InspectionsGateway,
   ) {}
 
   /**
@@ -145,7 +148,7 @@ export class InspectionsService {
       }
     }
 
-    return await this.prismaService.inspection.create({
+    const inspection = await this.prismaService.inspection.create({
       data: {
         appointmentId,
         jobs:
@@ -169,6 +172,10 @@ export class InspectionsService {
         },
       },
     })
+
+    this.inspectionsGateway.broadcastInspectionCreation()
+
+    return inspection
   }
 
   /**
@@ -222,7 +229,22 @@ export class InspectionsService {
       throw new InspectionPastDateException()
     }
 
-    return await this.prismaService.inspection.update({
+    if (updateInspectionDto.status === APPOINTMENT_STATUS.COMPLETED) {
+      const jobs = await this.prismaService.job.findMany({
+        where: {
+          inspectionId: id,
+          status: APPOINTMENT_STATUS.PENDING,
+        },
+      })
+
+      if (jobs.length > 0) {
+        throw new ConflictException(
+          'No se puede completar la inspección si hay trabajos pendientes',
+        )
+      }
+    }
+
+    const inspectionUpdate = await this.prismaService.inspection.update({
       where: {
         id,
       },
@@ -243,6 +265,10 @@ export class InspectionsService {
         },
       },
     })
+
+    this.inspectionsGateway.broadcastInspectionUpdate()
+
+    return inspectionUpdate
   }
 
   /**
@@ -258,10 +284,14 @@ export class InspectionsService {
       throw new InspectionNotFoundException(id)
     }
 
-    return await this.prismaService.inspection.delete({
+    const inspectionRemoved = await this.prismaService.inspection.delete({
       where: {
         id,
       },
     })
+
+    this.inspectionsGateway.broadcastInspectionDeletion()
+
+    return inspectionRemoved
   }
 }
