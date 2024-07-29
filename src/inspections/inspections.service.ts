@@ -290,7 +290,7 @@ export class InspectionsService {
       },
     })
 
-    this.inspectionsGateway.broadcastInspectionDeletiong()
+    this.inspectionsGateway.broadcastInspectionDeletion()
 
     return inspectionRemoved
   }
