@@ -218,14 +218,7 @@ export class InspectionsService {
     if (updateInspectionDto.appointmentId)
       await this.appointmentService.findOne(updateInspectionDto.appointmentId)
 
-    if (
-      updateInspectionDto.startDate < new Date() ||
-      updateInspectionDto.endDate < new Date()
-    ) {
-      throw new InspectionPastDateException()
-    }
-
-    if (updateInspectionDto.endDate < updateInspectionDto.startDate) {
+    if (updateInspectionDto.startDate < new Date()) {
       throw new InspectionPastDateException()
     }
 
@@ -235,6 +228,11 @@ export class InspectionsService {
       },
       data: {
         ...updateInspectionDto,
+        endDate:
+          updateInspectionDto.status &&
+          updateInspectionDto.status === APPOINTMENT_STATUS.COMPLETED
+            ? new Date()
+            : undefined,
       },
       include: {
         jobs: true,
