@@ -114,12 +114,19 @@ export class InspectionsService {
     return await this.prismaService.inspection.findMany({
       where: whereOptions,
       include: {
-        jobs: true,
+        jobs: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
         appointment: {
           include: {
             user: UserSelectInput,
           },
         },
+      },
+      orderBy: {
+        startDate: 'asc',
       },
     })
   }
