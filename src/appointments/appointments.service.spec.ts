@@ -149,7 +149,7 @@ describe('AppointmentsService', () => {
       const dto = new CreateAppointmentDto()
       jest
         .spyOn(validateAppointment, 'validate')
-        .mockRejectedValue(new AppointmentLimitPerHourException())
+        .mockRejectedValue(new AppointmentLimitPerHourException(3))
 
       await expect(service.create(dto)).rejects.toThrow(
         AppointmentLimitPerHourException,
