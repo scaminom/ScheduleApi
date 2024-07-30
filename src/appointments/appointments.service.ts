@@ -14,7 +14,6 @@ import { AppointmentsGateway } from './appointments.gateway'
 import { InspectionsService } from 'src/inspections/inspections.service'
 import { IAppointmentFilters } from './interfaces/i-appointment-filters'
 import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
-import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
 import { UserSelectInput } from 'src/shared/constants/user-select'
 
 @Injectable()
@@ -134,10 +133,6 @@ export class AppointmentsService {
   ): Promise<IAppointmentWithUser> {
     await this.validateAppointment.validate(createApointmentDto)
 
-    const { userCI } = createApointmentDto
-
-    validateUserExistence(this.prisma, userCI)
-
     const appointment = await this.prisma.appointment.create({
       data: {
         ...createApointmentDto,
@@ -202,10 +197,6 @@ export class AppointmentsService {
     await this.findOne(id)
 
     await this.validateAppointment.validate(updateApointmentDto)
-
-    const { userCI } = updateApointmentDto
-
-    validateUserExistence(this.prisma, userCI)
 
     const appointment = await this.prisma.appointment.update({
       where: {
