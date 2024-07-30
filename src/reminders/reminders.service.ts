@@ -129,6 +129,9 @@ export class RemindersService {
         deletedAt: null,
         createdAt: rest.createdAt ? new Date(rest.createdAt) : undefined,
       },
+      orderBy: {
+        reminderDate: 'asc',
+      },
       include: {
         user: {
           select: {

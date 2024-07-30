@@ -117,6 +117,9 @@ export class AppointmentsService {
       include: {
         user: UserSelectInput,
       },
+      orderBy: {
+        date: 'asc',
+      },
     })
   }
 
