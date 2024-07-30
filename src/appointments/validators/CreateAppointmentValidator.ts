@@ -1,4 +1,4 @@
-import { forwardRef, Inject } from '@nestjs/common'
+import { forwardRef, Inject, Logger } from '@nestjs/common'
 import { CreateAppointmentDto } from '../dto/create-appointment.dto'
 import { AppointmentPastDateException } from '../exceptions/appointment-past-date'
 import { AppointmentLaboralHoursException } from '../exceptions/appointment-laboral-hours'
@@ -12,6 +12,7 @@ import { UserService } from '../../users/users.service'
 import { toEsEcDate } from '../../shared/functions/local-date'
 
 export class AppoitmentValidator {
+  private readonly logger: Logger = new Logger('AppoitmentValidator')
   constructor(
     @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentsService: AppointmentsService,
@@ -21,25 +22,26 @@ export class AppoitmentValidator {
   ) {}
 
   public async validate(
-    createAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
+    handleAppointmentDto: CreateAppointmentDto | UpdateAppointmentDto,
   ): Promise<void> {
     try {
-      if (createAppointmentDto.date)
-        this.validateDateAndTime(createAppointmentDto.date)
+      if (handleAppointmentDto.date)
+        this.validateDateAndTime(handleAppointmentDto.date)
 
-      if (createAppointmentDto.userCI)
+      if (handleAppointmentDto.userCI)
         await this.validateMechanic(
-          createAppointmentDto.userCI,
-          createAppointmentDto.date,
+          handleAppointmentDto.userCI,
+          handleAppointmentDto.date,
         )
 
-      if (createAppointmentDto.date)
-        await this.validateAppointmentLimit(createAppointmentDto.date)
+      if (handleAppointmentDto.date)
+        await this.validateAppointmentLimit(handleAppointmentDto.date)
     } catch (error) {
       if (error instanceof BaseException) {
         throw error
       }
 
+      this.logger.error(error)
       throw new BaseConflictException('Error al validar la cita', error)
     }
   }
@@ -57,14 +59,18 @@ export class AppoitmentValidator {
 
   private async validateMechanic(
     mechanicCI: string,
-    date: Date,
+    date?: Date,
   ): Promise<void> {
     await this.userService.findOne(mechanicCI)
+
+    if (!date) {
+      return
+    }
 
     const dateCopy = new Date(date)
     const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
-    const minutes = minutesRange.find((minute) => minute <= minutesOfDate)
+    const minutes = minutesRange.find((minute) => minutesOfDate <= minute)
     dateCopy.setMinutes(minutes)
     dateCopy.setSeconds(0)
 
@@ -72,8 +78,8 @@ export class AppoitmentValidator {
       where: {
         userCI: mechanicCI,
         date: {
-          lte: new Date(dateCopy.getTime() + 30 * 60 * 1000),
-          gte: dateCopy,
+          lt: new Date(dateCopy.getTime() + 30 * 60 * 1000),
+          gte: new Date(dateCopy),
         },
         deletedAt: null,
       },
@@ -85,10 +91,10 @@ export class AppoitmentValidator {
   }
 
   private async validateAppointmentLimit(date: Date): Promise<void> {
-    const dateCopy = new Date(date)
+    const dateCopy = toEsEcDate(new Date(date))
     const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
-    const minutes = minutesRange.find((minute) => minute <= minutesOfDate)
+    const minutes = minutesRange.find((minute) => minutesOfDate <= minute)
     dateCopy.setMinutes(minutes)
     dateCopy.setSeconds(0)
 
@@ -102,15 +108,15 @@ export class AppoitmentValidator {
     const appointments = await this.appointmentsService.appointments({
       where: {
         date: {
-          lte: new Date(dateCopy.getTime() + 20 * 60 * 1000),
-          gte: dateCopy,
+          lt: new Date(dateCopy.getTime() + 30 * 60 * 1000),
+          gte: new Date(dateCopy),
         },
         deletedAt: null,
       },
     })
 
     if (appointments.length >= mechanics.length) {
-      throw new AppointmentLimitPerHourException()
+      throw new AppointmentLimitPerHourException(mechanics.length)
     }
   }
 }
