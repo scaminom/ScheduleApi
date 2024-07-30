@@ -20,7 +20,6 @@ async function bootstrap() {
   )
 
   if (process.env.NODE_ENV !== 'production') {
-    console.log('Swagger enabled', process.env.NODE_ENV)
     const config = new DocumentBuilder()
       .setTitle('Schedule API')
       .addBearerAuth()
