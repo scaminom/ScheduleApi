@@ -9,6 +9,7 @@ export interface IAppointmentWithUser
           lastName: true
           ci: true
           role: true
+          color: true
         }
       }
     }

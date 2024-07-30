@@ -12,9 +12,9 @@ import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
 import { AppointmentNotFoundException } from './exceptions'
 import { AppointmentsGateway } from './appointments.gateway'
 import { InspectionsService } from 'src/inspections/inspections.service'
-import { IAppointementFilters } from './interfaces/i-appointment-filters'
+import { IAppointmentFilters } from './interfaces/i-appointment-filters'
 import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
-import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
+import { UserSelectInput } from 'src/shared/constants/user-select'
 
 @Injectable()
 /**
@@ -49,15 +49,7 @@ export class AppointmentsService {
     return await this.prisma.appointment.findUnique({
       where: appointmentWhereUniqueInput,
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
   }
@@ -76,15 +68,7 @@ export class AppointmentsService {
     return await this.prisma.appointment.findMany({
       ...params,
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
   }
@@ -96,7 +80,7 @@ export class AppointmentsService {
    * @throws {ConflictException} if the start date is greater than the end date
    */
   async findByFilters(
-    params: IAppointementFilters,
+    params: IAppointmentFilters,
   ): Promise<IAppointmentWithUser[]> {
     if (
       params.startDate &&
@@ -110,33 +94,30 @@ export class AppointmentsService {
 
     const { startDate, endDate, date, ...rest } = params
 
+    const whereOptions: Prisma.AppointmentWhereInput = {
+      ...rest,
+      date: params.date
+        ? new Date(date)
+        : params.startDate && params.endDate
+          ? {
+              lte: new Date(endDate),
+              gte: new Date(startDate),
+            }
+          : params.startDate
+            ? { gte: new Date(startDate) }
+            : params.endDate
+              ? { lte: new Date(endDate) }
+              : undefined,
+      deletedAt: null,
+    }
+
     return await this.prisma.appointment.findMany({
-      where: {
-        ...rest,
-        date: params.date
-          ? date
-          : params.startDate && params.endDate
-            ? {
-                lte: endDate,
-                gte: startDate,
-              }
-            : params.startDate
-              ? { gte: startDate }
-              : params.endDate
-                ? { lte: endDate }
-                : undefined,
-        deletedAt: null,
-      },
+      where: whereOptions,
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
+      },
+      orderBy: {
+        date: 'asc',
       },
     })
   }
@@ -152,24 +133,12 @@ export class AppointmentsService {
   ): Promise<IAppointmentWithUser> {
     await this.validateAppointment.validate(createApointmentDto)
 
-    const { userCI } = createApointmentDto
-
-    validateUserExistence(this.prisma, userCI)
-
     const appointment = await this.prisma.appointment.create({
       data: {
         ...createApointmentDto,
       },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
 
@@ -191,15 +160,7 @@ export class AppointmentsService {
   async findAll() {
     return await this.prisma.appointment.findMany({
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
       where: {
         deletedAt: null,
@@ -237,10 +198,6 @@ export class AppointmentsService {
 
     await this.validateAppointment.validate(updateApointmentDto)
 
-    const { userCI } = updateApointmentDto
-
-    validateUserExistence(this.prisma, userCI)
-
     const appointment = await this.prisma.appointment.update({
       where: {
         id,
@@ -249,15 +206,7 @@ export class AppointmentsService {
         ...updateApointmentDto,
       },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
 
@@ -287,15 +236,7 @@ export class AppointmentsService {
         deletedAt: new Date(),
       },
       include: {
-        user: {
-          select: {
-            firstName: true,
-            lastName: true,
-            ci: true,
-            role: true,
-            color: true,
-          },
-        },
+        user: UserSelectInput,
       },
     })
 

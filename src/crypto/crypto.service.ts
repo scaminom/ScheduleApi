@@ -12,8 +12,11 @@ export class CryptoService {
   constructor(private readonly config: ConfigService) {
     this.algorithm = this.config.get<IEnvConfig>('config').CRYPTO_ALGORITHM
     const key = this.config.get<IEnvConfig>('config').CRYPTO_SECRET
-    this.securityKey = Buffer.from(key)
-    this.ivKey = Buffer.from(this.config.get<IEnvConfig>('config').CRYPTO_KEY)
+    this.securityKey = Buffer.from(key, 'utf8')
+    this.ivKey = Buffer.from(
+      this.config.get<IEnvConfig>('config').CRYPTO_KEY,
+      'utf8',
+    )
   }
 
   async encryptString(text: string): Promise<string> {

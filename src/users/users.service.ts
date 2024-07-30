@@ -27,11 +27,9 @@ export class UserService {
   async user(
     userWhereUniqueInput: Prisma.UserWhereUniqueInput,
   ): Promise<User | null> {
-    const { ci } = userWhereUniqueInput
-
     const user = await this.prisma.user.findUnique({
       where: {
-        ci,
+        ...userWhereUniqueInput,
         deletedAt: null,
       },
     })

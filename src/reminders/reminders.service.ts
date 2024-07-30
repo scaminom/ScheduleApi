@@ -118,15 +118,19 @@ export class RemindersService {
         reminderDate:
           params.startDate && params.endDate
             ? {
-                lte: endDate,
-                gte: startDate,
+                lte: new Date(endDate),
+                gte: new Date(startDate),
               }
             : params.startDate
-              ? { gte: startDate }
+              ? { gte: new Date(startDate) }
               : params.endDate
-                ? { lte: endDate }
+                ? { lte: new Date(endDate) }
                 : undefined,
         deletedAt: null,
+        createdAt: rest.createdAt ? new Date(rest.createdAt) : undefined,
+      },
+      orderBy: {
+        reminderDate: 'asc',
       },
       include: {
         user: {
@@ -174,6 +178,12 @@ export class RemindersService {
     const { userCI } = data
 
     validateUserExistence(this.prisma, userCI)
+
+    if (new Date(data.reminderDate) < new Date()) {
+      throw new ConflictException(
+        'La fecha de recordatorio no puede ser menor a la fecha actual',
+      )
+    }
 
     const reminder = await this.prisma.reminder.create({
       data: {

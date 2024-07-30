@@ -1,14 +1,22 @@
-import { forwardRef, Inject, Injectable } from '@nestjs/common'
-import { CreateInspectionDto } from './dto/create-inspection.dto'
-import { UpdateInspectionDto } from './dto/update-inspection.dto'
-import { PrismaService } from '../prisma/prisma.service'
+import {
+  ConflictException,
+  forwardRef,
+  Inject,
+  Injectable,
+} from '@nestjs/common'
 import { APPOINTMENT_STATUS, Inspection, Prisma } from '@prisma/client'
 import { AppointmentsService } from '../appointments/appointments.service'
+import { JobAlreadyExitsException } from '../jobs/exceptions'
+import { PrismaService } from '../prisma/prisma.service'
+import { CreateInspectionDto } from './dto/create-inspection.dto'
+import { UpdateInspectionDto } from './dto/update-inspection.dto'
 import {
   InspectionNotFoundException,
   InspectionPastDateException,
 } from './exceptions'
-import { JobAlreadyExitsException } from '../jobs/exceptions'
+import { IInspectionFilters } from './interfaces/i-inspection-filters'
+import { UserSelectInput } from 'src/shared/constants/user-select'
+import { InspectionsGateway } from './inspections.gateway'
 
 /*
  *
@@ -20,6 +28,8 @@ export class InspectionsService {
 
     @Inject(forwardRef(() => AppointmentsService))
     private readonly appointmentService: AppointmentsService,
+
+    private readonly inspectionsGateway: InspectionsGateway,
   ) {}
 
   /**
@@ -34,7 +44,11 @@ export class InspectionsService {
       where: params,
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: UserSelectInput,
+          },
+        },
       },
     })
   }
@@ -54,7 +68,65 @@ export class InspectionsService {
       ...params,
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: UserSelectInput,
+          },
+        },
+      },
+    })
+  }
+
+  /**
+   * Find inspections by filters
+   * @param {IInspectionFilters} params - The filters to find the inspections
+   * @returns {Promise<Inspection[]>} - The inspections found
+   * @throws {ConflictException} - If the start date is greater than the end date
+   */
+  async findByFilters(params: IInspectionFilters) {
+    if (
+      params.startDate &&
+      params.endDate &&
+      params.startDate > params.endDate
+    ) {
+      throw new ConflictException(
+        'Fecha de inicio no puede ser mayor a la fecha de fin',
+      )
+    }
+
+    const { startDate, endDate, ...rest } = params
+
+    const whereOptions: Prisma.InspectionWhereInput = {
+      ...rest,
+      startDate:
+        params.startDate && params.endDate
+          ? {
+              lte: new Date(endDate),
+              gte: new Date(startDate),
+            }
+          : params.startDate
+            ? { gte: new Date(startDate) }
+            : params.endDate
+              ? { lte: new Date(endDate) }
+              : undefined,
+    }
+
+    return await this.prismaService.inspection.findMany({
+      where: whereOptions,
+      include: {
+        jobs: {
+          orderBy: {
+            createdAt: 'asc',
+          },
+        },
+        appointment: {
+          include: {
+            user: UserSelectInput,
+          },
+        },
+      },
+      orderBy: {
+        startDate: 'asc',
       },
     })
   }
@@ -83,7 +155,7 @@ export class InspectionsService {
       }
     }
 
-    return await this.prismaService.inspection.create({
+    const inspection = await this.prismaService.inspection.create({
       data: {
         appointmentId,
         jobs:
@@ -98,7 +170,19 @@ export class InspectionsService {
         startDate,
         status: APPOINTMENT_STATUS.PENDING,
       },
+      include: {
+        jobs: true,
+        appointment: {
+          include: {
+            user: UserSelectInput,
+          },
+        },
+      },
     })
+
+    this.inspectionsGateway.broadcastInspectionCreation()
+
+    return inspection
   }
 
   /**
@@ -109,7 +193,11 @@ export class InspectionsService {
     return await this.prismaService.inspection.findMany({
       include: {
         jobs: true,
-        appointment: true,
+        appointment: {
+          include: {
+            user: UserSelectInput,
+          },
+        },
       },
     })
   }
@@ -144,25 +232,50 @@ export class InspectionsService {
     if (updateInspectionDto.appointmentId)
       await this.appointmentService.findOne(updateInspectionDto.appointmentId)
 
-    if (
-      updateInspectionDto.startDate < new Date() ||
-      updateInspectionDto.endDate < new Date()
-    ) {
+    if (updateInspectionDto.startDate < new Date()) {
       throw new InspectionPastDateException()
     }
 
-    if (updateInspectionDto.endDate < updateInspectionDto.startDate) {
-      throw new InspectionPastDateException()
+    if (updateInspectionDto.status === APPOINTMENT_STATUS.COMPLETED) {
+      const jobs = await this.prismaService.job.findMany({
+        where: {
+          inspectionId: id,
+          status: APPOINTMENT_STATUS.PENDING,
+        },
+      })
+
+      if (jobs.length > 0) {
+        throw new ConflictException(
+          'No se puede completar la inspección si hay trabajos pendientes',
+        )
+      }
     }
 
-    return await this.prismaService.inspection.update({
+    const inspectionUpdate = await this.prismaService.inspection.update({
       where: {
         id,
       },
       data: {
         ...updateInspectionDto,
+        endDate:
+          updateInspectionDto.status &&
+          updateInspectionDto.status === APPOINTMENT_STATUS.COMPLETED
+            ? new Date()
+            : undefined,
+      },
+      include: {
+        jobs: true,
+        appointment: {
+          include: {
+            user: UserSelectInput,
+          },
+        },
       },
     })
+
+    this.inspectionsGateway.broadcastInspectionUpdate()
+
+    return inspectionUpdate
   }
 
   /**
@@ -178,10 +291,14 @@ export class InspectionsService {
       throw new InspectionNotFoundException(id)
     }
 
-    return await this.prismaService.inspection.delete({
+    const inspectionRemoved = await this.prismaService.inspection.delete({
       where: {
         id,
       },
     })
+
+    this.inspectionsGateway.broadcastInspectionDeletion()
+
+    return inspectionRemoved
   }
 }
