@@ -4,12 +4,11 @@ import {
   WebSocketGateway,
   WebSocketServer,
 } from '@nestjs/websockets'
-import { Prisma, Reminder, Role } from '@prisma/client'
+import { Reminder, Role } from '@prisma/client'
 import { Server, Socket } from 'socket.io'
 import { NotificationsService } from 'src/notifications/notifications.service'
 import { toEsEcDate } from 'src/shared/functions/local-date'
 import { SubscriptionsService } from 'src/subscriptions/subscriptions.service'
-import * as webpush from 'web-push'
 
 @WebSocketGateway({
   cors: {
@@ -29,16 +28,11 @@ export class RemindersGateway {
 
     const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Nueva cita administrativa',
-          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Nueva cita administrativa',
+        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -47,16 +41,11 @@ export class RemindersGateway {
 
     const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Actualización de cita administrativa',
-          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Actualización de cita administrativa',
+        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -65,16 +54,11 @@ export class RemindersGateway {
 
     const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Eliminación de cita administrativa',
-          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Eliminación de cita administrativa',
+        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -83,16 +67,11 @@ export class RemindersGateway {
 
     const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
-          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
+        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -101,16 +80,11 @@ export class RemindersGateway {
 
     const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: `Cita administrativa agendada en 1 minuto`,
-          body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: `Cita administrativa agendada en 1 minuto`,
+        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 

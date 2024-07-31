@@ -1,5 +1,22 @@
 import { registerAs } from '@nestjs/config'
 
+export interface IEnvConfig {
+  DB_PASSWORD: string
+  DB_NAME: string
+  DB_HOST: string
+  DB_PORT: number
+  DB_USERNAME: string
+  CONTAINER_NAME: string
+  DATABASE_URL: string
+  JWT_SECRET: string
+  JWT_EXPIRATION: string
+  VAPID_PUBLIC_KEY: string
+  VAPID_PRIVATE_KEY: string
+  VAPID_SUBJECT: string
+  CRYPTO_SECRET: string
+  CRYPTO_ALGORITHM: string
+  CRYPTO_KEY: string
+}
 export default registerAs('config', () => {
   return {
     DB_PASSWORD: process.env.DB_PASSWORD,
@@ -19,21 +36,3 @@ export default registerAs('config', () => {
     CRYPTO_KEY: process.env.CRYPTO_KEY,
   }
 })
-
-export interface IEnvConfig {
-  DB_PASSWORD: string
-  DB_NAME: string
-  DB_HOST: string
-  DB_PORT: number
-  DB_USERNAME: string
-  CONTAINER_NAME: string
-  DATABASE_URL: string
-  JWT_SECRET: string
-  JWT_EXPIRATION: string
-  VAPID_PUBLIC_KEY: string
-  VAPID_PRIVATE_KEY: string
-  VAPID_SUBJECT: string
-  CRYPTO_SECRET: string
-  CRYPTO_ALGORITHM: string
-  CRYPTO_KEY: string
-}

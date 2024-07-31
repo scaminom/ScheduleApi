@@ -110,7 +110,6 @@ model Job {
 model Subscription {
   id        Int      @id @default(autoincrement())
   endpoint  String
-  keys      Json
   userCI    String   @map("user_ci")
   createdAt DateTime @default(now())
   available Boolean  @default(true)

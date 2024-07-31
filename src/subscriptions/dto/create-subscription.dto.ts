@@ -6,10 +6,6 @@ export class CreateSubscriptionDto {
   @ApiProperty({
     example: {
       endpoint: 'https://fcm.googleapis.com/fcm/send/fj4j3j4',
-      keys: {
-        p256dh: 'BGFJH',
-        auth: 'FJHJF',
-      },
     },
   })
   @IsObject()

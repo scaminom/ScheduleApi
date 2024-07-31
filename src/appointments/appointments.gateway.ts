@@ -4,12 +4,11 @@ import {
   SubscribeMessage,
   ConnectedSocket,
 } from '@nestjs/websockets'
-import { Prisma, Role } from '@prisma/client'
+import { Role } from '@prisma/client'
 import { Server, Socket } from 'socket.io'
 import { NotificationsService } from 'src/notifications/notifications.service'
 import { toEsEcDate } from 'src/shared/functions/local-date'
 import { SubscriptionsService } from 'src/subscriptions/subscriptions.service'
-import * as webpush from 'web-push'
 import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
 
 @WebSocketGateway({
@@ -32,17 +31,13 @@ export class AppointmentsGateway {
     const subscriptions = await this.subscriptionsService.findByRole(
       Role.MECHANIC,
     )
+
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Nueva cita',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Nueva cita',
+        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -53,16 +48,11 @@ export class AppointmentsGateway {
       Role.MECHANIC,
     )
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Cita actualizada',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Cita actualizada',
+        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -73,16 +63,11 @@ export class AppointmentsGateway {
       Role.MECHANIC,
     )
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Cita cancelada',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Cita cancelada',
+        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -91,16 +76,11 @@ export class AppointmentsGateway {
       Role.MECHANIC,
     )
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Cita agendada en 10 minutos',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Cita agendada en 10 minutos',
+        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 
@@ -109,16 +89,11 @@ export class AppointmentsGateway {
       Role.MECHANIC,
     )
     subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification(
-        {
-          endpoint: subscription.endpoint,
-          keys: subscription.keys as Prisma.JsonObject as webpush.PushSubscription['keys'],
-        },
-        {
-          title: 'Cita agendada para este momento',
-          body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        },
-      )
+      this.notificationsService.sendPushNotification({
+        title: 'Cita agendada para este momento',
+        body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+        endpoint: subscription.endpoint,
+      })
     })
   }
 

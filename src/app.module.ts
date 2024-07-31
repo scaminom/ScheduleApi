@@ -14,6 +14,7 @@ import { JobsModule } from './jobs/jobs.module'
 import { NotificationsModule } from './notifications/notifications.module'
 import { SubscriptionsModule } from './subscriptions/subscriptions.module'
 import { CryptoModule } from './crypto/crypto.module'
+import { FirebaseModule } from './firebase/firebase.module';
 
 @Module({
   imports: [
@@ -31,6 +32,7 @@ import { CryptoModule } from './crypto/crypto.module'
     NotificationsModule,
     SubscriptionsModule,
     CryptoModule,
+    FirebaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
