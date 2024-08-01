@@ -70,4 +70,3 @@ docker-compose.yaml
 
 #prisma
 src/__generated__/*
-
