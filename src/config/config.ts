@@ -42,5 +42,5 @@ export default registerAs('config', () => {
 export const serviceAccount: admin.ServiceAccount = {
   projectId: process.env.PROJECT_ID_FIREBASE,
   clientEmail: process.env.CLIENT_EMAIL_FIREBASE,
-  privateKey: process.env.PRIVATE_KEY_FIREBASE?.replace(/\\n/g, '\n'),
+  privateKey: process.env.PRIVATE_KEY_FIREBASE.replace(/\\n/g, '\n'),
 }
