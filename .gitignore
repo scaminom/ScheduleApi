@@ -70,6 +70,3 @@ docker-compose.yaml
 
 #prisma
 src/__generated__/*
-
-#Firebase credentials
-credentials.json

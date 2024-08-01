@@ -1,14 +1,14 @@
 import { Module } from '@nestjs/common'
 import * as admin from 'firebase-admin'
-import { applicationDefault } from 'firebase-admin/app'
 import { FIREBASE_PROVIDER } from './constans'
 import { FirebaseService } from './firebase.service'
+import { serviceAccount } from 'src/config/config'
 
 const firebaseProvider = {
   provide: FIREBASE_PROVIDER,
   useFactory: () => {
     return admin.initializeApp({
-      credential: applicationDefault(),
+      credential: admin.credential.cert(serviceAccount),
     })
   },
 }
