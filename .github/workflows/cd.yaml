@@ -24,10 +24,13 @@ jobs:
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
         with:
           context: .
           push: true
-          tags: scaminom/schedule-api:latest
+          tags: $DOCKER_USERNAME/schedule-api:latest
           target: production
           build-args: |
             NODE_VERSION=20-alpine3.18
