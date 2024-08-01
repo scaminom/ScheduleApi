@@ -36,7 +36,7 @@ export class AppointmentsGateway {
       this.notificationsService.sendPushNotification({
         title: 'Nueva cita',
         body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -51,7 +51,7 @@ export class AppointmentsGateway {
       this.notificationsService.sendPushNotification({
         title: 'Cita actualizada',
         body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -66,7 +66,7 @@ export class AppointmentsGateway {
       this.notificationsService.sendPushNotification({
         title: 'Cita cancelada',
         body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -79,7 +79,7 @@ export class AppointmentsGateway {
       this.notificationsService.sendPushNotification({
         title: 'Cita agendada en 10 minutos',
         body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -92,7 +92,7 @@ export class AppointmentsGateway {
       this.notificationsService.sendPushNotification({
         title: 'Cita agendada para este momento',
         body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }

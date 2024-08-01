@@ -31,7 +31,7 @@ export class RemindersGateway {
       this.notificationsService.sendPushNotification({
         title: 'Nueva cita administrativa',
         body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -44,7 +44,7 @@ export class RemindersGateway {
       this.notificationsService.sendPushNotification({
         title: 'Actualización de cita administrativa',
         body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -57,7 +57,7 @@ export class RemindersGateway {
       this.notificationsService.sendPushNotification({
         title: 'Eliminación de cita administrativa',
         body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -70,7 +70,7 @@ export class RemindersGateway {
       this.notificationsService.sendPushNotification({
         title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
         body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }
@@ -83,7 +83,7 @@ export class RemindersGateway {
       this.notificationsService.sendPushNotification({
         title: `Cita administrativa agendada en 1 minuto`,
         body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
-        endpoint: subscription.endpoint,
+        endpoint: subscription.token,
       })
     })
   }

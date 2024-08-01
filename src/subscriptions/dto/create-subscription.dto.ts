@@ -1,15 +1,12 @@
 import { ApiProperty } from '@nestjs/swagger'
-import { IsNumberString, IsObject } from 'class-validator'
-import { ISubscriptionPayload } from '../interfaces/i-subscription-payload'
+import { IsNumberString, IsString } from 'class-validator'
 
 export class CreateSubscriptionDto {
   @ApiProperty({
-    example: {
-      endpoint: 'https://fcm.googleapis.com/fcm/send/fj4j3j4',
-    },
+    example: 'adgyw-12afdywu09_da8w',
   })
-  @IsObject()
-  subscription: ISubscriptionPayload
+  @IsString()
+  token: string
 
   @ApiProperty({ example: '0202020202' })
   @IsNumberString()
