@@ -22,16 +22,14 @@ export class SubscriptionsService {
   }
 
   async create(createSubscriptionDto: CreateSubscriptionDto) {
-    delete createSubscriptionDto.subscription.expirationTime
-
+    console.log(createSubscriptionDto)
     const encriptedEndpoint = await this.cryptoService.encryptString(
-      createSubscriptionDto.subscription.endpoint,
+      createSubscriptionDto.token,
     )
     const subscription = await this.prisma.subscription.create({
       data: {
         userCI: createSubscriptionDto.userCI,
-        ...createSubscriptionDto.subscription,
-        endpoint: encriptedEndpoint,
+        token: encriptedEndpoint,
       },
     })
 

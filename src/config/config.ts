@@ -1,4 +1,23 @@
 import { registerAs } from '@nestjs/config'
+import * as admin from 'firebase-admin'
+
+export interface IEnvConfig {
+  DB_PASSWORD: string
+  DB_NAME: string
+  DB_HOST: string
+  DB_PORT: number
+  DB_USERNAME: string
+  CONTAINER_NAME: string
+  DATABASE_URL: string
+  JWT_SECRET: string
+  JWT_EXPIRATION: string
+  VAPID_PUBLIC_KEY: string
+  VAPID_PRIVATE_KEY: string
+  VAPID_SUBJECT: string
+  CRYPTO_SECRET: string
+  CRYPTO_ALGORITHM: string
+  CRYPTO_KEY: string
+}
 
 export default registerAs('config', () => {
   return {
@@ -20,20 +39,8 @@ export default registerAs('config', () => {
   }
 })
 
-export interface IEnvConfig {
-  DB_PASSWORD: string
-  DB_NAME: string
-  DB_HOST: string
-  DB_PORT: number
-  DB_USERNAME: string
-  CONTAINER_NAME: string
-  DATABASE_URL: string
-  JWT_SECRET: string
-  JWT_EXPIRATION: string
-  VAPID_PUBLIC_KEY: string
-  VAPID_PRIVATE_KEY: string
-  VAPID_SUBJECT: string
-  CRYPTO_SECRET: string
-  CRYPTO_ALGORITHM: string
-  CRYPTO_KEY: string
+export const serviceAccount: admin.ServiceAccount = {
+  projectId: process.env.PROJECT_ID_FIREBASE,
+  clientEmail: process.env.CLIENT_EMAIL_FIREBASE,
+  privateKey: process.env.PRIVATE_KEY_FIREBASE?.replace(/\\n/g, '\n'),
 }
