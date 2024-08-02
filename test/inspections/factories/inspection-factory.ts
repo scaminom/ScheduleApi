@@ -2,8 +2,8 @@ import { APPOINTMENT_STATUS, PrismaClient } from '@prisma/client'
 import {
   defineInspectionFactory,
   initialize,
-} from '../../__generated__/fabbrica'
-import { fakerAppointmentFactorySchema } from 'src/appointments/factories/appointment-factory'
+} from '../../../src/__generated__/fabbrica'
+import { fakerAppointmentFactorySchema } from 'test/appointments/factories/appointment-factory'
 
 const prisma = new PrismaClient()
 

@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { RemindersService } from './reminders.service'
-import { PrismaService } from '../prisma/prisma.service'
+import { RemindersService } from '../../src/reminders/reminders.service'
+import { PrismaService } from '../../src/prisma/prisma.service'
 import { ReminderFactory } from './factories/reminder.factory'
-import { RemindersGateway } from './reminders.gateway'
+import { RemindersGateway } from '../../src/reminders/reminders.gateway'
 
 const prismaMock = {
   reminder: {
