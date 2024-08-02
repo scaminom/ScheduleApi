@@ -2,7 +2,14 @@ import { Module } from '@nestjs/common'
 import * as admin from 'firebase-admin'
 import { FIREBASE_PROVIDER } from './constans'
 import { FirebaseService } from './firebase.service'
-import { serviceAccount } from 'src/config/config'
+import * as fs from 'fs'
+import * as path from 'path'
+
+const credentialsPath =
+  process.env.RENDER_SECRET_FILE_PATH ||
+  path.join(__dirname, '../../fb/credentials.json')
+
+const serviceAccount = JSON.parse(fs.readFileSync(credentialsPath, 'utf8'))
 
 const firebaseProvider = {
   provide: FIREBASE_PROVIDER,

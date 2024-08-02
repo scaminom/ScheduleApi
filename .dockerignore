@@ -19,3 +19,4 @@ npm-debug.log
 !jest.setup.ts
 !.eslintrc.js
 !.prettierrc
+!./fb/credentials.json

@@ -1,9 +1,12 @@
+name: CD Pipeline
+
 on:
   push:
     branches:
       - main
+
 jobs:
-  deploy:
+  build-and-push:
     runs-on: ubuntu-latest
 
     steps:
@@ -13,50 +16,22 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
-      - name: Log in to Docker Hub
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
         env:
           DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
-        run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login --username ${{ secrets.DOCKER_USERNAME }} --password-stdin
 
-      - name: Build, tag, and push Docker image
-        env:
-          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
-          HUB_REPOSITORY: ${{ secrets.HUB_REPOSITORY }}
-          IMAGE_TAG: latest
-          NODE_VERSION: 20-alpine3.18
-          DUMB_INIT_VERSION: 1.2.5-r2
-          JWT_SECRET: ${{ secrets.JWT_SECRET }}
-          JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
-          DATABASE_URL: ${{ secrets.DATABASE_URL }}
-          PRISMA_LOG_LEVEL: ${{ secrets.PRISMA_LOG_LEVEL }}
-          VAPID_PUBLIC_KEY: ${{secrets.VAPID_PUBLIC_KEY}}
-          VAPID_PRIVATE_KEY: ${{secrets.VAPID_PRIVATE_KEY}}
-          VAPID_SUBJECT: ${{secrets.VAPID_SUBJECT}}
-          CRYPTO_SECRET: ${{secrets.CRYPTO_SECRET}}
-          CRYPTO_ALGORITHM: ${{secrets.CRYPTO_ALGORITHM}}
-          CRYPTO_KEY: ${{secrets.CRYPTO_KEY}}
-          NODE_ENV: production
-
-          PORT: ${{ secrets.PORT }}
-        run: |
-
-          docker build -t schedule-api:$IMAGE_TAG \
-            --target production \
-            --build-arg NODE_VERSION=$NODE_VERSION \
-            --build-arg DUMB_INIT_VERSION=$DUMB_INIT_VERSION \
-            --build-arg JWT_SECRET=$JWT_SECRET \
-            --build-arg JWT_EXPIRATION=$JWT_EXPIRATION \
-            --build-arg DATABASE_URL=$DATABASE_URL \
-            --build-arg PRISMA_LOG_LEVEL=$PRISMA_LOG_LEVEL \
-            --build-arg NODE_ENV=$NODE_ENV \
-            --build-arg VAPID_PUBLIC_KEY=$VAPID_PUBLIC_KEY \
-            --build-arg VAPID_PRIVATE_KEY=$VAPID_PRIVATE_KEY \
-            --build-arg VAPID_SUBJECT=$VAPID_SUBJECT \
-            --build-arg CRYPTO_SECRET=$CRYPTO_SECRET \
-            --build-arg CRYPTO_ALGORITHM=$CRYPTO_ALGORITHM \
-            --build-arg CRYPTO_KEY=$CRYPTO_KEY \
-            --build-arg PORT=$PORT .
-
-          docker tag schedule-api:$IMAGE_TAG $DOCKER_USERNAME/$HUB_REPOSITORY:$IMAGE_TAG
-          docker push $DOCKER_USERNAME/$HUB_REPOSITORY:$IMAGE_TAG
+        with:
+          context: .
+          push: true
+          tags: ${{ secrets.DOCKER_USERNAME }}/schedule-repo:latest
+          target: production
+          build-args: |
+            NODE_VERSION=20-alpine3.18
+            DUMB_INIT_VERSION=1.2.5-r2

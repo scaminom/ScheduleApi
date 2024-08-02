@@ -1,5 +1,4 @@
 import { registerAs } from '@nestjs/config'
-import * as admin from 'firebase-admin'
 
 export interface IEnvConfig {
   DB_PASSWORD: string
@@ -38,9 +37,3 @@ export default registerAs('config', () => {
     CRYPTO_KEY: process.env.CRYPTO_KEY,
   }
 })
-
-export const serviceAccount: admin.ServiceAccount = {
-  projectId: process.env.PROJECT_ID_FIREBASE,
-  clientEmail: process.env.CLIENT_EMAIL_FIREBASE,
-  privateKey: process.env.PRIVATE_KEY_FIREBASE?.replace(/\\n/g, '\n'),
-}

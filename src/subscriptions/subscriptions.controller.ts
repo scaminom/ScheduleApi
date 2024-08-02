@@ -26,9 +26,7 @@ export class SubscriptionsController {
     description: 'The record encypted.',
     example: { id: '1', userCI: '123', available: true },
   })
-  async create(
-    @Body() createSubscriptionDto: CreateSubscriptionDto,
-  ): Promise<{ id: number; userCI: string; available: boolean }> {
+  async create(@Body() createSubscriptionDto: CreateSubscriptionDto) {
     return await this.subscriptionsService.create(createSubscriptionDto)
   }
 

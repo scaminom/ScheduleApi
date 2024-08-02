@@ -5,6 +5,7 @@ import { Prisma, Role, Subscription } from '@prisma/client'
 import { SubscriptionNotFoundException } from './exceptions/subscription-not-found'
 import { CryptoService } from 'src/crypto/crypto.service'
 import { UpdateSubscriptionDto } from './dto/update-subscription.dto'
+import { SubscriptionAlreadyExistsException } from './exceptions/subscription-already-exists'
 
 @Injectable()
 export class SubscriptionsService {
@@ -22,10 +23,25 @@ export class SubscriptionsService {
   }
 
   async create(createSubscriptionDto: CreateSubscriptionDto) {
-    console.log(createSubscriptionDto)
     const encriptedEndpoint = await this.cryptoService.encryptString(
       createSubscriptionDto.token,
     )
+
+    const subscriptions = await this.findAllByUser(createSubscriptionDto.userCI)
+    if (subscriptions.length > 0) {
+      const promise = subscriptions.map(async (subscription) => {
+        const decrypted = await this.cryptoService.decryptString(
+          subscription.token,
+        )
+        if (decrypted === createSubscriptionDto.token) {
+          throw new SubscriptionAlreadyExistsException()
+        }
+        return subscription
+      })
+
+      await Promise.all(promise)
+    }
+
     const subscription = await this.prisma.subscription.create({
       data: {
         userCI: createSubscriptionDto.userCI,
@@ -57,6 +73,14 @@ export class SubscriptionsService {
       userCI: subscriptionUpdated.userCI,
       available: subscriptionUpdated.available,
     }
+  }
+
+  async findAllByUser(userCI: string): Promise<Subscription[]> {
+    return await this.prisma.subscription.findMany({
+      where: {
+        userCI,
+      },
+    })
   }
 
   async findAll(): Promise<Subscription[]> {

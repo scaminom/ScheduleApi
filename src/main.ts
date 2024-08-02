@@ -4,9 +4,16 @@ import { Logger, ValidationPipe } from '@nestjs/common'
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger'
 import { RemindersBackgroundService } from './reminders/reminders.background.service'
 import { AppointmentsBackgroundService } from './appointments/appointments.background.service'
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify'
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule)
+  const app = await NestFactory.create<NestFastifyApplication>(
+    AppModule,
+    new FastifyAdapter(),
+  )
 
   app.useGlobalPipes(
     new ValidationPipe({
@@ -44,7 +51,11 @@ async function bootstrap() {
 
   app.enableCors()
 
-  await app.listen(process.env.PORT || 3000)
-  Logger.log(`Application is running on: ${await app.getUrl()}`)
+  const port = process.env.PORT || 3000
+
+  await app.listen(port, '0.0.0.0')
+
+  Logger.log(`App is ready and listening on port ${port} 🚀`)
 }
+
 bootstrap()
