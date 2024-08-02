@@ -1,12 +1,10 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable } from '@nestjs/common'
 import { AppointmentsService } from './appointments.service'
 import { AppointmentsGateway } from './appointments.gateway'
 import { APPOINTMENT_STATUS } from '@prisma/client'
 
 @Injectable()
 export class AppointmentsBackgroundService {
-  private readonly logger = new Logger(AppointmentsBackgroundService.name)
-
   constructor(
     private readonly appointmentsService: AppointmentsService,
     private readonly appointmentsGateway: AppointmentsGateway,
@@ -15,7 +13,6 @@ export class AppointmentsBackgroundService {
   async checkAppointments() {
     const now = new Date()
     const minutes = now.getMinutes()
-    this.logger.log('Checking appointments...', minutes)
 
     if (minutes === 20 || minutes === 50) {
       this.remindAppointments(minutes)
@@ -36,17 +33,13 @@ export class AppointmentsBackgroundService {
       dateCopy.setHours(dateCopy.getHours() + 1)
     }
 
-    this.logger.log('Reminding appointments...', dateCopy)
     const appointments = await this.appointmentsService.findByFilters({
       date: dateCopy,
       status: APPOINTMENT_STATUS.PENDING,
     })
 
-    this.logger.log('Appointments found:', appointments.length)
     for (const appointment of appointments) {
-      this.logger.log(`Sending notification for appointment ${appointment.id}`)
       this.appointmentsGateway.broadcastAppointmentReminder(appointment)
-      this.logger.log(`Notification sent for appointment ${appointment.id}`)
     }
   }
 
@@ -62,26 +55,16 @@ export class AppointmentsBackgroundService {
       dateCopy.setHours(dateCopy.getHours() + 1)
     }
 
-    this.logger.log('Notifying appointments...', dateCopy)
-
     const appointments = await this.appointmentsService.findByFilters({
       date: dateCopy,
       status: APPOINTMENT_STATUS.PENDING,
     })
 
-    this.logger.log('Appointments found:', appointments.length)
-
     for (const appointment of appointments) {
-      this.logger.log(
-        `Sending last notification for appointment ${appointment.id}`,
-      )
       this.appointmentsGateway.broadcastAppointmentNotification(appointment)
       this.appointmentsService.update(appointment.id, {
         status: APPOINTMENT_STATUS.COMPLETED,
       })
-      this.logger.log(
-        `Last notification sent for appointment ${appointment.id}`,
-      )
     }
   }
 }

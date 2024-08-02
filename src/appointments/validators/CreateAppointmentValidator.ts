@@ -94,7 +94,7 @@ export class AppoitmentValidator {
     const dateCopy = toEsEcDate(new Date(date))
     const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
-    const minutes = minutesRange.find((minute) => minutesOfDate <= minute)
+    const minutes = minutesRange.find((minute) => minutesOfDate <= minute) ?? 0
     dateCopy.setMinutes(minutes)
     dateCopy.setSeconds(0)
 
@@ -105,11 +105,15 @@ export class AppoitmentValidator {
       },
     })
 
+    const startTime = toEsEcDate(new Date(dateCopy))
+    const endTime = toEsEcDate(new Date(dateCopy))
+    endTime.setMinutes(startTime.getMinutes() + 30)
+
     const appointments = await this.appointmentsService.appointments({
       where: {
         date: {
-          lt: new Date(dateCopy.getTime() + 30 * 60 * 1000),
-          gte: new Date(dateCopy),
+          lt: endTime,
+          gte: startTime,
         },
         deletedAt: null,
       },
