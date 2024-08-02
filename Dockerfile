@@ -23,7 +23,7 @@ ARG DUMB_INIT_VERSION
 RUN apk update && apk add --no-cache dumb-init=${DUMB_INIT_VERSION}
 COPY . .
 RUN yarn install
-RUN yarn prisma generate
+RUN yarn prisma generate --generator client
 RUN yarn build && yarn install --production --frozen-lockfile
 
 # Production stage
@@ -44,4 +44,3 @@ COPY --from=build /app/prisma prisma
 ARG PORT=80
 EXPOSE $PORT
 CMD ["dumb-init", "node", "dist/main.js"]
-
