@@ -1,13 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { UserService } from './users.service'
-import { PrismaService } from '../prisma/prisma.service'
-import { UserInvalidCIException } from './exceptions/user-invalid-ci'
-import { UserAlreadyExistsException } from './exceptions/user-already-exits'
-import { UserNotFoundException } from './exceptions/user-not-found'
-import { UpdateUserDto } from './dto/update-user.dto'
+import { UserService } from '../../src/users/users.service'
+import { PrismaService } from '../../src/prisma/prisma.service'
+import { UserInvalidCIException } from '../../src/users/exceptions/user-invalid-ci'
+import { UserAlreadyExistsException } from '../../src/users/exceptions/user-already-exits'
+import { UserNotFoundException } from '../../src/users/exceptions/user-not-found'
+import { UpdateUserDto } from '../../src/users/dto/update-user.dto'
 import { Role, User } from '@prisma/client'
 import { generateValidCI, UserFactory } from './factories/user.factory'
-import { UserCantAssignColorException } from './exceptions/user-cant-assign-color'
+import { UserCantAssignColorException } from '../../src/users/exceptions/user-cant-assign-color'
 
 const prismaMock = {
   user: {

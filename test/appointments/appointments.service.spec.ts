@@ -1,17 +1,17 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AppointmentsService } from './appointments.service'
-import { PrismaService } from '../prisma/prisma.service'
-import { AppoitmentValidator } from './validators/CreateAppointmentValidator'
-import { CreateAppointmentDto } from './dto/create-appointment.dto'
+import { AppointmentsService } from '../../src/appointments/appointments.service'
+import { PrismaService } from '../../src/prisma/prisma.service'
+import { AppoitmentValidator } from '../../src/appointments/validators/CreateAppointmentValidator'
+import { CreateAppointmentDto } from '../../src/appointments/dto/create-appointment.dto'
 import {
   AppointmentPastDateException,
   AppointmentLaboralHoursException,
   AppointmentAlreadyExitsException,
   AppointmentLimitPerHourException,
-} from './exceptions'
+} from '../../src/appointments/exceptions'
 import { AppointmentFactory } from './factories/appointment-factory'
 import fakerEs from 'src/faker/faker.config'
-import { AppointmentsGateway } from './appointments.gateway'
+import { AppointmentsGateway } from '../../src/appointments/appointments.gateway'
 import { InspectionsModule } from 'src/inspections/inspections.module'
 import { forwardRef } from '@nestjs/common'
 

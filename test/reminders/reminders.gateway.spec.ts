@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { RemindersGateway } from './reminders.gateway'
+import { RemindersGateway } from '../../src/reminders/reminders.gateway'
 import { Server, Socket } from 'socket.io'
 import { ReminderFactory } from './factories/reminder.factory'
-import { UserFactory } from 'src/users/factories/user.factory'
+import { UserFactory } from 'test/users/factories/user.factory'
 
 describe('RemindersGateway', () => {
   let gateway: RemindersGateway

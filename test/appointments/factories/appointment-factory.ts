@@ -2,8 +2,8 @@ import { APPOINTMENT_STATUS, PrismaClient, Role } from '@prisma/client'
 import {
   defineAppointmentFactory,
   initialize,
-} from '../../__generated__/fabbrica'
-import { generateValidCI } from 'src/users/factories/user.factory'
+} from '../../../src/__generated__/fabbrica'
+import { generateValidCI } from 'test/users/factories/user.factory'
 import fakerEs from 'src/faker/faker.config'
 
 const prisma = new PrismaClient()

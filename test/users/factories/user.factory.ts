@@ -1,6 +1,9 @@
 import { PrismaClient } from '@prisma/client'
-import { defineUserFactory, initialize } from '../../__generated__/fabbrica'
-import { validateCI } from '../validators/user-validator'
+import {
+  defineUserFactory,
+  initialize,
+} from '../../../src/__generated__/fabbrica'
+import { validateCI } from '../../../src/users/validators/user-validator'
 import fakerEs from 'src/faker/faker.config'
 
 const prisma = new PrismaClient()

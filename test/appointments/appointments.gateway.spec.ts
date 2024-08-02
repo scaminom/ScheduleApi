@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing'
-import { AppointmentsGateway } from './appointments.gateway'
+import { AppointmentsGateway } from '../../src/appointments/appointments.gateway'
 import { Server, Socket } from 'socket.io'
+import { UserFactory } from 'test/users/factories/user.factory'
 import { AppointmentFactory } from './factories/appointment-factory'
-import { UserFactory } from 'src/users/factories/user.factory'
 
 describe('AppointmentsGateway', () => {
   let gateway: AppointmentsGateway
