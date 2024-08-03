@@ -17,9 +17,21 @@ export class FirebaseService {
     try {
       return await this.firebaseApp.messaging().send(payload)
     } catch (error) {
-      this.logger.error(error)
+      if (
+        error.code === 'messaging/invalid-argument' ||
+        error.code === 'messaging/registration-token-not-registered' ||
+        error.code === 'messaging/invalid-registration-token' ||
+        error.code?.name == 'INVALID_ARGUMENT' ||
+        error.code?.name == 'NOT_FOUND' ||
+        error.messagingErrorCode?.name == 'UNREGISTERED'
+      ) {
+        throw new BaseConflictException('Token de notificación inválido', error)
+      }
+
+      this.logger.error('Error al enviar notificación', error)
       throw new BaseConflictException(
         'Servicio de notificaciones no disponible',
+        error,
       )
     }
   }

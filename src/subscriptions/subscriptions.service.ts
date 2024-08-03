@@ -42,6 +42,15 @@ export class SubscriptionsService {
       await Promise.all(promise)
     }
 
+    const subscriptionTokenAlreadyExists =
+      await this.prisma.subscription.findFirst({
+        where: { token: encriptedEndpoint },
+      })
+
+    if (subscriptionTokenAlreadyExists) {
+      throw new SubscriptionAlreadyExistsException()
+    }
+
     const subscription = await this.prisma.subscription.create({
       data: {
         userCI: createSubscriptionDto.userCI,
@@ -122,6 +131,20 @@ export class SubscriptionsService {
       userCI: subscription.userCI,
       available: subscription.available,
     }
+  }
+
+  async deleteSubscription(token: string) {
+    const subscription = await this.prisma.subscription.findFirst({
+      where: { token },
+    })
+
+    if (!subscription) {
+      throw new SubscriptionNotFoundException()
+    }
+
+    await this.prisma.subscription.delete({
+      where: { id: subscription.id },
+    })
   }
 
   async disableSubscriptionsByUser(userCI: string) {

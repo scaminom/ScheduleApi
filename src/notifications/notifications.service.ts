@@ -2,12 +2,14 @@ import { Injectable } from '@nestjs/common'
 import { CryptoService } from 'src/crypto/crypto.service'
 import { FirebaseService } from 'src/firebase/firebase.service'
 import { INotificationPayload } from './interfaces/i-notification-payload'
+import { SubscriptionsService } from 'src/subscriptions/subscriptions.service'
 
 @Injectable()
 export class NotificationsService {
   constructor(
     private readonly cryptoService: CryptoService,
     private readonly firebaseService: FirebaseService,
+    private readonly subscriptionService: SubscriptionsService,
   ) {}
 
   async sendPushNotification(payload: INotificationPayload) {
@@ -60,6 +62,9 @@ export class NotificationsService {
         },
       })
     } catch (error) {
+      if (error.message === 'Token de notificación inválido') {
+        await this.subscriptionService.deleteSubscription(payload.endpoint)
+      }
       return error
     }
   }
