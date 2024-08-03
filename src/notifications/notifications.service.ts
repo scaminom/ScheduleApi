@@ -23,7 +23,7 @@ export class NotificationsService {
           body: payload.body,
         },
         android: {
-          priority: 'high',
+          priority: 'normal',
           ttl: 1000 * 60 * 60 * 24,
           notification: {
             priority: 'max',
@@ -31,7 +31,7 @@ export class NotificationsService {
         },
         apns: {
           headers: {
-            'apns-priority': '10',
+            'apns-priority': '5',
             'apns-expiration': String(
               Math.floor(Date.now() / 1000) + 60 * 60 * 24,
             ),
@@ -51,7 +51,7 @@ export class NotificationsService {
         },
         webpush: {
           headers: {
-            Urgency: 'high',
+            Urgency: 'normal',
             TTL: String(1000 * 60 * 60 * 24),
           },
           notification: {
