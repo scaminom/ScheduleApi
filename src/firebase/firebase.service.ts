@@ -17,6 +17,7 @@ export class FirebaseService {
     try {
       await this.firebaseApp.messaging().send(payload)
     } catch (error) {
+      console.error(error)
       this.logger.error(error)
       throw new BaseConflictException(
         'Servicio de notificaciones no disponible',
