@@ -14,9 +14,7 @@ export class NotificationsService {
     try {
       const endpoint = await this.cryptoService.decryptString(payload.endpoint)
 
-      console.log('Enviando notificación a endpoint:', endpoint)
-
-      const response = await this.firebaseService.sendNotification({
+      await this.firebaseService.sendNotification({
         token: endpoint,
         notification: {
           title: payload.title,
@@ -61,10 +59,7 @@ export class NotificationsService {
           },
         },
       })
-
-      console.log('Respuesta de Firebase:', response)
     } catch (error) {
-      console.error('Error al enviar la notificación:', error)
       return error
     }
   }
