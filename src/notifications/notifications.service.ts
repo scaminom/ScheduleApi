@@ -14,7 +14,9 @@ export class NotificationsService {
     try {
       const endpoint = await this.cryptoService.decryptString(payload.endpoint)
 
-      await this.firebaseService.sendNotification({
+      console.log('Enviando notificación a endpoint:', endpoint)
+
+      const response = await this.firebaseService.sendNotification({
         token: endpoint,
         notification: {
           title: payload.title,
@@ -23,14 +25,26 @@ export class NotificationsService {
         android: {
           priority: 'high',
           ttl: 1000 * 60 * 60 * 24,
+          notification: {
+            priority: 'max',
+          },
         },
         apns: {
           headers: {
-            'apns-priority': '5',
-            'apns-expiration': String(1000 * 60 * 60 * 24),
+            'apns-priority': '10',
+            'apns-expiration': String(
+              Math.floor(Date.now() / 1000) + 60 * 60 * 24,
+            ),
           },
           payload: {
             aps: {
+              alert: {
+                title: payload.title,
+                body: payload.body,
+              },
+              sound: 'default',
+              badge: 1,
+              contentAvailable: true,
               category: 'TEST',
             },
           },
@@ -40,9 +54,17 @@ export class NotificationsService {
             Urgency: 'high',
             TTL: String(1000 * 60 * 60 * 24),
           },
+          notification: {
+            title: payload.title,
+            body: payload.body,
+            requireInteraction: true,
+          },
         },
       })
+
+      console.log('Respuesta de Firebase:', response)
     } catch (error) {
+      console.error('Error al enviar la notificación:', error)
       return error
     }
   }
