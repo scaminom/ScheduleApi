@@ -11,26 +11,30 @@ export class NotificationsService {
   ) {}
 
   async sendPushNotification(payload: INotificationPayload) {
-    const endpoint = await this.cryptoService.decryptString(payload.endpoint)
+    try {
+      const endpoint = await this.cryptoService.decryptString(payload.endpoint)
 
-    await this.firebaseService.sendNotification({
-      token: endpoint,
-      notification: {
-        title: payload.title,
-        body: payload.body,
-      },
-      webpush: payload.link && {
-        headers: {
-          TTL: '60',
-        },
+      await this.firebaseService.sendNotification({
+        token: endpoint,
         notification: {
-          vibrate: [200, 100, 200],
-          icon: 'https://avatars.githubusercontent.com/u/56169832?s=200&v=4',
+          title: payload.title,
+          body: payload.body,
         },
-        fcmOptions: {
-          link: payload.link,
+        webpush: payload.link && {
+          headers: {
+            TTL: '60',
+          },
+          notification: {
+            vibrate: [200, 100, 200],
+            icon: 'https://avatars.githubusercontent.com/u/56169832?s=200&v=4',
+          },
+          fcmOptions: {
+            link: payload.link,
+          },
         },
-      },
-    })
+      })
+    } catch (error) {
+      return error
+    }
   }
 }

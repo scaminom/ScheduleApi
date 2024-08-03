@@ -32,13 +32,17 @@ export class AppointmentsGateway {
       Role.MECHANIC,
     )
 
-    subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification({
-        title: 'Nueva cita',
-        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.token,
+    try {
+      subscriptions.forEach((subscription) => {
+        this.notificationsService.sendPushNotification({
+          title: 'Nueva cita',
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          endpoint: subscription.token,
+        })
       })
-    })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async broadcastAppointmentUpdate(appointment: IAppointmentWithUser) {
@@ -47,13 +51,18 @@ export class AppointmentsGateway {
     const subscriptions = await this.subscriptionsService.findByRole(
       Role.MECHANIC,
     )
-    subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification({
-        title: 'Cita actualizada',
-        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.token,
+
+    try {
+      subscriptions.forEach((subscription) => {
+        this.notificationsService.sendPushNotification({
+          title: 'Cita actualizada',
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          endpoint: subscription.token,
+        })
       })
-    })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async broadcastAppointmentDeletion(appointment: IAppointmentWithUser) {
@@ -62,39 +71,54 @@ export class AppointmentsGateway {
     const subscriptions = await this.subscriptionsService.findByRole(
       Role.MECHANIC,
     )
-    subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification({
-        title: 'Cita cancelada',
-        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.token,
+
+    try {
+      subscriptions.forEach((subscription) => {
+        this.notificationsService.sendPushNotification({
+          title: 'Cita cancelada',
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          endpoint: subscription.token,
+        })
       })
-    })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async broadcastAppointmentReminder(appointment: IAppointmentWithUser) {
     const subscriptions = await this.subscriptionsService.findByRole(
       Role.MECHANIC,
     )
-    subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification({
-        title: 'Cita agendada en 10 minutos',
-        body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.token,
+
+    try {
+      subscriptions.forEach((subscription) => {
+        this.notificationsService.sendPushNotification({
+          title: 'Cita agendada en 10 minutos',
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          endpoint: subscription.token,
+        })
       })
-    })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   async broadcastAppointmentNotification(appointment: IAppointmentWithUser) {
     const subscriptions = await this.subscriptionsService.findByRole(
       Role.MECHANIC,
     )
-    subscriptions.forEach((subscription) => {
-      this.notificationsService.sendPushNotification({
-        title: 'Cita agendada para este momento',
-        body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
-        endpoint: subscription.token,
+
+    try {
+      subscriptions.forEach((subscription) => {
+        this.notificationsService.sendPushNotification({
+          title: 'Cita agendada para este momento',
+          body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          endpoint: subscription.token,
+        })
       })
-    })
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   @SubscribeMessage('joinMechanicsRoom')
