@@ -20,16 +20,25 @@ export class NotificationsService {
           title: payload.title,
           body: payload.body,
         },
-        webpush: payload.link && {
+        android: {
+          priority: 'high',
+          ttl: 1000 * 60 * 60 * 24,
+        },
+        apns: {
           headers: {
-            TTL: '60',
+            'apns-priority': '5',
+            'apns-expiration': String(1000 * 60 * 60 * 24),
           },
-          notification: {
-            vibrate: [200, 100, 200],
-            icon: 'https://avatars.githubusercontent.com/u/56169832?s=200&v=4',
+          payload: {
+            aps: {
+              category: 'TEST',
+            },
           },
-          fcmOptions: {
-            link: payload.link,
+        },
+        webpush: {
+          headers: {
+            Urgency: 'high',
+            TTL: String(1000 * 60 * 60 * 24),
           },
         },
       })
