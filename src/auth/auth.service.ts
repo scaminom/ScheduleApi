@@ -44,7 +44,13 @@ export class AuthService {
     if (!this.comparePassword(pass, user.password)) {
       throw new UnauthorizedException('Credenciales inválidas')
     }
-    const payload = { sub: user.ci, firstName: user.firstName, role: user.role }
+
+    const payload = {
+      sub: user.ci,
+      firstName: user.firstName,
+      lastName: user.lastName,
+      role: user.role,
+    }
 
     return {
       access_token: await this.jwtService.signAsync(payload),
