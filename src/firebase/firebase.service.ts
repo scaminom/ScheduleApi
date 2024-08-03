@@ -15,7 +15,7 @@ export class FirebaseService {
 
   async sendNotification(payload: Message) {
     try {
-      await this.firebaseApp.messaging().send(payload)
+      return await this.firebaseApp.messaging().send(payload)
     } catch (error) {
       console.error(error)
       this.logger.error(error)
