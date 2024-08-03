@@ -109,6 +109,9 @@ export class InspectionsService {
             : params.endDate
               ? { lte: new Date(endDate) }
               : undefined,
+      appointment: {
+        deletedAt: null,
+      },
     }
 
     return await this.prismaService.inspection.findMany({
@@ -191,6 +194,11 @@ export class InspectionsService {
    */
   async findAll() {
     return await this.prismaService.inspection.findMany({
+      where: {
+        appointment: {
+          deletedAt: null,
+        },
+      },
       include: {
         jobs: true,
         appointment: {
