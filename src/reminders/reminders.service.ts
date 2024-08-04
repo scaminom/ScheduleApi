@@ -225,7 +225,7 @@ export class RemindersService {
     if (
       updatedMinutesBefore &&
       new Date(
-        new Date(reminder.reminderDate).getTime() -
+        new Date(data.reminderDate ?? reminder.reminderDate).getTime() -
           data.notificationMinutesBefore * 60000,
       ) < new Date()
     ) {
@@ -244,7 +244,7 @@ export class RemindersService {
       },
     })
 
-    this.remindersGateway.broadCastReminderUpdate(reminder)
+    this.remindersGateway.broadCastReminderUpdate(reminderUpdated)
 
     return reminderUpdated
   }
