@@ -1,7 +1,6 @@
 import { forwardRef, Inject, Logger } from '@nestjs/common'
 import { CreateAppointmentDto } from '../dto/create-appointment.dto'
 import { AppointmentPastDateException } from '../exceptions/appointment-past-date'
-import { AppointmentLaboralHoursException } from '../exceptions/appointment-laboral-hours'
 import { AppointmentsService } from '../appointments.service'
 import { AppointmentAlreadyExitsException } from '../exceptions/appointment-already-exists'
 import { AppointmentLimitPerHourException } from '../exceptions/appointment-limit-per-hour'
@@ -54,9 +53,9 @@ export class AppoitmentValidator {
     if (dateCopy < toEsEcDate(new Date())) {
       throw new AppointmentPastDateException()
     }
-    if (dateCopy.getHours() < 8 || dateCopy.getHours() > 17) {
-      throw new AppointmentLaboralHoursException()
-    }
+    // if (dateCopy.getHours() < 8 || dateCopy.getHours() > 17) {
+    //   throw new AppointmentLaboralHoursException()
+    // }
   }
 
   private async validateMechanic(
