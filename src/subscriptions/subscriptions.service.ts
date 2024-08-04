@@ -107,6 +107,19 @@ export class SubscriptionsService {
     })
   }
 
+  async findByRoles(userRoles: Role[]): Promise<Subscription[]> {
+    return await this.prisma.subscription.findMany({
+      where: {
+        user: {
+          role: {
+            in: userRoles,
+          },
+        },
+        available: true,
+      },
+    })
+  }
+
   async findOneComplete(id: number): Promise<Subscription> {
     const subscription = await this.subscription({ id })
 
