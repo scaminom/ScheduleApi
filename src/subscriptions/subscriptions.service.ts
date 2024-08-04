@@ -107,6 +107,19 @@ export class SubscriptionsService {
     })
   }
 
+  async findByRoles(userRoles: Role[]): Promise<Subscription[]> {
+    return await this.prisma.subscription.findMany({
+      where: {
+        user: {
+          role: {
+            in: userRoles,
+          },
+        },
+        available: true,
+      },
+    })
+  }
+
   async findOne(
     id: number,
   ): Promise<{ id: number; userCI: string; available: boolean }> {

@@ -23,10 +23,14 @@ export class RemindersGateway {
   @WebSocketServer()
   server: Server
 
+  private allowedRoles: Role[] = ['ADMIN', 'SECRETARY']
+
   async broadCastReminderCreation(reminder: Reminder) {
     this.server.to('admins').emit('reminders-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
+    )
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: 'Nueva cita administrativa',
@@ -39,7 +43,9 @@ export class RemindersGateway {
   async broadCastReminderUpdate(reminder: Reminder) {
     this.server.to('admins').emit('reminders-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
+    )
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: 'Actualización de cita administrativa',
@@ -52,7 +58,9 @@ export class RemindersGateway {
   async broadCastReminderDeletion(reminder: Reminder) {
     this.server.to('admins').emit('reminders-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
+    )
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: 'Eliminación de cita administrativa',
@@ -65,7 +73,9 @@ export class RemindersGateway {
   async broadcastReminderFirstNotification(reminder: Reminder) {
     this.server.to('admins').emit('reminders-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
+    )
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
@@ -78,7 +88,9 @@ export class RemindersGateway {
   async broadcastReminderSecondNotification(reminder: Reminder) {
     this.server.to('admins').emit('reminders-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(Role.ADMIN)
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
+    )
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: `Cita administrativa agendada en 1 minuto`,
