@@ -120,16 +120,6 @@ export class SubscriptionsService {
     })
   }
 
-  async findOneComplete(id: number): Promise<Subscription> {
-    const subscription = await this.subscription({ id })
-
-    if (!subscription) {
-      throw new SubscriptionNotFoundException()
-    }
-
-    return subscription
-  }
-
   async findOne(
     id: number,
   ): Promise<{ id: number; userCI: string; available: boolean }> {

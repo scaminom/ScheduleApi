@@ -34,15 +34,6 @@ export class RemindersService {
         reminderDate.getTime() - reminder.notificationMinutesBefore * 60000 - 1,
       )
 
-      console.log(
-        'now',
-        now,
-        'reminderDate',
-        reminderDate,
-        'dateMinutesBefore',
-        dateMinutesBefore,
-      )
-
       return now >= dateMinutesBefore && now <= reminderDate
     })
 
@@ -219,9 +210,38 @@ export class RemindersService {
       throw new ReminderNotFoundException(id)
     }
 
+    if (data.reminderDate && reminder.reminderDate !== data.reminderDate) {
+      if (new Date(data.reminderDate) < new Date()) {
+        throw new ConflictException(
+          'La fecha de recordatorio no puede ser menor a la fecha actual',
+        )
+      }
+    }
+
+    const updatedMinutesBefore =
+      data.notificationMinutesBefore &&
+      data.notificationMinutesBefore !== reminder.notificationMinutesBefore
+
+    if (
+      updatedMinutesBefore &&
+      new Date(
+        new Date(reminder.reminderDate).getTime() -
+          data.notificationMinutesBefore * 60000,
+      ) < new Date()
+    ) {
+      throw new ConflictException(
+        'La fecha de minutos antes del recordatorio no puede ser menor a la fecha actual',
+      )
+    }
+
     const reminderUpdated = await this.prisma.reminder.update({
       where: { id },
-      data,
+      data: {
+        ...data,
+        minutesBeforeNotificationSent: updatedMinutesBefore
+          ? false
+          : reminder.minutesBeforeNotificationSent,
+      },
     })
 
     this.remindersGateway.broadCastReminderUpdate(reminder)

@@ -7,7 +7,7 @@ import {
 import { Reminder, Role } from '@prisma/client'
 import { Server, Socket } from 'socket.io'
 import { NotificationsService } from 'src/notifications/notifications.service'
-import { toEsEcDate } from 'src/shared/functions/local-date'
+import { stringLocaleDate } from 'src/shared/functions/local-date'
 import { SubscriptionsService } from 'src/subscriptions/subscriptions.service'
 
 @WebSocketGateway({
@@ -34,7 +34,7 @@ export class RemindersGateway {
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: 'Nueva cita administrativa',
-        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        body: `${reminder.title} - ${stringLocaleDate(new Date(reminder.reminderDate))}`,
         endpoint: subscription.token,
       })
     })
@@ -49,7 +49,7 @@ export class RemindersGateway {
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: 'Actualización de cita administrativa',
-        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        body: `${reminder.title} - ${stringLocaleDate(new Date(reminder.reminderDate))}`,
         endpoint: subscription.token,
       })
     })
@@ -64,7 +64,7 @@ export class RemindersGateway {
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: 'Eliminación de cita administrativa',
-        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        body: `${reminder.title} - ${stringLocaleDate(new Date(reminder.reminderDate))}`,
         endpoint: subscription.token,
       })
     })
@@ -79,7 +79,7 @@ export class RemindersGateway {
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: `Cita administrativa agendada en ${reminder.notificationMinutesBefore} minutos`,
-        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        body: `${reminder.title} - ${stringLocaleDate(new Date(reminder.reminderDate))}`,
         endpoint: subscription.token,
       })
     })
@@ -94,7 +94,7 @@ export class RemindersGateway {
     subscriptions.forEach((subscription) => {
       this.notificationsService.sendPushNotification({
         title: `Cita administrativa agendada en 1 minuto`,
-        body: `${reminder.title} - ${toEsEcDate(new Date(reminder.reminderDate))}`,
+        body: `${reminder.title} - ${stringLocaleDate(new Date(reminder.reminderDate))}`,
         endpoint: subscription.token,
       })
     })
