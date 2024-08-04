@@ -33,8 +33,6 @@ export class AppointmentsBackgroundService {
       dateCopy.setHours(dateCopy.getHours() + 1)
     }
 
-    console.log('dateCopy', dateCopy, 'background')
-
     const appointments = await this.appointmentsService.findByFilters({
       date: dateCopy,
       status: APPOINTMENT_STATUS.PENDING,
