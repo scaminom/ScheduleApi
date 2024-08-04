@@ -49,6 +49,8 @@ export class AppoitmentValidator {
   private validateDateAndTime(date: Date): void {
     const dateCopy = toEsEcDate(new Date(date))
 
+    console.log(dateCopy, toEsEcDate(new Date()), 'validate')
+
     if (dateCopy < toEsEcDate(new Date())) {
       throw new AppointmentPastDateException()
     }
@@ -107,7 +109,10 @@ export class AppoitmentValidator {
 
     const startTime = toEsEcDate(new Date(dateCopy))
     const endTime = toEsEcDate(new Date(dateCopy))
+
     endTime.setMinutes(startTime.getMinutes() + 30)
+
+    console.log(startTime, endTime, 'limit')
 
     const appointments = await this.appointmentsService.appointments({
       where: {
