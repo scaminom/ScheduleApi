@@ -15,10 +15,11 @@ import { InspectionsService } from 'src/inspections/inspections.service'
 import { IAppointmentFilters } from './interfaces/i-appointment-filters'
 import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
 import { UserSelectInput } from 'src/shared/constants/user-select'
+import { InspectionsGateway } from '../inspections/inspections.gateway'
 
 @Injectable()
 /**
- * AppointmentsService, each appointment has a max duration of 20 minutes, there are 3 mechanics available, so there can be 3 appointments at the same time,
+ * AppointmentsService, each appointment has a max duration of 30 minutes.
  * if there are no mechanics available, throw an exception with the message "No mechanics available",
  * validadte date and time, if the date and time are in the past, throw an exception with the message "Date and time must be in the future",
  * if the date and time are not in the range of 8:00 to 17:00, throw an exception with the message "Date and time must be in the range of 8:00 to 17:00"
@@ -34,6 +35,7 @@ export class AppointmentsService {
     private readonly inspectionsService: InspectionsService,
 
     private readonly appointmentsGateway: AppointmentsGateway,
+    private readonly inspectionsGateway: InspectionsGateway,
   ) {}
 
   /**
@@ -211,6 +213,7 @@ export class AppointmentsService {
     })
 
     this.appointmentsGateway.broadcastAppointmentUpdate(appointment)
+    this.inspectionsGateway.broadcastInspectionUpdate()
     return appointment
   }
 
@@ -241,6 +244,7 @@ export class AppointmentsService {
     })
 
     this.appointmentsGateway.broadcastAppointmentDeletion(deletedAppointment)
+    this.inspectionsGateway.broadcastInspectionDeletion()
 
     return deletedAppointment
   }
