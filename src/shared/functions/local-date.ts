@@ -41,5 +41,11 @@ export const toEsEcDate = (date) => {
     second: '2-digit',
   })
 
-  return parseDateFromString(formatter.format(date))
+  return parseDateFromString(formatter.format(new Date(date)))
+}
+
+export const stringLocaleDate = (date: Date) => {
+  return new Date(date).toLocaleString('es-EC', {
+    timeZone: 'America/Guayaquil',
+  })
 }
