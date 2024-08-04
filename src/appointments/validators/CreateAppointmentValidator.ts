@@ -9,6 +9,7 @@ import { BaseConflictException } from '../../shared/exceptions/conflict'
 import { UpdateAppointmentDto } from '../dto/update-appointment.dto'
 import { UserService } from '../../users/users.service'
 import { toEsEcDate } from '../../shared/functions/local-date'
+import { AppointmentLaboralHoursException } from '../exceptions'
 
 export class AppoitmentValidator {
   private readonly logger: Logger = new Logger('AppoitmentValidator')
@@ -48,14 +49,12 @@ export class AppoitmentValidator {
   private validateDateAndTime(date: Date): void {
     const dateCopy = toEsEcDate(new Date(date))
 
-    console.log(dateCopy, toEsEcDate(new Date()), 'validate')
-
     if (dateCopy < toEsEcDate(new Date())) {
       throw new AppointmentPastDateException()
     }
-    // if (dateCopy.getHours() < 8 || dateCopy.getHours() > 17) {
-    //   throw new AppointmentLaboralHoursException()
-    // }
+    if (dateCopy.getHours() < 8 || dateCopy.getHours() > 17) {
+      throw new AppointmentLaboralHoursException()
+    }
   }
 
   private async validateMechanic(
@@ -92,7 +91,7 @@ export class AppoitmentValidator {
   }
 
   private async validateAppointmentLimit(date: Date): Promise<void> {
-    const dateCopy = toEsEcDate(new Date(date))
+    const dateCopy = new Date(date)
     const minutesRange = [0, 30]
     const minutesOfDate = dateCopy.getMinutes()
     const minutes = minutesRange.find((minute) => minutesOfDate <= minute) ?? 0
@@ -106,12 +105,10 @@ export class AppoitmentValidator {
       },
     })
 
-    const startTime = toEsEcDate(new Date(dateCopy))
-    const endTime = toEsEcDate(new Date(dateCopy))
+    const startTime = new Date(dateCopy)
+    const endTime = new Date(dateCopy)
 
     endTime.setMinutes(startTime.getMinutes() + 30)
-
-    console.log(startTime, endTime, 'limit')
 
     const appointments = await this.appointmentsService.appointments({
       where: {
