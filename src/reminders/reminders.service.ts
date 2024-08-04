@@ -4,7 +4,6 @@ import { UpdateReminderDto } from './dto/update-reminder.dto'
 import { Reminder } from '@prisma/client'
 import { PrismaService } from '../prisma/prisma.service'
 import { ReminderNotFoundException } from './exceptions/reminder-not-found'
-import { getLocalDate } from 'src/shared/functions/local-date'
 import { IReminderFilters } from './interfaces/i-reminder-filters'
 import { RemindersGateway } from './reminders.gateway'
 import { validateUserExistence } from 'src/shared/validations/user-existence-validator'
@@ -29,10 +28,19 @@ export class RemindersService {
     })
 
     const firstReminders = firstRemindersToFilter.filter((reminder) => {
-      const now = getLocalDate()
+      const now = new Date()
       const reminderDate = new Date(reminder.reminderDate)
       const dateMinutesBefore = new Date(
         reminderDate.getTime() - reminder.notificationMinutesBefore * 60000 - 1,
+      )
+
+      console.log(
+        'now',
+        now,
+        'reminderDate',
+        reminderDate,
+        'dateMinutesBefore',
+        dateMinutesBefore,
       )
 
       return now >= dateMinutesBefore && now <= reminderDate
@@ -47,7 +55,7 @@ export class RemindersService {
     })
 
     const secondReminders = secondRemindersToFilter.filter((reminder) => {
-      const now = getLocalDate()
+      const now = new Date()
       const reminderDate = new Date(reminder.reminderDate)
       const dateMinuteBefore = new Date(reminderDate.getTime() - 60000 - 1)
       const dateMinuteAfter = new Date(reminderDate.getTime() + 60000 - 1)
