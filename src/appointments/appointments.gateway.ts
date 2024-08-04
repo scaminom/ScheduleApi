@@ -7,7 +7,7 @@ import {
 import { Role } from '@prisma/client'
 import { Server, Socket } from 'socket.io'
 import { NotificationsService } from 'src/notifications/notifications.service'
-import { toEsEcDate } from 'src/shared/functions/local-date'
+import { stringLocaleDate } from 'src/shared/functions/local-date'
 import { SubscriptionsService } from 'src/subscriptions/subscriptions.service'
 import { IAppointmentWithUser } from './interfaces/i-appointment-with-user'
 
@@ -36,7 +36,7 @@ export class AppointmentsGateway {
       subscriptions.forEach((subscription) => {
         this.notificationsService.sendPushNotification({
           title: 'Nueva cita',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${stringLocaleDate(appointment.date)}`,
           endpoint: subscription.token,
         })
       })
@@ -56,7 +56,7 @@ export class AppointmentsGateway {
       subscriptions.forEach((subscription) => {
         this.notificationsService.sendPushNotification({
           title: 'Cita actualizada',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${stringLocaleDate(appointment.date)}`,
           endpoint: subscription.token,
         })
       })
@@ -76,7 +76,7 @@ export class AppointmentsGateway {
       subscriptions.forEach((subscription) => {
         this.notificationsService.sendPushNotification({
           title: 'Cita cancelada',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${stringLocaleDate(appointment.date)}`,
           endpoint: subscription.token,
         })
       })
@@ -94,7 +94,7 @@ export class AppointmentsGateway {
       subscriptions.forEach((subscription) => {
         this.notificationsService.sendPushNotification({
           title: 'Cita agendada en 10 minutos',
-          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `Cliente: ${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${stringLocaleDate(appointment.date)}`,
           endpoint: subscription.token,
         })
       })
@@ -112,7 +112,7 @@ export class AppointmentsGateway {
       subscriptions.forEach((subscription) => {
         this.notificationsService.sendPushNotification({
           title: 'Cita agendada para este momento',
-          body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${toEsEcDate(new Date(appointment.date))}`,
+          body: `${appointment.clientName} - Asignado a: ${appointment.user.firstName} ${appointment.user.lastName} - ${stringLocaleDate(appointment.date)}`,
           endpoint: subscription.token,
         })
       })
