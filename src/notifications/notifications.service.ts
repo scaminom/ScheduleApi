@@ -32,9 +32,6 @@ export class NotificationsService {
         apns: {
           headers: {
             'apns-priority': '5',
-            'apns-expiration': String(
-              Math.floor(Date.now() / 1000) + 60 * 60 * 24,
-            ),
           },
           payload: {
             aps: {
