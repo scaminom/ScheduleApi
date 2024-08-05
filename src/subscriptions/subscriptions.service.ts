@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { PrismaService } from '../prisma/prisma.service'
 import { CreateSubscriptionDto } from './dto/create-subscription.dto'
 import { Prisma, Role, Subscription } from '@prisma/client'
@@ -9,6 +9,7 @@ import { SubscriptionAlreadyExistsException } from './exceptions/subscription-al
 
 @Injectable()
 export class SubscriptionsService {
+  private readonly logger = new Logger(SubscriptionsService.name)
   constructor(
     private readonly prisma: PrismaService,
     private readonly cryptoService: CryptoService,
@@ -137,17 +138,21 @@ export class SubscriptionsService {
   }
 
   async deleteSubscription(token: string) {
-    const subscription = await this.prisma.subscription.findFirst({
-      where: { token },
-    })
+    try {
+      const subscription = await this.prisma.subscription.findFirst({
+        where: { token },
+      })
 
-    if (!subscription) {
-      throw new SubscriptionNotFoundException()
+      if (!subscription) {
+        throw new SubscriptionNotFoundException()
+      }
+
+      await this.prisma.subscription.delete({
+        where: { id: subscription.id },
+      })
+    } catch (error) {
+      this.logger.error(error)
     }
-
-    await this.prisma.subscription.delete({
-      where: { id: subscription.id },
-    })
   }
 
   async disableSubscriptionsByUser(userCI: string) {
