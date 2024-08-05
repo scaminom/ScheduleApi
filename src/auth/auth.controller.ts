@@ -37,7 +37,6 @@ export class AuthController {
     return this.authService.signIn(signInDto.ci, signInDto.password)
   }
 
-  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('signup')
   @ApiOperation({ summary: 'User Signup' })
