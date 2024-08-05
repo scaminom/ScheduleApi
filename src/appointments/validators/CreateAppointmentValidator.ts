@@ -49,7 +49,7 @@ export class AppoitmentValidator {
   private validateDateAndTime(date: Date): void {
     const dateCopy = toEsEcDate(new Date(date))
 
-    if (dateCopy < toEsEcDate(new Date())) {
+    if (new Date() > new Date(date)) {
       throw new AppointmentPastDateException()
     }
     if (dateCopy.getHours() < 8 || dateCopy.getHours() > 17) {
