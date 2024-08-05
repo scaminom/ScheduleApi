@@ -9,6 +9,6 @@ import { InspectionsGateway } from './inspections.gateway'
   controllers: [InspectionsController],
   imports: [PrismaModule, forwardRef(() => AppointmentsModule)],
   providers: [InspectionsService, InspectionsGateway],
-  exports: [InspectionsService],
+  exports: [InspectionsService, InspectionsGateway],
 })
 export class InspectionsModule {}
