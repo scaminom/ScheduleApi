@@ -25,11 +25,18 @@ export class AppointmentsGateway {
   @WebSocketServer()
   server: Server
 
+  private allowedRoles: Role[] = [
+    'ADMIN',
+    'SECRETARY',
+    'MECHANIC',
+    'TECHNICIAN_MECHANIC',
+  ]
+
   async broadcastAppointmentCreation(appointment: IAppointmentWithUser) {
     this.server.to('mechanics').emit('appointments-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(
-      Role.MECHANIC,
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
     )
 
     try {
@@ -48,8 +55,8 @@ export class AppointmentsGateway {
   async broadcastAppointmentUpdate(appointment: IAppointmentWithUser) {
     this.server.to('mechanics').emit('appointments-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(
-      Role.MECHANIC,
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
     )
 
     try {
@@ -68,8 +75,8 @@ export class AppointmentsGateway {
   async broadcastAppointmentDeletion(appointment: IAppointmentWithUser) {
     this.server.to('mechanics').emit('appointments-change')
 
-    const subscriptions = await this.subscriptionsService.findByRole(
-      Role.MECHANIC,
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
     )
 
     try {
@@ -86,8 +93,8 @@ export class AppointmentsGateway {
   }
 
   async broadcastAppointmentReminder(appointment: IAppointmentWithUser) {
-    const subscriptions = await this.subscriptionsService.findByRole(
-      Role.MECHANIC,
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
     )
 
     try {
@@ -104,8 +111,8 @@ export class AppointmentsGateway {
   }
 
   async broadcastAppointmentNotification(appointment: IAppointmentWithUser) {
-    const subscriptions = await this.subscriptionsService.findByRole(
-      Role.MECHANIC,
+    const subscriptions = await this.subscriptionsService.findByRoles(
+      this.allowedRoles,
     )
 
     try {
